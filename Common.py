@@ -1,3 +1,6 @@
+#coding: utf8
+#author: Tian Xia (summer.xia1@pactera.com)
+
 from collections import defaultdict, namedtuple, Counter
 from operator import methodcaller, attrgetter, itemgetter, add
 from optparse import OptionParser
@@ -162,7 +165,7 @@ def getInstalledPackages():
   packages = sorted(["%s==%s" % (i.key, i.version) for i in packages])
   return packages
 
-def eq(v1, v2, prec = EPSILON):
+def eq(v1, v2, prec=EPSILON):
   return abs(v1 - v2) < prec
 
 def getMemory(size_type="rss"):
