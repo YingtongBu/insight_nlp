@@ -8,7 +8,7 @@ import json
 
 from EmailSender import BufferingSMTPHandler
 from NLP import Processor
-from crawlers import Scraper
+from Crawlers import Scraper
 
 def saveJson(list_news, file):
   with open(file + '.json', 'w') as fp:

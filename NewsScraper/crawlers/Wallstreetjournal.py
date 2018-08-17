@@ -6,7 +6,7 @@ This modules implements the scraper_wsj which is used to scrap news from Reuters
 import bs4
 import datetime as dt
 import logging
-from crawlers.clean import cleanText
+from Crawlers.Clean import cleanText
 from NLP import newsTitleFilter, newsSummaryFilter
 
 logger = logging.getLogger("NewsScraper.crawlers.wsj")

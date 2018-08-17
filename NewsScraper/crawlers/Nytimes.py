@@ -6,7 +6,7 @@ The New York Times
 """
 import requests
 import bs4
-from crawlers.clean import cleanText
+from Crawlers.Clean import cleanText
 import datetime as dt
 import logging
 from NLP import newsTitleFilter, newsSummaryFilter

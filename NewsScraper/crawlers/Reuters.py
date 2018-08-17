@@ -7,7 +7,7 @@ Reuters
 import requests
 import bs4
 import datetime as dt
-from crawlers.clean import cleanText
+from Crawlers.Clean import cleanText
 import logging
 from NLP import newsTitleFilter, newsSummaryFilter
 
