@@ -81,7 +81,7 @@ if __name__ == '__main__':
             help="change USERNAME of Wall Street Journal")
   parser.add_option("-w", "--wsjPassword", default='ready2ca',
             help="change PASSWORD of Wall Street Journal")
-  parser.add_option("-w", "--emailAddr", default='xinyi.wu5@pactera.com',
+  parser.add_option("--emailAddr", default='xinyi.wu5@pactera.com',
                     help="email ADDRESSES to send logs (separate by ',')")
   parser.add_option("-q", "--quiet",
             action="store_false", dest="verbose", default=True,
