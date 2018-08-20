@@ -29,7 +29,7 @@ def defineCFG():
   return cfg
 
 def eventInput():
-  file = open('./BigEvents.csv', encoding='utf-8')
+  file = open('./BigEvents.data', encoding='utf-8')
   eventDf = pd.DataFrame.from_csv(file,index_col=None, header=None)
   objectDf = eventDf.select_dtypes(['object'])
   eventDf[objectDf.columns] = objectDf.apply(lambda x: x.str.strip())
@@ -37,7 +37,7 @@ def eventInput():
   return eventDf
 
 def makeCompanyDictionary():
-  file = open('./S&P500.csv', encoding='utf-8')
+  file = open('./S&P500.data', encoding='utf-8')
   df = pd.DataFrame.from_csv(file, index_col=None)
   companyNameList = df["Name"]
   companySymbolList = df["Symbol"]
