@@ -22,16 +22,14 @@ out/
 *.h5
 *.pkl
 *.csv
-BiLstmCnnCrf.code-workspace
-chineseWordVector
 *.temp
-*.data
 *.log
 
 *.iml
 META-INF
 upload.to.servers.sh
 
+!*.data
 !*.java
 !*.py
 !*.h
