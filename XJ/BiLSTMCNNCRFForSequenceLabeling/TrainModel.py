@@ -46,3 +46,6 @@ def trainModel():
   model.storeResults('results/Chinese_NER_results.csv')
   model.modelSavePath = "models/[ModelName]_[DevScore]_[TestScore]_[Epoch].h5"
   model.fit(epochs=25)
+
+if __name__ == '__main__':
+  pass
