@@ -24,6 +24,8 @@ out/
 *.csv
 BiLstmCnnCrf.code-workspace
 chineseWordVector
+*.temp
+*.data
 
 *.iml
 META-INF
