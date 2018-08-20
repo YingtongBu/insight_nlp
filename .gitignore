@@ -26,6 +26,7 @@ BiLstmCnnCrf.code-workspace
 chineseWordVector
 *.temp
 *.data
+*.log
 
 *.iml
 META-INF

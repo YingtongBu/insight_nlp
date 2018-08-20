@@ -176,7 +176,7 @@ def outputProcessing(idRecordFile, outputFile, groundTruthFile):
       accurateNum += 1
   
   accuracy = accurateNum / 1120
-  print('accuracy = ', accuracy)
+  print(f'accuracy: {accuracy}')
 
 def preprocess(wordVectorFile, trainJiaFangDataFile, 
                testJiaFangDataFile, trainSetModelFile,
