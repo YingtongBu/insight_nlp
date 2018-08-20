@@ -1,4 +1,6 @@
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
+#coding: utf8
+#author: Xin Jin (xin.jin12@pactera.com)
 from __future__ import print_function
 import os
 import logging

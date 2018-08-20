@@ -1,4 +1,7 @@
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
+#coding: utf8
+#author: Xin Jin (xin.jin12@pactera.com)
+
 import DataProcessing
 import optparse
 import TrainModel
