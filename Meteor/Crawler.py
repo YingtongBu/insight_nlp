@@ -42,7 +42,7 @@ class Crawler:
     # create store folder path
     os.mkdir(search_item)
     for items in search_keywords:
-      f = open(search_item + '/' + items + ".csv", "w+")
+      newFile = open(search_item + '/' + items + ".csv", "w+")
       for iter in range(loop_num):
         print('page' + str(iter))
         res = service.cse().list(
@@ -53,10 +53,10 @@ class Crawler:
         ).execute()
 
         #start saving
-        myWriter = csv.writer(f, delimiter = ',')
+        myWriter = csv.writer(newFile, delimiter = ',')
         rlist = []
         for iter in range(len(res['items'])):
           snippet = res['items'][iter]['snippet'].replace('\n', '')
           rlist.append([snippet])
         myWriter.writerows(rlist)
-      f.close()
+      newFile.close()
