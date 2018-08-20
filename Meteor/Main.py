@@ -12,7 +12,6 @@ if __name__ == '__main__':
   parser.add_option('-o', '--outputPath', default='result.txt')
   (options, args) = parser.parse_args()
 
-
   print('--------finished!----------')
 
 
