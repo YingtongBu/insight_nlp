@@ -9,6 +9,9 @@ import data_helpers
 from text_cnn import TextCNN
 from tensorflow.contrib import learn
 
+# For GPU selection
+os.environ["CUDA_VISIBLE_DEVICES"] = "3"
+
 # Parameters
 # ==================================================
 
@@ -47,6 +50,7 @@ def preprocess():
 
     # Load data
     print("Loading data...")
+    #TODO: ADD our data here
     x_text, y = data_helpers.load_data_and_labels(FLAGS.positive_data_file, FLAGS.negative_data_file)
 
     # Build vocabulary
