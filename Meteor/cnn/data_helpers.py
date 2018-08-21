@@ -23,7 +23,7 @@ def clean_str(string):
     return string.strip().lower()
 
 
-def load_data_and_labels(positive_data_file, negative_data_file):
+def load_data_and_labels(filePath):
     """
     Loads MR polarity data from files, splits the data into words and generates labels.
     Returns split sentences and labels.
@@ -33,6 +33,8 @@ def load_data_and_labels(positive_data_file, negative_data_file):
     positive_examples = [s.strip() for s in positive_examples]
     negative_examples = list(open(negative_data_file, "r", encoding='utf-8').readlines())
     negative_examples = [s.strip() for s in negative_examples]
+    open(filePath, 'r', encoding='latin').readlines()
+    data = newFile.readlines()[1:]
     # Split by words
     x_text = positive_examples + negative_examples
     x_text = [clean_str(sent) for sent in x_text]

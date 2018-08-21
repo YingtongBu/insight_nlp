@@ -8,13 +8,13 @@ import numpy as np
 def preProcessENG(filePath):
   trainData = []
   trainX, trainY = [], []
-  with open(filePath, encoding = 'latin') as newFile:
+  with open(filePath, 'r', encoding = 'latin') as newFile:
     data = newFile.readlines()[1: ]
+    print(type(data))
     print('Loading data ...')
     for row in tq(data):
       row = row.split('\t')
       trainData.append([row[0], row[1]])
-
   for index, item in enumerate(trainData):
     if item[0].isdigit() != True:
       pass
