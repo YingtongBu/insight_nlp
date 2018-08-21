@@ -19,13 +19,6 @@ model.*
 direct-ranker
 target/
 out/
-*.h5
-*.pkl
-*.csv
-*.temp
-*.log
-*.wav
-chineseWordVector
 
 *.iml
 META-INF
