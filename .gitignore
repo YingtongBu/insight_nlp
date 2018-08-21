@@ -26,7 +26,6 @@ out/
 *.log
 *.wav
 chineseWordVector
-*.data
 
 *.iml
 META-INF
