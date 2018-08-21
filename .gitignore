@@ -24,6 +24,9 @@ out/
 *.csv
 *.temp
 *.log
+*.wav
+chineseWordVector
+*.data
 
 *.iml
 META-INF
