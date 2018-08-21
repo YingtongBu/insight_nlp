@@ -17,8 +17,8 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "3"
 
 # Data loading params
 tf.flags.DEFINE_float("dev_sample_percentage", .1, "Percentage of the training data to use for validation")
-tf.flags.DEFINE_string("positive_data_file", "./data/rt-polaritydata/rt-polarity.pos", "Data source for the positive data.")
-tf.flags.DEFINE_string("negative_data_file", "./data/rt-polaritydata/rt-polarity.neg", "Data source for the negative data.")
+tf.flags.DEFINE_string("data_file", "./data/TotalEvent.txt", "Data source for "
+                                                           "the data.")
 
 # Model Hyperparameters
 tf.flags.DEFINE_integer("embedding_dim", 128, "Dimensionality of character embedding (default: 128)")
@@ -51,7 +51,7 @@ def preprocess():
     # Load data
     print("Loading data...")
     #TODO: ADD our data here
-    x_text, y = data_helpers.load_data_and_labels(FLAGS.positive_data_file, FLAGS.negative_data_file)
+    x_text, y = data_helpers.load_data_and_labels(FLAGS.data_file)
 
     # Build vocabulary
     max_document_length = max([len(x.split(" ")) for x in x_text])
