@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-
 from __future__ import absolute_import
-
 import keras
 from keras import backend as K
 from keras import regularizers
@@ -11,26 +8,20 @@ from keras.engine import Layer, InputSpec
 import tensorflow as tf
 
 def path_energy(y, x, U, b_start=None, b_end=None, mask=None):
-    '''Calculates the energy of a tag path y for a given input x (with mask),
-    transition energies U and boundary energies b_start, b_end.'''
     x = add_boundary_energy(x, b_start, b_end, mask)
     return path_energy0(y, x, U, mask)
 
 
 def path_energy0(y, x, U, mask=None):
-    '''Path energy without boundary potential handling.'''
     n_classes = K.shape(x)[2]
     y_one_hot = K.one_hot(y, n_classes)
 
-    # Tag path energy
     energy = K.sum(x * y_one_hot, 2)
     energy = K.sum(energy, 1)
 
-    # Transition energy
     y_t = y[:, :-1]
     y_tp1 = y[:, 1:]
     U_flat = K.reshape(U, [-1])
-    # Convert 2-dim indices (y_t, y_tp1) of U to 1-dim indices of U_flat:
     flat_indices = y_t * n_classes + y_tp1
     U_y_t_tp1 = K.gather(U_flat, flat_indices)
 
@@ -46,16 +37,6 @@ def path_energy0(y, x, U, mask=None):
 
 
 def sparse_chain_crf_loss(y, x, U, b_start=None, b_end=None, mask=None):
-    '''Given the true sparsely encoded tag sequence y, input x (with mask),
-    transition energies U, boundary energies b_start and b_end, it computes
-    the loss function of a Linear Chain Conditional Random Field:
-
-    loss(y, x) = NNL(P(y|x)), where P(y|x) = exp(E(y, x)) / Z.
-    So, loss(y, x) = - E(y, x) + log(Z)
-
-    Here, E(y, x) is the tag path energy, and Z is the normalization constant.
-    The values log(Z) is also called free energy.
-    '''
     x = add_boundary_energy(x, b_start, b_end, mask)
     energy = path_energy0(y, x, U, mask)
     energy -= free_energy0(x, U, mask)
@@ -64,16 +45,12 @@ def sparse_chain_crf_loss(y, x, U, b_start=None, b_end=None, mask=None):
 
 
 def chain_crf_loss(y, x, U, b_start=None, b_end=None, mask=None):
-    '''Variant of sparse_chain_crf_loss but with one-hot encoded tags y.'''
     y_sparse = K.argmax(y, -1)
     y_sparse = K.cast(y_sparse, 'int32')
     return sparse_chain_crf_loss(y_sparse, x, U, b_start, b_end, mask)
 
 
 def add_boundary_energy(x, b_start=None, b_end=None, mask=None):
-    '''Given the observations x, it adds the start boundary energy b_start (resp.
-    end boundary energy b_end on the start (resp. end) elements and multiplies
-    the mask.'''
     if mask is None:
         if b_start is not None:
             x = K.concatenate([x[:, :1, :] + b_start, x[:, 1:, :]], axis=1)
@@ -97,8 +74,6 @@ def add_boundary_energy(x, b_start=None, b_end=None, mask=None):
 
 
 def viterbi_decode(x, U, b_start=None, b_end=None, mask=None):
-    '''Computes the best tag sequence y for a given input x, i.e. the one that
-    maximizes the value of path_energy.'''
     x = add_boundary_energy(x, b_start, b_end, mask)
 
     alpha_0 = x[:, 0, :]
@@ -114,14 +89,11 @@ def viterbi_decode(x, U, b_start=None, b_end=None, mask=None):
     return y
 
 def free_energy(x, U, b_start=None, b_end=None, mask=None):
-    '''Computes efficiently the sum of all path energies for input x, when
-    runs over all possible tag sequences.'''
     x = add_boundary_energy(x, b_start, b_end, mask)
     return free_energy0(x, U, mask)
 
 
 def free_energy0(x, U, mask=None):
-    '''Free energy without boundary potential handling.'''
     initial_states = [x[:, 0, :]]
     last_alpha, _ = _forward(x,
                              lambda B: [K.logsumexp(B, axis=1)],
@@ -132,8 +104,6 @@ def free_energy0(x, U, mask=None):
 
 
 def _forward(x, reduce_step, initial_states, U, mask=None):
-    '''Forward recurrence of the linear chain crf.'''
-
     def _forward_step(energy_matrix_t, states):
         alpha_tm1 = states[-1]
         new_states = reduce_step(K.expand_dims(alpha_tm1, 2) + energy_matrix_t)
@@ -162,7 +132,6 @@ def batch_gather(reference, indices):
 
 
 def _backward(gamma, mask):
-    '''Backward recurrence of the linear chain crf.'''
     gamma = K.cast(gamma, 'int32')
 
     def _backward_step(gamma_t, states):
@@ -179,93 +148,12 @@ def _backward(gamma, mask):
 
     if mask is not None:
         mask = K.cast(mask, dtype='int32')
-        # mask output
         y *= mask
-        # set masked values to -1
         y += -(1 - mask)
     return y
 
 
 class ChainCRF(Layer):
-    '''A Linear Chain Conditional Random Field output layer.
-
-    It carries the loss function and its weights for computing
-    the global tag sequence scores. While training it acts as
-    the identity function that passes the inputs to the subsequently
-    used loss function. While testing it applies Viterbi decoding
-    and returns the best scoring tag sequence as one-hot encoded vectors.
-
-    # Arguments
-        init: weight initialization function for chain energies U.
-            Can be the name of an existing function (str),
-            or a Theano function (see: [initializers](../initializers.md)).
-        U_regularizer: instance of [WeightRegularizer](../regularizers.md)
-        (eg. L1 or L2 regularization), applied to the transition weight matrix.
-        b_start_regularizer: instance of [WeightRegularizer]
-        (../regularizers.md),
-            applied to the start bias b.
-        b_end_regularizer: instance of [WeightRegularizer](../regularizers.md)
-            module, applied to the end bias b.
-        b_start_constraint: instance of the [constraints](../constraints.md)
-            module, applied to the start bias b.
-        b_end_constraint: instance of the [constraints](../constraints.md)
-            module, applied to the end bias b.
-        weights: list of Numpy arrays for initializing [U, b_start, b_end].
-            Thus it should be a list of 3 elements of shape
-            [(n_classes, n_classes), (n_classes, ), (n_classes, )]
-
-    # Input shape
-        3D tensor with shape `(nb_samples, timesteps, nb_classes)`, where
-        ´timesteps >= 2`and `nb_classes >= 2`.
-
-    # Output shape
-        Same shape as input.
-
-    # Masking
-        This layer supports masking for input sequences of variable length.
-
-    # Example
-
-    ```python
-    # As the last layer of sequential layer with
-    # model.output_shape == (None, timesteps, nb_classes)
-    crf = ChainCRF()
-    model.add(crf)
-    # now: model.output_shape == (None, timesteps, nb_classes)
-
-    # Compile model with chain crf loss (and one-hot encoded labels) and 
-    # accuracy
-    model.compile(loss=crf.loss, optimizer='sgd', metrics=['accuracy'])
-
-    # Alternatively, compile model with sparsely encoded labels and sparse 
-    # accuracy:
-    model.compile(loss=crf.sparse_loss, optimizer='sgd', 
-    metrics=['sparse_categorical_accuracy'])
-    ```
-
-    # Gotchas
-
-    ## Model loading
-
-    When you want to load a saved model that has a crf output, then loading
-    the model with 'keras.models.load_model' won't work properly because
-    the reference of the loss function to the transition parameters is lost. To
-    fix this, you need to use the parameter 'custom_objects' as follows:
-
-    ```python
-    from keras.layer.crf import create_custom_objects:
-    model = keras.models.load_model(filename, 
-    custom_objects=create_custom_objects())
-    ```
-
-    ## Temporal sample weights
-
-    Given a ChainCRF instance crf both loss functions, 
-    crf.loss and crf.sparse_loss
-    return a tensor of shape (batch_size, 1) and not (batch_size, maxlen).
-    that sample weighting in temporal mode.
-
-    '''
     def __init__(self, init='glorot_uniform',
                  U_regularizer=None,
                  b_start_regularizer=None,
@@ -346,22 +234,14 @@ class ChainCRF(Layer):
         return K.in_train_phase(x, y_pred_one_hot)
 
     def loss(self, y_true, y_pred):
-        '''Linear Chain Conditional Random Field loss function.
-        '''
         mask = self._fetch_mask()
         return chain_crf_loss(y_true, y_pred, self.U, self.b_start, self.b_end, 
                               mask)
 
     def sparse_loss(self, y_true, y_pred):
-        '''Linear Chain Conditional Random Field loss function with sparse
-        tag sequences.
-        '''
         y_true = K.cast(y_true, 'int32')
         y_true = K.squeeze(y_true, 2)
         mask = self._fetch_mask()
-        # print('------------------sparse_loss------------------')
-        # print(tf.Print(y_pred))
-        # print(tf.Print(y_true))
         return sparse_chain_crf_loss(y_true, y_pred, self.U, self.b_start, 
                                      self.b_end, mask)
 

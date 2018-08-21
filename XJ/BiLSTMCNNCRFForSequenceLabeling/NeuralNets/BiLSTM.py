@@ -1,13 +1,5 @@
-"""
-A bidirectional LSTM with optional CRF and character-based presentation for NLP sequence tagging used for multi-task learning.
-
-Author: Nils Reimers
-License: Apache-2.0
-"""
-
 from __future__ import print_function
 from util import BIOF1Validation
-
 import keras
 from keras.optimizers import *
 from keras.models import Model
@@ -20,17 +12,14 @@ import time
 import os
 import random
 import logging
-
 from .KerasLayers.ChainCRF import ChainCRF
 
 class BiLSTM:
     def __init__(self, params=None):
-        # modelSavePath = Path for storing models, resultsSavePath = Path for storing output labels while training
         self.models = None
         self.modelSavePath = None
         self.resultsSavePath = None
 
-        # Hyperparameters for the network
         defaultParams = {'dropout': (0.5, 0.5), 'classifier': ['Softmax'], 'LSTM-Size': (100,), 'customClassifier': {},
                          'optimizer': 'adam',
                          'charEmbeddings': None, 'charEmbeddingsSize': 30, 'charFilterSize': 30, 'charFilterLength': 3, 'charLSTMSize': 25, 'maxCharLength': 25,
@@ -48,8 +37,6 @@ class BiLSTM:
     def setDataset(self, datasets, data):
         self.datasets = datasets
         self.data = data
-
-        # Create some helping variables
         self.mainModelName = None
         self.epoch = 0
         self.learning_rate_updates = {'sgd': {1: 0.1, 3: 0.05, 5: 0.01}}
@@ -108,7 +95,6 @@ class BiLSTM:
             inputNodes.append(feature_input)
             mergeInputLayers.append(feature_embedding)
         
-        # :: Character Embeddings ::
         if self.params['charEmbeddings'] not in [None, "None", "none", False, "False", "false"]:
             charset = self.mappings['characters']
             charEmbeddingsSize = self.params['charEmbeddingsSize']
@@ -119,21 +105,21 @@ class BiLSTM:
                 vector = np.random.uniform(-limit, limit, charEmbeddingsSize)
                 charEmbeddings.append(vector)
 
-            charEmbeddings[0] = np.zeros(charEmbeddingsSize)  # Zero padding
+            charEmbeddings[0] = np.zeros(charEmbeddingsSize)  
             charEmbeddings = np.asarray(charEmbeddings)
 
             chars_input = Input(shape=(None, maxCharLen), dtype='int32', name='char_input')
-            mask_zero = (self.params['charEmbeddings'].lower() == 'lstm')  # Zero mask only works with LSTM
+            mask_zero = (self.params['charEmbeddings'].lower() == 'lstm') 
             chars = TimeDistributed(
                 Embedding(input_dim=charEmbeddings.shape[0], output_dim=charEmbeddings.shape[1],
                           weights=[charEmbeddings],
                           trainable=True, mask_zero=mask_zero), name='char_emd')(chars_input)
 
-            if self.params['charEmbeddings'].lower() == 'lstm':  # Use LSTM for char embeddings from Lample et al., 2016
+            if self.params['charEmbeddings'].lower() == 'lstm': 
                 charLSTMSize = self.params['charLSTMSize']
                 chars = TimeDistributed(Bidirectional(LSTM(charLSTMSize, return_sequences=False)), name="char_lstm")(
                     chars)
-            else:  # Use CNNs for character embeddings from Ma and Hovy, 2016
+            else:  
                 charFilterSize = self.params['charFilterSize']
                 charFilterLength = self.params['charFilterLength']
                 chars = TimeDistributed(Conv1D(charFilterSize, charFilterLength, padding='same'), name="char_cnn")(
@@ -143,8 +129,7 @@ class BiLSTM:
             self.params['featureNames'].append('characters')
             mergeInputLayers.append(chars)
             inputNodes.append(chars_input)
-            
-        # :: Task Identifier :: 
+
         if self.params['useTaskIdentifier']:
             self.addTaskIdentifier()
             
@@ -160,8 +145,7 @@ class BiLSTM:
             merged_input = concatenate(mergeInputLayers)
         else:
             merged_input = mergeInputLayers[0]
-             
-        # Add LSTMs
+
         shared_layer = merged_input
         logging.info("LSTM-Size: %s" % str(self.params['LSTM-Size']))
         cnt = 1
@@ -197,8 +181,6 @@ class BiLSTM:
                     crf = ChainCRF(name=modelName + '_crf')
                     output = crf(output)
                     lossFct = crf.sparse_loss
-                    # print('-----------------debug CRF loss------------------')
-                    # print(output)
                 elif isinstance(classifier, (list, tuple)) and classifier[0] == 'LSTM':
                             
                     size = classifier[1]
@@ -210,18 +192,16 @@ class BiLSTM:
                         if self.params['dropout'] > 0.0:
                             output = TimeDistributed(Dropout(self.params['dropout']), name=modelName + '_dropout_' + str(self.params['dropout']) + "_" + str(cnt))(output)                    
                 else:
-                    assert(False)  # Wrong classifier
+                    assert(False)  
                     
                 cnt += 1
-                
-            # :: Parameters for the optimizer ::
+
             optimizerParams = {}
             if 'clipnorm' in self.params and self.params['clipnorm'] is not None and self.params['clipnorm'] > 0:
                 optimizerParams['clipnorm'] = self.params['clipnorm']
             
             if 'clipvalue' in self.params and self.params['clipvalue'] is not None and self.params['clipvalue'] > 0:
                 optimizerParams['clipvalue'] = self.params['clipvalue']
-            
             if self.params['optimizer'].lower() == 'adam':
                 opt = Adam(**optimizerParams)
             elif self.params['optimizer'].lower() == 'nadam':
@@ -238,10 +218,7 @@ class BiLSTM:
             model = Model(inputs=inputNodes, outputs=[output])
             model.compile(loss=lossFct, optimizer=opt)
             
-            model.summary(line_length=125)
-            #logging.info(model.get_config())
-            #logging.info("Optimizer: %s - %s" % (str(type(model.optimizer)), str(model.optimizer.get_config())))
-            
+            model.summary(line_length=125)        
             self.models[modelName] = model
 
     def trainModel(self):
@@ -268,12 +245,11 @@ class BiLSTM:
             self.trainMiniBatchRanges = {}            
             for modelName in self.modelNames:
                 trainData = self.data[modelName]['trainMatrix']
-                trainData.sort(key=lambda x: len(x['tokens']))  # Sort train matrix by sentence length
+                trainData.sort(key=lambda x: len(x['tokens']))  
                 trainRanges = []
                 oldSentLength = len(trainData[0]['tokens'])            
                 idxStart = 0
-                
-                #Find start and end of ranges with sentences with same length
+
                 for idx in range(len(trainData)):
                     sentLength = len(trainData[idx]['tokens'])
                     
@@ -282,11 +258,7 @@ class BiLSTM:
                         idxStart = idx
                     
                     oldSentLength = sentLength
-                
-                #Add last sentence
                 trainRanges.append((idxStart, len(trainData)))
-                     
-                #Break up ranges into smaller mini batch sizes
                 miniBatchRanges = []
                 for batchRange in trainRanges:
                     rangeLen = batchRange[1] - batchRange[0]
@@ -304,21 +276,16 @@ class BiLSTM:
                 
         if modelNames is None:
             modelNames = self.modelNames
-            
-        #Shuffle training data
+
         for modelName in modelNames:      
-            #1. Shuffle sentences that have the same length
             x = self.data[modelName]['trainMatrix']
             for dataRange in self.trainSentenceLengthRanges[modelName]:
                 for i in reversed(range(dataRange[0] + 1, dataRange[1])):
-                    # pick an element in x[:i+1] with which to exchange x[i]
                     j = random.randint(dataRange[0], i)
                     x[i], x[j] = x[j], x[i]
-               
-            #2. Shuffle the order of the mini batch ranges       
+                   
             random.shuffle(self.trainMiniBatchRanges[modelName])
         
-        #Iterate over the mini batch ranges
         if self.mainModelName is not None:
             rangeLength = len(self.trainMiniBatchRanges[self.mainModelName])
         else:
@@ -375,13 +342,10 @@ class BiLSTM:
             for modelName in self.evaluateModelNames:
                 logging.info("-- %s --" % (modelName))
                 dev_score, test_score = self.computeScore(modelName, self.data[modelName]['devMatrix'], self.data[modelName]['testMatrix'])
-                # print('test_score: ', test_score)
                 if dev_score > max_dev_score[modelName]:
                     max_dev_score[modelName] = dev_score
                     max_test_score[modelName] = test_score
                     no_improvement_since = 0
-
-                    #Save the model
                     if self.modelSavePath is not None:
                         self.saveModel(modelName, epoch, dev_score, test_score)
                 else:
@@ -402,7 +366,6 @@ class BiLSTM:
                 break
             
     def tagSentences(self, sentences):
-        # Pad characters
         if 'characters' in self.params['featureNames']:
             self.padCharacters(sentences)
 
@@ -413,7 +376,7 @@ class BiLSTM:
             for idx in range(len(sentences)):
                 unpaddedPredLabels = []
                 for tokenIdx in range(len(sentences[idx]['tokens'])):
-                    if sentences[idx]['tokens'][tokenIdx] != 0:  # Skip padding tokens
+                    if sentences[idx]['tokens'][tokenIdx] != 0:  
                         unpaddedPredLabels.append(paddedPredLabels[idx][tokenIdx])
 
                 predLabels.append(unpaddedPredLabels)
@@ -444,12 +407,7 @@ class BiLSTM:
                 nnInput.append(inputData)
             
             predictions = model.predict(nnInput, verbose=False)
-
-            # predictions = model.predict_prob(nnInput, verbose=False)
-            # print('-----------------debug---------------')
-            # print(predictions)
-            predictions = predictions.argmax(axis=-1)  # Predict classes            
-           
+            predictions = predictions.argmax(axis=-1)            
             predIdx = 0
             for idx in indices:
                 predLabels[idx] = predictions[predIdx]    
@@ -463,10 +421,7 @@ class BiLSTM:
         else:
             return self.computeAccScores(modelName, devMatrix, testMatrix)   
 
-    def computeF1Scores(self, modelName, devMatrix, testMatrix):
-        #train_pre, train_rec, train_f1 = self.computeF1(modelName, self.datasets[modelName]['trainMatrix'])
-        #print "Train-Data: Prec: %.3f, Rec: %.3f, F1: %.4f" % (train_pre, train_rec, train_f1)
-        
+    def computeF1Scores(self, modelName, devMatrix, testMatrix):    
         dev_pre, dev_rec, dev_f1 = self.computeF1(modelName, devMatrix)
         logging.info("Dev-Data: Prec: %.3f, Rec: %.3f, F1: %.4f" % (dev_pre, dev_rec, dev_f1))
         
@@ -480,10 +435,8 @@ class BiLSTM:
         test_acc = self.computeAcc(modelName, testMatrix)
         
         logging.info("Dev-Data: Accuracy: %.4f" % (dev_acc))
-        logging.info("Test-Data: Accuracy: %.4f" % (test_acc))
-        
-        return dev_acc, test_acc   
-        
+        logging.info("Test-Data: Accuracy: %.4f" % (test_acc)) 
+        return dev_acc, test_acc       
         
     def computeF1(self, modelName, sentences):
         labelKey = self.labelKeys[modelName]
@@ -496,8 +449,8 @@ class BiLSTM:
         labelKey = self.labelKeys[modelName]
         encodingScheme = labelKey[labelKey.index('_') + 1:]
         
-        pre, rec, f1 = BIOF1Validation.compute_f1(predLabels, correctLabels, idx2Label, 'O', encodingScheme)
-        pre_b, rec_b, f1_b = BIOF1Validation.compute_f1(predLabels, correctLabels, idx2Label, 'B', encodingScheme)
+        pre, rec, f1 = BIOF1Validation.computeF1(predLabels, correctLabels, idx2Label, 'O', encodingScheme)
+        pre_b, rec_b, f1_b = BIOF1Validation.computeF1(predLabels, correctLabels, idx2Label, 'B', encodingScheme)
         
         if f1_b > f1:
             logging.debug("Setting wrong tags to B- improves from %.4f to %.4f" % (f1, f1_b))
@@ -521,28 +474,24 @@ class BiLSTM:
         return numCorrLabels / float(numLabels)
     
     def padCharacters(self, sentences):
-        """ Pads the character representations of the words to the longest word in the dataset """
-        #Find the longest word in the dataset
         maxCharLen = self.params['maxCharLength']
         if maxCharLen <= 0:
             for sentence in sentences:
                 for token in sentence['characters']:
                     maxCharLen = max(maxCharLen, len(token))
-          
 
         for sentenceIdx in range(len(sentences)):
             for tokenIdx in range(len(sentences[sentenceIdx]['characters'])):
                 token = sentences[sentenceIdx]['characters'][tokenIdx]
 
-                if len(token) < maxCharLen:  # Token shorter than maxCharLen -> pad token
+                if len(token) < maxCharLen:  
                     sentences[sentenceIdx]['characters'][tokenIdx] = np.pad(token, (0, maxCharLen - len(token)), 'constant')
-                else:  # Token longer than maxCharLen -> truncate token
+                else:  
                     sentences[sentenceIdx]['characters'][tokenIdx] = token[0:maxCharLen]
     
         self.maxCharLen = maxCharLen
         
     def addTaskIdentifier(self):
-        """ Adds an identifier to every token, which identifies the task the token stems from """
         taskID = 0
         for modelName in self.modelNames:
             dataset = self.data[modelName]
