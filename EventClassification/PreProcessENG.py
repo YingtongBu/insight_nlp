@@ -2,6 +2,7 @@
 #coding: utf8
 #author: Yu Liu (yu.liu55@pactera.com)
 
+#todo: do not use this strange package.
 from tqdm import tqdm as tq
 import numpy as np
 
