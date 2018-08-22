@@ -249,10 +249,12 @@ class ChainCRF(Layer):
         config = {
             'init': initializers.serialize(self.init),
             'U_regularizer': regularizers.serialize(self.U_regularizer),
-            'b_start_regularizer': regularizers.serialize(self.b_start_regularizer),
+            'b_start_regularizer': regularizers.serialize(self.
+                                                          b_start_regularizer),
             'b_end_regularizer': regularizers.serialize(self.b_end_regularizer),
             'U_constraint': constraints.serialize(self.U_constraint),
-            'b_start_constraint': constraints.serialize(self.b_start_constraint),
+            'b_start_constraint': constraints.serialize(self.
+                                                        b_start_constraint),
             'b_end_constraint': constraints.serialize(self.b_end_constraint)
         }
         base_config = super(ChainCRF, self).get_config()
