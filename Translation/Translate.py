@@ -19,6 +19,7 @@ def run_quickstart(text):
   return(translation)
 
 if __name__ == '__main__':
+  #todo: code review: should use cmdline parameter.
   file = open('./TotalEvent.txt', encoding='latin')
   eventDf = pd.DataFrame.from_csv(file, index_col=None, sep='\t')
   trans = []
