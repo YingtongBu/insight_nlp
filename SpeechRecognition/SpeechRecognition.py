@@ -5,7 +5,7 @@ import speech_recognition as sr
 
 if __name__ == '__main__':
   r = sr.Recognizer()
-  mic = sr.Microphone(device_index=1)
+  mic = sr.Microphone(device_index=0)
   with mic as source:
     r.adjust_for_ambient_noise(source)
     audio = r.listen(source, phrase_time_limit=10, timeout=5)
