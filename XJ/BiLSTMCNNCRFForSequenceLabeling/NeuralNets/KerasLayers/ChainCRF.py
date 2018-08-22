@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+#coding: utf8
+#author: Xin Jin (xin.jin12@pactera.com)
 from __future__ import absolute_import
 import keras
 from keras import backend as K

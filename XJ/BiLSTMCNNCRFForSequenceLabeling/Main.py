@@ -25,7 +25,7 @@ if __name__ == '__main__':
   parser.add_option('-r', '--trainJiaFangDataFile', 
                     default='./DataForTaskTest/JiaFang/trainTemp1.data')
   parser.add_option('-e', '--testJiaFangDataFile', 
-                    default='./DataForTaskTest/JiaFang/testTemp1.temp')
+                    default='./DataForTaskTest/JiaFang/testTemp1.data')
   parser.add_option('-t', '--trainSetModelFile', 
                     default='./DataForModelTraining/Chinese/train.txt')
   parser.add_option('-x', '--testSetModelFile', 
@@ -33,7 +33,7 @@ if __name__ == '__main__':
   parser.add_option('-v', '--validationSetModelFile', 
                     default='./DataForModelTraining/Chinese/validation.txt')
   parser.add_option('-p', '--predictProbFile', 
-                    default='./DataForTaskTest/JiaFang/predictProb1.temp') 
+                    default='./DataForTaskTest/JiaFang/predictProb1.data') 
   parser.add_option('-d', '--idRecordFile', 
                     default='./idRecord.txt')
   parser.add_option('-i', '--inputFile', 
@@ -41,7 +41,7 @@ if __name__ == '__main__':
   parser.add_option('-o', '--outputFile', 
                     default='./outputFile.txt')
   parser.add_option('-g', '--groundTruthFile', 
-                    default='./DataForTaskTest/label.test_lower.csv')
+                    default='./DataForTaskTest/label.test_lower.data')
   (options, args) = parser.parse_args()
 
   main(options.wordVectorFile, options.trainJiaFangDataFile, 
