@@ -11,14 +11,14 @@ import os
 
 def runModel(inputFile, outputFile):
 
-  modelPathList = os.listdir('./Models')
+  modelPathList = os.listdir('./models')
   accuracyList = []
   for model in modelPathList:
     if model.split('_')[1] == 'Store':
       accuracyList.append(0)
     else:
       accuracyList.append(float(model.split('_')[1]))
-  modelFile = './Models/' + modelPathList[accuracyList.index(max(accuracyList))]
+  modelFile = './models/' + modelPathList[accuracyList.index(max(accuracyList))]
 
   with open(inputFile, 'r') as f:
     text = f.read()

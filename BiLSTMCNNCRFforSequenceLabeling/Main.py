@@ -39,7 +39,7 @@ if __name__ == '__main__':
   parser.add_option('-i', '--inputFile', 
                     default='./input.txt')
   parser.add_option('-o', '--outputFile', 
-                    default='./outputFile.txt')
+                    default='./output.txt')
   parser.add_option('-g', '--groundTruthFile', 
                     default='./DataForTaskTest/label.test_lower.data')
   (options, args) = parser.parse_args()
