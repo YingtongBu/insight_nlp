@@ -5,7 +5,7 @@ Install the requirements:
 ```
 pip3 install -r requirements
 ```
-You need to have the whole nltk dictionary in your computer.
+You need to have nltk dictionary in your computer.
 ```
 import nltk
 nltk.download()
