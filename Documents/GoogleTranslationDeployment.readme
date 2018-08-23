@@ -1,0 +1,33 @@
+1. 进入https://cloud.google.com/sdk/docs/ 下载macOS64位下的软件包，下载完成之后运行2和3.
+
+2. ./google-cloud-sdk/install.sh
+遇到 Do you want to help improve the Google Cloud SDK (Y/n)?  可以选n
+接着遇到 Do you want to continue (Y/n)?  选y
+之后打回车就行。
+
+3. ./google-cloud-sdk/bin/gcloud init
+You must log in to continue. Would you like to log in (Y/n)?  选y
+如果在服务器中配置，复制链接到浏览器进行登录，如果在本机，可能会直接弹出登录界面
+登录账号为pingankensho@gmail.com 密码可询问他人。
+登录后可能需要Enter verification code， 也可能直接就OK了。
+接着会跳出：
+Pick cloud project to use:
+ [1] my-project-1529355555567
+#!/usr/bin/env python3
+ [2] zinc-shard-207022
+ [3] zsproject-1529362184026
+ [4] Create a new project
+Please enter numeric choice or text value (must exactly match list
+item):  
+这里选3.
+
+4. 之后还需要安装一些package：
+ pip install --upgrade google-cloud
+ pip install gcloud
+ pip install --upgrade google-cloud-bigquery
+ pip install --upgrade google-cloud-translate
+
+5. 配置基本完成。将google-cloud-sdk 和 key放在一个目录下。 在python程序中加一行：
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'ZSProject-94cb8e930aab.json'
+(key需要写成相对的目录)
+之后就可以运行了，代码可以参考NLP/Translation/Translate.py
