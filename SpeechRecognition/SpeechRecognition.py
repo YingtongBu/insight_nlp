@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 #coding: utf8
 #author: Xin Jin (xin.jin12@pactera.com)
+
+# pip install SpeechRecognition
 import speech_recognition as sr 
 
 if __name__ == '__main__':
