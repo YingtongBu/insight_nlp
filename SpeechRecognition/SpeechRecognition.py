@@ -4,6 +4,7 @@
 import speech_recognition as sr 
 
 if __name__ == '__main__':
+  #todo: code review: please refactor as a function.
   r = sr.Recognizer()
   mic = sr.Microphone(device_index=0)
   with mic as source:
