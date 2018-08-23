@@ -6,7 +6,7 @@ from Common import *
 import jieba
 import jieba.posseg as pseg
 
-def convertFullToHalf(s):
+def convert_full_to_half(s):
   '''全角转半角'''
   n = []
   for char in s:
@@ -21,8 +21,8 @@ def convertFullToHalf(s):
     n.append(num)
   return ''.join(n)
 
-def segmentSentence(text, posTagging=False):
-  if posTagging:
+def segment_sentence(text, pos_tagging=False):
+  if pos_tagging:
     words, tags = [], []
     for token in pseg.cut(text):
       words.append(token.word)
@@ -33,6 +33,6 @@ def segmentSentence(text, posTagging=False):
 
 if __name__ == "__main__":
   text = "中国人民共和国今天成立了。"
-  print(segmentSentence(text, False))
-  print(segmentSentence(text, True))
+  print(segment_sentence(text, False))
+  print(segment_sentence(text, True))
 
