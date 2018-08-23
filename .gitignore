@@ -30,6 +30,7 @@ chineseWordVector
 META-INF
 upload.to.servers.sh
 
+!*.readme
 !*.data
 !*.java
 !*.py
