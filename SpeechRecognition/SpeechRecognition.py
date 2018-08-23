@@ -3,8 +3,7 @@
 #author: Xin Jin (xin.jin12@pactera.com)
 import speech_recognition as sr 
 
-if __name__ == '__main__':
-  #todo: code review: please refactor as a function.
+def listen_and_recognize():
   r = sr.Recognizer()
   mic = sr.Microphone(device_index=0)
   with mic as source:
@@ -14,3 +13,6 @@ if __name__ == '__main__':
     print(r.recognize_google(audio, show_all=True, language="cmn-Hans-CN"))
   except:
     print("Sorry, I cannot understand your questions.")
+    
+if __name__ == '__main__':
+  listen_and_recognize()
