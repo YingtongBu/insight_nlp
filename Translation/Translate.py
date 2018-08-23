@@ -10,7 +10,7 @@ import os
 
 os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = './ZSProject-94cb8e930aab.json'
 
-def translate_sentence(text, target):
+def translate_sentence(text, target='Zh-cn'):
   # Imports the Google Cloud client library
   translate_client = translate.Client()
   translation = translate_client.translate(text, target_language=target)
@@ -18,10 +18,4 @@ def translate_sentence(text, target):
   return(translation['translatedText'])
 
 if __name__ == '__main__':
-  file = open('./TotalEvent.txt', encoding='latin')
-  eventDf = pd.DataFrame.from_csv(file, index_col=None, sep='\t')
-  trans = []
-  for idx, text in enumerate(eventDf['Events']):
-    translation = translate_sentence(text, 'Zh-cn')
-    print(idx)
-    trans.append(translation)
+  output = translate_sentence('Beijing')
