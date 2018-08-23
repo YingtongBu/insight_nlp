@@ -36,7 +36,7 @@ try:
 except ImportError:
   print("Does not find package 'scipy'")
   
-def normalizeRegex(regexExpr):
+def norm_regex(regexExpr):
   return regexExpr\
     .replace("*", "\*")\
     .replace("+", "\+")\
@@ -46,7 +46,7 @@ def normalizeRegex(regexExpr):
     .replace("{", "\{").replace("}", "\}")\
     .replace(".", "\.")
 
-def readCSVFile(fname, splitter="\t", colNum=None):
+def read_CSV(fname, splitter="\t", col_num=None):
   ''' All column name would be removed.
   '''
   def normalize(toks):
@@ -61,61 +61,61 @@ def readCSVFile(fname, splitter="\t", colNum=None):
     for ln in fin:
       toks = ln.split(splitter)
       toks = normalize(toks)
-      if colNum is None:
+      if col_num is None:
         table.append(toks)
       else:
         size = len(toks)
-        if size != colNum:
-          print(f"Warn: {size} != {colNum}: {toks}")
+        if size != col_num:
+          print(f"Warn: {size} != {col_num}: {toks}")
           continue
         else:
           table.append(toks)
   
   return table
 
-def writeCSVFile(fname, data, colNames=None, splitter="\t", colNum=None):
+def write_CSV(fname, data, col_names=None, splitter="\t", col_num=None):
   '''We could save name for each column, which is more human-readable.
    data: 2D array
   '''
-  assert len(colNames) == colNum
+  assert len(col_names) == col_num
   with open(fname) as fou:
     for row in data:
-      if colNum is not None:
-        assert len(row) == colNum, row
+      if col_num is not None:
+        assert len(row) == col_num, row
         
-      if colNames is not None:
-        assert len(row) == len(colNames), row
-        rowStr = [name + "=" + str(e) for name, e in zip(colNames, row)]
+      if col_names is not None:
+        assert len(row) == len(col_names), row
+        rowStr = [name + "=" + str(e) for name, e in zip(col_names, row)]
       else:
         rowStr = [str(e) for e in row]
       print(splitter.join(rowStr), file=fou)
 
-def getFilesInFolder(dataPath, fileExts=None, resursive=False):
+def get_files_in_folder(data_path, file_exts=None, resursive=False):
   '''
     do NOT set fileExt=html, as in some rare cases, all data files do not have
     an file extension.
     return: an iterator, [[fullFilePath, fileID] ...]
   '''
-  for root, subFolders, files in os.walk(dataPath):
+  for root, subFolders, files in os.walk(data_path):
     for fname in files:
       if fname.startswith("."):
         continue
       ext = fname.split(".")[0]
-      if not isNoneOrEmpty(fileExts) and ext not in fileExts:
+      if not is_none_or_empty(file_exts) and ext not in file_exts:
         continue
       
-      yield os.path.join(dataPath, fname), fname.split(".")[0]
+      yield os.path.join(data_path, fname), fname.split(".")[0]
       if not resursive:
         break
 
-def createList(shape: list, defaultValue=None):
+def create_list(shape: list, value=None):
   assert len(shape) > 0
   if len(shape) == 1:
-    return [defaultValue for _ in range(shape[0])]
+    return [value for _ in range(shape[0])]
   else:
-    return [createList(shape[1:], defaultValue) for _ in range(shape[0])]
+    return [create_list(shape[1:], value) for _ in range(shape[0])]
 
-def splitBy(data, func):
+def split_by(data, func):
   data1, data2 = [], []
   for d in data:
     if func(d):
@@ -124,7 +124,7 @@ def splitBy(data, func):
       data2.append(d)
   return data1, data2
 
-def isNoneOrEmpty(data):
+def is_none_or_empty(data):
   '''This applies to any data type which has a __len__ method'''
   if data is None:
     return True
@@ -132,14 +132,14 @@ def isNoneOrEmpty(data):
     return len(data) == 0
   return False
 
-def executeCmd(cmd):
+def execute_cmd(cmd):
   ret = os.system(cmd)
   status = "OK" if ret == 0 else "fail"
   date = time.strftime('%x %X')
   print(f"{date} [{status}] executing '{cmd}'")
   sys.stdout.flush()
 
-def toUtf8(line):
+def to_utf8(line):
   if type(line) is str:
     try:
       return line.encode("utf8")
@@ -153,13 +153,13 @@ def toUtf8(line):
   print("Error: wrong type in toUtf8(...)")
   return None
 
-def printFlush(cont, stream=None):
+def print_with_flush(cont, stream=None):
   if stream is None:
     stream = sys.stdout
   print(cont, file=stream)
   stream.flush()
 
-def getInstalledPackages():
+def get_installed_packages():
   import pip
   packages = pip.get_installed_distributions()
   packages = sorted(["%s==%s" % (i.key, i.version) for i in packages])
@@ -168,12 +168,12 @@ def getInstalledPackages():
 def eq(v1, v2, prec=EPSILON):
   return abs(v1 - v2) < prec
 
-def getMemory(size_type="rss"):
+def get_memory(size_type="rss"):
   '''Generalization; memory sizes (MB): rss, rsz, vsz.'''
   content = os.popen(f"ps -p {os.getpid()} -o {size_type} | tail -1").read()
   return round(content / 1024, 3)
 
-def discreteSample(dists):
+def discrete_sample(dists):
   '''each probability must be greater than 0'''
   dists = array(dists)
   assert all(dists >= 0)
@@ -181,7 +181,7 @@ def discreteSample(dists):
   expNum = accsum[-1] * random.random()
   return bisect.bisect(accsum, expNum)
 
-def logSum(ds):
+def log_sum(ds):
   '''input: [d1, d2, d3..] = [log(p1), log(p2), log(p3)..]
       output: log(p1 + p2 + p3..)
   '''
@@ -189,13 +189,13 @@ def logSum(ds):
   e = math.log(sum([math.exp(d - dv) for d in ds]))
   return dv + e
 
-def logFPrime(fss, weight):
+def log_f_prime(fss, weight):
   '''input: fss: a list of feature vectors
       weight: scipy.array
       output: return log-gradient of log-linear model.
   '''
   #dn  = logsum([(ws.T * f)[0] for f in fs])
-  dn  = logSum(list(map(weight.dot, fss)))
+  dn  = log_sum(list(map(weight.dot, fss)))
   pdw = array([0.0] * len(weight))
   for fs in fss:
     pdw += math.exp(weight.dot(fs) - dn) * fs
@@ -207,14 +207,14 @@ if __name__ == "__main__":
   #default = False, help = "")
   (options, args) = parser.parse_args()
 
-  data = createList([10])
+  data = create_list([10])
   data[0] = 1
   print(data)
 
-  data = createList([3, 4], None)
+  data = create_list([3, 4], None)
   data[0][0] = 1
   print(data)
 
-  data = createList([3, 4, 5], None)
+  data = create_list([3, 4, 5], None)
   data[0][0][0] = 1
   print(data)
