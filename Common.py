@@ -36,6 +36,22 @@ try:
 except ImportError:
   print("Does not find package 'scipy'")
   
+def get_module_path(module_name):
+  '''
+  e.g., get_module_path("NLP.Translation.Translate")
+  '''
+  module_name = module_name.replace(".", "/") + ".py"
+  for path in sys.path:
+    path = path.strip()
+    if path == "":
+      path = os.getcwd()
+    
+    file_name = os.path.join(path, module_name)
+    if os.path.exists(file_name):
+      return path
+  
+  return None
+
 def norm_regex(regexExpr):
   return regexExpr\
     .replace("*", "\*")\
@@ -218,3 +234,5 @@ if __name__ == "__main__":
   data = create_list([3, 4, 5], None)
   data[0][0][0] = 1
   print(data)
+  
+  print(get_module_path("NLP.Translation.Translate"))
