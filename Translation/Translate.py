@@ -10,7 +10,7 @@ import Insight_NLP.Common as common
 
 os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = \
   common.get_module_path("NLP.Translation.Translate") + \
-  "/NLP/Translation/ZSProject-94cb8e930aab.json"
+  "/Insight_NLP/Translation/ZSProject-94cb8e930aab.json"
 
 def translate_sentence(text, target='Zh-cn'):
   # Imports the Google Cloud client library
@@ -19,12 +19,3 @@ def translate_sentence(text, target='Zh-cn'):
 
   return translation['translatedText']
 
-if __name__ == '__main__':
-  src = "Beijing"
-  tran = translate_sentence(src)
-  print(f"{src} --> {tran}")
-  
-  src = "你好，平安银行"
-  tran = translate_sentence(src, "en")
-  print(f"{src} --> {tran}")
-  
