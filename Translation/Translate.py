@@ -9,7 +9,7 @@ import os
 import Insight_NLP.Common as common
 
 os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = \
-  common.get_module_path("NLP.Translation.Translate") + \
+  common.get_module_path("Insight_NLP.Translation.Translate") + \
   "/Insight_NLP/Translation/ZSProject-94cb8e930aab.json"
 
 def translate_sentence(text, target='Zh-cn'):
