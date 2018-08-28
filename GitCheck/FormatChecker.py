@@ -15,6 +15,7 @@ class FormatChecker:
     
   def _ruleAnalyzeAuthor(self):
     for ln in self.lines:
+      ln = ln.lower()
       if "#author:" in ln and "@" in ln:
         return
     print("Error! 文件头上应该有脚本作者以及⼯工作邮箱: "
@@ -54,6 +55,9 @@ class FormatChecker:
 
   def _ruleAnalyzeFileName(self):
     name = self.basename
+    if name == "__init__.py":
+      return
+    name = name.replace("_TEST.py", ".py")
     if name[0].islower() or name.isupper() or '_' in name:
       print("Error! 文件名称采用类命名形式，例如FileName.py")
       self.error += 1
@@ -66,9 +70,10 @@ class FormatChecker:
     self.error += 1
 
   def _ruleAnalyzeMainFunctionDefinition(self):
-    for ln in self.lines:
+    return
+    '''for ln in self.lines:
       if "__name__" in ln and "__main__" in ln:
-        return
+        return'''
     
     print("Error! 每⼀个py⽂件必须添加“伪主函数”部分")
     self.error += 1
@@ -127,9 +132,12 @@ class FormatChecker:
         return
       if funcName.startswith("_"):
         funcName = funcName[1:]
-      if funcName[0].isupper() or "_" in funcName or funcName.isupper():
-        print(f"Error! line:{lnNum} 函数命名第一个单词小写，后续单词首字母大写。")
-        self.error += 1
+      
+      for tok in funcName.split("_"):
+        if not (tok.isupper() or tok.islower()):
+          print(f"Error! line:{lnNum} 函数命名采用get_global_func风格。")
+          self.error += 1
+          break
 
   def _ruleAnalyzeConstants(self):
     pass

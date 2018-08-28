@@ -1,5 +1,5 @@
 #coding: utf8
-# author: Xinyi Wu (xinyi.wu5@pactera.com)
+#author: Xinyi Wu (xinyi.wu5@pactera.com)
 import logging, logging.handlers
 
 class BufferingSMTPHandler(logging.handlers.BufferingHandler):
