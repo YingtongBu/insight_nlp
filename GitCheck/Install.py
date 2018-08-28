@@ -16,9 +16,9 @@ if __name__ == "__main__":
   (options, args) = parser.parse_args()
   
   realPath = os.path.join(os.getcwd(), sys.argv[0])
-  print(realPath)
+  # print(realPath)
   sciptFolder = os.path.split(realPath)[0]
-  print(sciptFolder)
+  # print(sciptFolder)
   
   scipt = os.path.join(sciptFolder, "PrePushCheck.py")
   
@@ -27,5 +27,5 @@ if __name__ == "__main__":
             f"rm pre-push;"
             f"cp {scipt} pre-push")
   
-  print("Done")
+  print("Successful!")
 

@@ -2,13 +2,8 @@
 #coding: utf8
 #author: Tian Xia (summer.xia1@pactera.com)
 
-import os
-import re
-import optparse
-import sys
-sys.path.append("")
-print(sys.path)
-from nlp.GitCheck.FormatChecker import *
+from Insight_NLP.Common import *
+from Insight_NLP.GitCheck.FormatChecker import *
 
 USER_WHITE_LIST = set(["summer"])
 
@@ -98,5 +93,5 @@ if __name__ == "__main__":
     error += checker.analyze()
     
   print(f"Total error number: {error}")
-  #exit(1)
+  exit(1)
   exit(error)
