@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # coding: utf8
 # author: Xin Jin (xin.jin12@pactera.com)
+
 import requests
 import time
 import hashlib
@@ -55,6 +56,3 @@ def text_to_speech(content, prefix, app_id='5b7f49bd',
     print('success, sid = ' + sid)
   else:
     print(r.text)
-
-if __name__ == '__main__':
-  text_to_speech('苟利国家生死以，岂因祸福避趋之', 'audio')
