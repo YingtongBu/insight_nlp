@@ -5,6 +5,8 @@
 import re
 from sklearn import preprocessing
 
+
+#todo: code review: ... not good. 
 def clean_str(string):
   """
   Tokenization/string cleaning for all datasets except for SST.
@@ -24,6 +26,7 @@ def clean_str(string):
   string = re.sub(r"\s{2,}", " ", string)
   return string.strip().lower()
 
+#todo: code review: .... what is it? Do you think others would invoke this function?  
 def load_data_eng(file_path, num_of_class):
   x_text, trainY, y = [], [], []
   data = open(file_path, 'r', encoding='latin').readlines()[1:]
