@@ -49,7 +49,7 @@ class Crawler:
           q = items,
           cx = self.key,
           num = self.num,
-          low_range = (iter + 1) * 10
+          high_range = (iter + 1) * 10
         ).execute()
 
         #start saving
