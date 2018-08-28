@@ -6,10 +6,11 @@
 
 from google.cloud import translate
 import os
-import NLP.Common as common
+import Insight_NLP.Common as common
 
 os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = \
-  common.get_module_path("NLP.Translation.Translate") + "/NLP/Translation/ZSProject-94cb8e930aab.json"
+  common.get_module_path("NLP.Translation.Translate") + \
+  "/NLP/Translation/ZSProject-94cb8e930aab.json"
 
 def translate_sentence(text, target='Zh-cn'):
   # Imports the Google Cloud client library
