@@ -43,17 +43,18 @@ def _write_file(file, content):
     f.write(content)
   f.close()
 
-if __name__ == '__main__':
-  r = requests.post(URL, headers=_get_header(), data=_get_body('平安，滴滴，优步，'
-                                                               '中国银行，'
-                                                               '上证综指'))
+def text_to_speech(content, output_dir):
+  r = requests.post(URL, headers=_get_header(), data=_get_body(content))
   contentType = r.headers['Content-Type']
-  if contentType == "audio/mpeg":
+  if contentType == 'audio/mpeg':
     sid = r.headers['sid']
     if AUE == "raw":
-      _write_file("audio/" + sid + ".wav", r.content)
+      _write_file(output_dir + '/' + sid + '.wav', r.content)
     else:
-      _write_file("audio/" + sid + ".mp3", r.content)
-    print("success, sid = " + sid)
+      _write_file(output_dir + '/' + sid + '.mp3', r.content)
+    print('success, sid = ' + sid)
   else:
     print(r.text)
+
+if __name__ == '__main__':
+  text_to_speech('苟利国家生死以，岂因祸福避趋之', 'audio')
