@@ -43,15 +43,15 @@ def _write_file(file, content):
     f.write(content)
   f.close()
 
-def text_to_speech(content, output_dir):
+def text_to_speech(content, prefix):
   r = requests.post(URL, headers=_get_header(), data=_get_body(content))
   contentType = r.headers['Content-Type']
   if contentType == 'audio/mpeg':
     sid = r.headers['sid']
     if AUE == "raw":
-      _write_file(output_dir + '/' + sid + '.wav', r.content)
+      _write_file(prefix + '.' + sid + '.wav', r.content)
     else:
-      _write_file(output_dir + '/' + sid + '.mp3', r.content)
+      _write_file(prefix + '.' + sid + '.mp3', r.content)
     print('success, sid = ' + sid)
   else:
     print(r.text)
