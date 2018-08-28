@@ -154,17 +154,21 @@ def get_files_in_folder(data_path, file_exts=None, resursive=False):
   '''
     do NOT set fileExt=html, as in some rare cases, all data files do not have
     an file extension.
-    return: an iterator, [[fullFilePath, fileID] ...]
+    return: an iterator, [fullFilePath]
   '''
-  for root, subFolders, files in os.walk(data_path):
-    for fname in files:
-      if fname.startswith("."):
+  def get_extension(short_name):
+    toks = short_name.split(".")
+    return short_name if len(toks) == 1 else toks[-1]
+  
+  for path, folders, files in os.walk(data_path):
+    for short_name in files:
+      if short_name.startswith("."):
         continue
-      ext = fname.split(".")[0]
+      ext = get_extension(short_name)
       if not is_none_or_empty(file_exts) and ext not in file_exts:
         continue
       
-      yield os.path.join(data_path, fname), fname.split(".")[0]
+      yield os.path.realpath(os.path.join(path, short_name))
       if not resursive:
         break
 

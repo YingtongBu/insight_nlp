@@ -3,17 +3,18 @@
 
 from optparse import OptionParser
 import re, os
+import Insight_NLP.Common as Common
 
 debug = None
 
 class FormatChecker:
   def __init__(self, fname):
-    self.basename = os.path.basename(fname)
+    self.base_name = os.path.basename(fname)
     self.lines = {} 
     self.lines = [ln.rstrip() for ln in open(fname)]
     self.error = 0
     
-  def _ruleAnalyzeAuthor(self):
+  def _rule_analyze_author(self):
     for ln in self.lines:
       ln = ln.lower()
       if "#author:" in ln and "@" in ln:
@@ -22,39 +23,39 @@ class FormatChecker:
           "e.g. #author: Tian Xia (summer.xia1@pactera.com)")
     self.error += 1
     
-  def _ruleAnalyzeFileLength(self):
+  def _rule_analyze_file_length(self):
     if len(self.lines) > 500:
       print("Error! 单个py文件不能超过500行")
       self.error += 1
       
   def analyze(self):
-    self._ruleAnalyzeFileName()
-    self._ruleAnalyzeUtf8Setting()
-    self._ruleAnalyzeAuthor()
-    self._ruleAnalyzeMainFunctionDefinition()
-    self._ruleAnalyzeIndentation()
-    self._ruleAnalyzeContinuesBlankLines()
-    self._ruleAnalyzeConstants()
-    self._ruleAnalyzeCompleteWordNaming()
-    self._ruleAnlyzeNoneGlobalCodes()
-    self._ruleAnalyzeUselessCodes()
-    self._ruleAnalyzeFileLength()
+    self._rule_analyze_file_name()
+    self._rule_analyze_utf8_setting()
+    self._rule_analyze_author()
+    self._rule_analyze_main_func_definition()
+    self._rule_analyze_indentation()
+    self._rule_analyze_continues_blank_lines()
+    self._rule_analyze_constants()
+    self._rule_analyze_complete_word_naming()
+    self._rule_anlyze_none_global_codes()
+    self._rule_analyze_useless_codes()
+    self._rule_analyze_file_length()
 
     for lnNum, ln in enumerate(self.lines):
       lnNum += 1
-      self._ruleAnalyzeMaxLineChars80(lnNum, ln)
-      self._ruleAnalyzeTab(lnNum, ln)
-      self._ruleAnalyzeClassName(lnNum, ln)
-      self._ruleAnalyzeFunctionName(lnNum, ln)
+      self._rule_analyze_max_line_chars_80(lnNum, ln)
+      self._rule_analyze_tab(lnNum, ln)
+      self._rule_analyze_class_name(lnNum, ln)
+      self._rule_analyze_function_name(lnNum, ln)
       # self._rule13AnalyzeBlanks(lnNum, ln)
-      self._ruleAnalyzeNoBlanksInFuncArguments(lnNum, ln)
-      self._ruleAnlyzeCodeReview(lnNum, ln)
-      self._ruleAnalyzeChdir(lnNum, ln)
+      self._rule_analyze_no_blanks_in_func_arg(lnNum, ln)
+      self._rule_anlyze_code_review(lnNum, ln)
+      self._rule_analyze_chdir(lnNum, ln)
       
     return self.error
 
-  def _ruleAnalyzeFileName(self):
-    name = self.basename
+  def _rule_analyze_file_name(self):
+    name = self.base_name
     if name == "__init__.py":
       return
     name = name.replace("_TEST.py", ".py")
@@ -62,14 +63,14 @@ class FormatChecker:
       print("Error! 文件名称采用类命名形式，例如FileName.py")
       self.error += 1
 
-  def _ruleAnalyzeUtf8Setting(self):
+  def _rule_analyze_utf8_setting(self):
     for ln in self.lines:
       if "#coding: utf8" in ln or "#coding: utf-8" in ln:
         return
     print("Error! 文件头增加编码设定：#coding: utf8")
     self.error += 1
 
-  def _ruleAnalyzeMainFunctionDefinition(self):
+  def _rule_analyze_main_func_definition(self):
     return
     '''for ln in self.lines:
       if "__name__" in ln and "__main__" in ln:
@@ -78,12 +79,12 @@ class FormatChecker:
     print("Error! 每⼀个py⽂件必须添加“伪主函数”部分")
     self.error += 1
 
-  def _ruleAnalyzeChdir(self, lnNum, ln):
+  def _rule_analyze_chdir(self, lnNum, ln):
     if "chdir(" in ln:
       print(f"Error! line:{lnNum}: 不能使用chdir函数。")
       self.error += 1
 
-  def _ruleAnalyzeTab(self, lnNum, ln):
+  def _rule_analyze_tab(self, lnNum, ln):
     if ln == "":
       return
     if "\t" in ln:
@@ -93,14 +94,14 @@ class FormatChecker:
         print(f"Error! line:{lnNum}: 采⽤用空格代替\\t。")
         self.error += 1
 
-  def _ruleAnalyzeIndentation(self):
+  def _rule_analyze_indentation(self):
     indents = [ln.index(ln.strip()) for ln in self.lines]
     indents = [num for num in indents if num != 0]
     if indents != [] and min(indents) == 4:
       print(f"Error! 每个缩进占2个空格。")
       self.error += 1
 
-  def _ruleAnalyzeMaxLineChars80(self, lnNum, ln):
+  def _rule_analyze_max_line_chars_80(self, lnNum, ln):
     length = len(ln)
     if length > 80:
       if debug:
@@ -108,14 +109,14 @@ class FormatChecker:
       print(f"Error! line:{lnNum} 每⾏行行字符[{length}]不不超过80个。")
       self.error += 1
 
-  def _ruleAnalyzeContinuesBlankLines(self):
+  def _rule_analyze_continues_blank_lines(self):
     for lnNum in [i for i, x in enumerate(self.lines) if x == ""]:
       if lnNum < len(self.lines) - 1:
         if self.lines[lnNum + 1] == "":
           print(f"Error! line:{lnNum}: 连续空⾏行行不不超过1个。")
           self.error += 1
 
-  def _ruleAnalyzeClassName(self, lnNum, ln):
+  def _rule_analyze_class_name(self, lnNum, ln):
     if ln.strip().startswith("class "):
       toks = ln.split()
       className = toks[toks.index("class") + 1]
@@ -123,7 +124,7 @@ class FormatChecker:
         print(f"Error! line:{lnNum} 类命名每个单词首字母大写，中间不加下划线。")
         self.error += 1
 
-  def _ruleAnalyzeFunctionName(self, lnNum, ln):
+  def _rule_analyze_function_name(self, lnNum, ln):
     if ln.strip().startswith("def "):
       toks = ln.split()
       funcName = toks[toks.index("def") + 1]
@@ -139,13 +140,13 @@ class FormatChecker:
           self.error += 1
           break
 
-  def _ruleAnalyzeConstants(self):
+  def _rule_analyze_constants(self):
     pass
 
-  def _ruleAnalyzeCompleteWordNaming(self):
+  def _rule_analyze_complete_word_naming(self):
     pass
 
-  def _ruleAnlyzeNoneGlobalCodes(self):
+  def _rule_anlyze_none_global_codes(self):
     pass
 
   def _ruleAnalyzeBlanks(self, lnNum, ln):
@@ -174,34 +175,30 @@ class FormatChecker:
       print(f"Error! line:{lnNum} 代码的空格，“,”后紧跟⼀个空格。")
       self.error += 1
 
-  def _ruleAnalyzeNoBlanksInFuncArguments(self, lnNum, ln):
+  def _rule_analyze_no_blanks_in_func_arg(self, lnNum, ln):
     block = " ".join(re.findall("\(.*?\)", ln))
     if " = " in block:
       print(f"Error! line:{lnNum} 函数参数中的=不要两边加空格。")
       self.error += 1
 
-  def _ruleAnalyzeUselessCodes(self):
+  def _rule_analyze_useless_codes(self):
     pass
   
-  def _ruleAnlyzeCodeReview(self, lnNum, ln):
+  def _rule_anlyze_code_review(self, lnNum, ln):
     if "code review" in ln:
       print(f"Error! line:{lnNum} 请及时修改code review的结果。{ln}")
       self.error += 1
 
-def getAllSourceFiles(args):
+def get_all_source_files(args):
   def getNextFile():
     if len(args) > 0:
       yield from args
-      return
-
-    for root, directories, fileNames in os.walk(os.getcwd()):
-      if "Temporary" in root:
-        continue
-      for fileName in fileNames:
-        yield os.path.join(root, fileName)
+    
+    else:
+      yield from Common.get_files_in_folder(os.getcwd(), ["py"], True)
 
   for fname in getNextFile():
-    if fname.endswith(".py") and "FormatChecker.py" not in fname:
+    if "FormatChecker.py" not in fname:
       yield fname
 
 if __name__ == "__main__":
@@ -212,7 +209,7 @@ if __name__ == "__main__":
   (options, args) = parser.parse_args()
 
   debug = options.debug
-  for fname in getAllSourceFiles(args):
+  for fname in get_all_source_files(args):
     checker = FormatChecker(fname)
     print("-" * 42, fname)
     checker.analyze()
