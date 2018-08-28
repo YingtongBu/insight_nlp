@@ -6,13 +6,13 @@ from googleapiclient.discovery import build
 import csv
 import os
 
-def mkdir(path):
+def _mkdir(path):
   folder_exist = os.path.exists(path)
   if not folder_exist:
     os.mkdir(path)
     print('Attention: new folder created')
   else:
-    print('Folder existed, data will be stored later')
+    print('Folder existed, continue adding new data')
 
 class Crawler:
   """ • Important optional parameters:
@@ -36,11 +36,11 @@ class Crawler:
   def crawl(self, times, search_keywords, search_item):
     loop_num = eval(times) // 10 + 1
     service = build("customsearch", "v1",
-                    developerKey="AIzaSyC1o8pJAwMvaRugaRp9nWtvrGQs2_llEps")
+                    developerKey="005808576341306023160:yojc6z7o63u")
     print('loop_num: ', loop_num)
 
     # create store folder path
-    os.mkdir(search_item)
+    _mkdir(search_item)
     for items in search_keywords:
       newFile = open(search_item + '/' + items + ".csv", "w+")
       for iter in range(loop_num):
@@ -49,14 +49,16 @@ class Crawler:
           q = items,
           cx = self.key,
           num = self.num,
-          lowRange = (iter + 1) * 10
+          low_range = (iter + 1) * 10
         ).execute()
 
         #start saving
-        myWriter = csv.writer(newFile, delimiter = ',')
+        myWriter = csv.writer(newFile, delimiter = '\t')
         rlist = []
         for iter in range(len(res['items'])):
           snippet = res['items'][iter]['snippet'].replace('\n', '')
-          rlist.append([snippet])
+          link =res['item'][iter]['displayLink']
+          final_result = snippet + link
+          rlist.append([final_result])
         myWriter.writerows(rlist)
       newFile.close()
