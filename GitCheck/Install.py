@@ -15,15 +15,15 @@ if __name__ == "__main__":
   parser.add_option("--repoPath")
   (options, args) = parser.parse_args()
   
-  realPath = os.path.join(os.getcwd(), sys.argv[0])
+  real_path = os.path.join(os.getcwd(), sys.argv[0])
   # print(realPath)
-  sciptFolder = os.path.split(realPath)[0]
+  scipt_folder = os.path.split(real_path)[0]
   # print(sciptFolder)
   
-  scipt = os.path.join(sciptFolder, "PrePushCheck.py")
+  scipt = os.path.join(scipt_folder, "PrePushCheck.py")
   
-  hookDir = os.path.join(options.repoPath, ".git/hooks")
-  os.system(f"cd {hookDir};"
+  hook_dir = os.path.join(options.repoPath, ".git/hooks")
+  os.system(f"cd {hook_dir};"
             f"rm pre-push;"
             f"cp {scipt} pre-push")
   

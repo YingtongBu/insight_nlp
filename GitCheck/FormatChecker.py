@@ -149,7 +149,7 @@ class FormatChecker:
   def _rule_anlyze_none_global_codes(self):
     pass
 
-  def _ruleAnalyzeBlanks(self, lnNum, ln):
+  def _rule_analyze_blanks(self, lnNum, ln):
     ln = re.sub("\(.*?\)", "", ln)
     replaced = [
       ("//=", "="),

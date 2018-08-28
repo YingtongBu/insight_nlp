@@ -7,12 +7,12 @@ from Insight_NLP.GitCheck.FormatChecker import *
 
 USER_WHITE_LIST = set(["summer"])
 
-def getAllCommitInfo():
+def get_all_commit_info():
   '''
   return [commit, email, [py-files]]
   '''
   
-  def readBuffer():
+  def read_buffer():
     '''
     return {commit: {"email": author-email, "python": [py-files]}}
     '''
@@ -23,7 +23,7 @@ def getAllCommitInfo():
       print(f"WARN: can not find .git/hooks/commit.data")
       return {}
     
-  def writeBuffer(allCommitInfo):
+  def write_buffer(allCommitInfo):
     try:
       buffer = {}
       for commit, user, files in allCommitInfo:
@@ -33,7 +33,7 @@ def getAllCommitInfo():
     except:
       print(f"WARN: can not write .git/hooks/commit.data")
     
-  def getAllCommit():
+  def get_all_commits():
     '''
     :return [commit, author-email] sorted by time.
     '''
@@ -44,24 +44,24 @@ def getAllCommitInfo():
     ret = [[c, e] for c, e in zip(commits, emails)]
     return ret
   
-  def getCommitFiles(commit, fileExt=".py"):
+  def get_commit_files(commit, fileExt=".py"):
     cmd = f"git diff-tree --no-commit-id --name-only -r {commit}"
     files = os.popen(cmd).read().split()
     files = [fname for fname in files if fname.endswith(fileExt)]
     return files
   
-  commitInfo = getAllCommit()
-  bufferedCommits = readBuffer()
+  commitInfo = get_all_commits()
+  bufferedCommits = read_buffer()
   for pos, [commit, _] in enumerate(commitInfo):
     if commit in bufferedCommits:
       commitInfo[pos].append(bufferedCommits[commit]["python"])
     else:
-      commitInfo[pos].append(getCommitFiles(commit))
+      commitInfo[pos].append(get_commit_files(commit))
   
-  writeBuffer(commitInfo)
+  write_buffer(commitInfo)
   return commitInfo
 
-def filterAndGetUserFiles(allCommitInfo):
+def filter_and_get_user_files(allCommitInfo):
   # We take user in the last commit and filter to get all files from him.
   if allCommitInfo == [] or allCommitInfo[0][1] in USER_WHITE_LIST:
     return []
@@ -84,8 +84,8 @@ if __name__ == "__main__":
                      #default=False, help="")
   (options, args) = parser.parse_args()
   
-  allCommitInfo = getAllCommitInfo()
-  files = filterAndGetUserFiles(allCommitInfo)
+  allCommitInfo = get_all_commit_info()
+  files = filter_and_get_user_files(allCommitInfo)
   error = 0
   for fname in files:
     checker = FormatChecker(fname)
