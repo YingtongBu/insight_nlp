@@ -1,18 +1,21 @@
-#!/usr/bin/env python
-#coding: utf8
-#author: Yu Liu (yu.liu55@pactera.com)
-
+"""Simple command-line example for Custom Search.
+Command-line application that does a search.
+"""
+import pprint
 from googleapiclient.discovery import build
 import csv
 import os
 
-def _mkdir(path):
+
+def mkdir(path):
   folder_exist = os.path.exists(path)
   if not folder_exist:
-    os.mkdir(path)
-    print('Attention: new folder created')
+      os.mkdir(path)
+      print('Attention: new folder created')
+
   else:
-    print('Folder existed, continue adding new data')
+      print('Folder existed, data will be stored later')
+
 
 class Crawler:
   """ • Important optional parameters:
@@ -30,35 +33,39 @@ class Crawler:
   """
 
   def __init__(self, key, num = 10):
-    self.key = key
-    self.num = num
+      self.key = key
+      self.num = num
+
 
   def crawl(self, times, search_keywords, search_item):
-    loop_num = eval(times) // 10 + 1
-    service = build("customsearch", "v1",
-                    developerKey="005808576341306023160:yojc6z7o63u")
-    print('loop_num: ', loop_num)
+      loop_num = eval(times) // 10 + 1
+      service = build("customsearch", "v1",
+                      developerKey="AIzaSyC1o8pJAwMvaRugaRp9nWtvrGQs2_llEps")
 
-    # create store folder path
-    _mkdir(search_item)
-    for items in search_keywords:
-      newFile = open(search_item + '/' + items + ".csv", "w+")
-      for iter in range(loop_num):
-        print('page' + str(iter))
-        res = service.cse().list(
-          q = items,
-          cx = self.key,
-          num = self.num,
-          high_range = (iter + 1) * 10
-        ).execute()
+      print('loop_num: ', loop_num)
 
-        #start saving
-        myWriter = csv.writer(newFile, delimiter = '\t')
-        rlist = []
-        for iter in range(len(res['items'])):
-          snippet = res['items'][iter]['snippet'].replace('\n', '')
-          link =res['item'][iter]['displayLink']
-          final_result = snippet + link
-          rlist.append([final_result])
-        myWriter.writerows(rlist)
-      newFile.close()
+      # create store folder path
+      mkdir(search_item)
+      print(search_keywords)
+      for items in search_keywords:
+          f = open(search_item + '/' + items + ".csv", "w+")
+          for i in range(loop_num):
+              res = service.cse().list(
+                  q = items,
+                  cx = self.key,
+                  num = self.num,
+                  high_range = (i + 1) * 10
+              ).execute()
+              #print(res)
+              # with open("result.json","w") as newfile:
+              #     newfile.write(str(res))
+              #start saving
+              myWriter = csv.writer(f, delimiter = '\t')
+              rlist = []
+              for i in range(len(res['items'])):
+                  s = res['items'][i]['snippet'].replace('\n', '')
+                  link = res['items'][i]['displayLink']
+                  final_result = s + link
+                  rlist.append([final_result])
+              myWriter.writerows(rlist)
+          f.close()

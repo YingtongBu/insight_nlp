@@ -93,5 +93,4 @@ if __name__ == "__main__":
     error += checker.analyze()
     
   print(f"Total error number: {error}")
-  exit(1)
   exit(error)
