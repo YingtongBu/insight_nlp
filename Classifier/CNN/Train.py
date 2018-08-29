@@ -7,7 +7,7 @@ import os
 import time
 import datetime
 from  Insight_NLP.Classifier.CNN import PreProcess
-from Insight_NLP.Classifier.CNN.TextCNN import TextCNN
+from Insight_NLP.Classifier.CNN.ClassifierCNN import ClassifierCNN
 from tensorflow.contrib import learn
 import optparse
 
@@ -83,7 +83,7 @@ def train(x_train, y_train, vocab_processor, x_dev, y_dev, x_ori_dev):
         vocab_len = 5000
       else:
         assert False
-      cnn = TextCNN(
+      cnn = ClassifierCNN(
         sequence_length=x_train.shape[1],
         num_classes=y_train.shape[1],
         vocab_size=vocab_len,
