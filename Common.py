@@ -265,25 +265,3 @@ def log_f_prime(fss, weight):
     pdw += math.exp(weight.dot(fs) - dn) * fs
   return pdw
 
-if __name__ == "__main__":
-  parser = OptionParser(usage="cmd dev1@dir1 dir2")
-  #parser.add_option("-q", "--quiet", action = "store_true", dest = "verbose",
-  #default = False, help = "")
-  (options, args) = parser.parse_args()
-
-  data = create_list([10])
-  data[0] = 1
-  print(data)
-
-  data = create_list([3, 4], None)
-  data[0][0] = 1
-  print(data)
-
-  data = create_list([3, 4, 5], None)
-  data[0][0][0] = 1
-  print(data)
-  
-  print(get_module_path("NLP.Translation.Translate"))
-  
-  print(Measure.calc_precision_recall_fvalue([0, 1, 1, 2],
-                                             [0, 0, 1, 2]))
