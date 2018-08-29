@@ -1,59 +1,111 @@
 #coding: utf8
-#author: Shuang Zhao (shuang.zhao11@pactera.com)
+#author: Yu Liu (yu.liu55@pactera.com)
 
 import numpy as np
+import re
+from sklearn import preprocessing
+from tqdm import tqdm
 
-def openTrainData(trainFile, lowRate, num):
-  trainX, trainY = [], []
-  rawText = []
-  for line in open(trainFile, 'r').readlines():
-    if int(line.replace('\ufeff', '').replace('\n', '').split('\t')[0]) < 45:
-      trainX.append((line.replace('\ufeff', '').replace('\n', '').split('\t')[1]
-                     + '*' * 200)[:num])
-      trainY.append(
+def _clean_str(string):
+  """
+  Tokenization/string cleaning for all datasets except for SST.
+  """
+  string = re.sub(r"[^A-Za-z0-9(),!?\'\`]", " ", string)
+  string = re.sub(r"\'s", " \'s", string)
+  string = re.sub(r"\'ve", " \'ve", string)
+  string = re.sub(r"n\'t", " n\'t", string)
+  string = re.sub(r"\'re", " \'re", string)
+  string = re.sub(r"\'d", " \'d", string)
+  string = re.sub(r"\'ll", " \'ll", string)
+  string = re.sub(r",", " , ", string)
+  string = re.sub(r"!", " ! ", string)
+  string = re.sub(r"\(", " \( ", string)
+  string = re.sub(r"\)", " \) ", string)
+  string = re.sub(r"\?", " \? ", string)
+  string = re.sub(r"\s{2,}", " ", string)
+  return string.strip().lower()
+
+def load_data_eng(file_path, num_of_class):
+  x_text, train_y, y = [], [], []
+  data = open(file_path, 'r', encoding='latin').readlines()[1:]
+  data = [sample.strip() for sample in data]
+  for row in data:
+    row = row.split('\t')
+    x_text.append(row[1].replace('\ufeff', ''))
+    train_y.append(row[0])
+  # Split by words
+  x_original = x_text
+  x_text = [_clean_str(sent) for sent in x_text]
+  # clean y
+  for item in train_y:
+    try:
+      item = int(item)
+      if item > num_of_class:
+        item = 0
+    except:
+      item = 0
+    y.append(item)
+
+  # Generate labels
+  y = [[item] for item in y]
+  enc = preprocessing.OneHotEncoder()
+  enc.fit(y)
+  y = enc.transform(y).toarray()
+  return [x_text, y, x_original]
+
+def load_data_chi(file_path, lowRate, len_sentence, num_of_class):
+  train_x, train_y = [], []
+  raw_text = []
+  for line in open(file_path, 'r').readlines()[1:]:
+    if int(line.replace('\ufeff', '').replace('\n', '').split('\t')[0]) \
+                                                                < num_of_class:
+      train_x.append((line.replace('\ufeff', '').replace('\n', '').split(
+        '\t')[1] + '*' * 200)[:len_sentence])
+      train_y.append(
         int(line.replace('\ufeff', '').replace('\n', '').split('\t')[0]))
-      rawText.append(line.replace('\ufeff', '').replace('\n', '').split('\t'))
-  wordDict = {}
-  wordCount = {}
+      raw_text.append(line.replace('\ufeff', '').replace('\n', '').split('\t'))
+  word_dict = {}
+  word_count = {}
   index = 0
-  for line in trainX:
-    wordSeparate = []
+  for line in train_x:
+    word_separate = []
     for idx in range(len(line)):
-      wordSeparate.append(line[idx])
-    wordSeparate = sorted(list(set(wordSeparate)))
-    for char in wordSeparate:
-      if char not in wordCount:
-        wordCount[char] = 1
+      word_separate.append(line[idx])
+    word_separate = sorted(list(set(word_separate)))
+    # sorted for n-gram concurrence added
+    for char in word_separate:
+      if char not in word_count:
+        word_count[char] = 1
       else:
-        wordCount[char] += 1
-      if char not in wordDict and wordCount[char] > lowRate:
-        wordDict[char] = index
+        word_count[char] += 1
+      if char not in word_dict and word_count[char] > lowRate:
+        word_dict[char] = index
         index += 1
-  dictLength = len(wordDict)
-  print('length of wordDict:', len(wordDict))
-  trainOutputX = embedding(trainX, wordDict)
-  del trainX
-  trainOutputY = oneHot(trainY)
-  del trainY
-  return trainOutputX, trainOutputY, dictLength, wordDict, rawText
+  dict_length = len(word_dict)
+  print('length of wordDict:', len(word_dict))
+  train_output_x = _embedding(train_x, word_dict)
+  del train_x
+  train_output_y = _one_hot(train_y)
+  del train_y
+  return train_output_x, train_output_y, dict_length, word_dict, raw_text
 
-def embedding(data, wordDict):
-  dataOutput = []
+def _embedding(data, word_dict):
+  data_output = []
   for line in data:
-    wordSeparate = []
+    word_separate = []
     for idx in range(len(line)):
-      wordSeparate.append(line[idx])
-    embeddingWord = []
-    for char in wordSeparate:
-      if char in wordDict.keys():
-        embeddingWord.append(wordDict[char])
+      word_separate.append(line[idx])
+    embedding_word = []
+    for char in word_separate:
+      if char in word_dict.keys():
+        embedding_word.append(word_dict[char])
       else:
-        embeddingWord.append(len(wordDict))
-    dataOutput.append(np.array(embeddingWord))
-  dataOutput = np.array(dataOutput)
-  return dataOutput
+        embedding_word.append(len(word_dict))
+    data_output.append(np.array(embedding_word))
+  data_output = np.array(data_output)
+  return data_output
 
-def oneHot(data):
+def _one_hot(data):
   largest = max(data)
   out = []
   for idx in range(len(data)):
@@ -63,24 +115,21 @@ def oneHot(data):
   out = np.array(out)
   return out
 
-def batchIter(data, batchSize, numEpochs, shuffle=True):
+def batch_iter(data, batch_size, num_epochs, shuffle=True):
   """
   Generates a batch iterator for a dataset.
   """
   data = np.array(data)
-  dataSize = len(data)
-  numBatchesPerEpoch = int((len(data) - 1) / batchSize) + 1
-  for epoch in range(numEpochs):
+  data_size = len(data)
+  num_batches_per_epoch = int((len(data) - 1) / batch_size) + 1
+  for epoch in range(num_epochs):
     # Shuffle the data at each epoch
     if shuffle:
-      shuffleIndices = np.random.permutation(np.arange(dataSize))
-      shuffledData = data[shuffleIndices]
+      shuffle_indices = np.random.permutation(np.arange(data_size))
+      shuffled_data = data[shuffle_indices]
     else:
-      shuffledData = data
-    for batchNum in range(numBatchesPerEpoch):
-      startIndex = batchNum * batchSize
-      endIndex = min((batchNum + 1) * batchSize, dataSize)
-      yield shuffledData[startIndex:endIndex]
-
-if __name__ == '__main__':
-  pass
+      shuffled_data = data
+    for batch_num in range(num_batches_per_epoch):
+      start_index = batch_num * batch_size
+      end_index = min((batch_num + 1) * batch_size, data_size)
+      yield shuffled_data[start_index:end_index]
