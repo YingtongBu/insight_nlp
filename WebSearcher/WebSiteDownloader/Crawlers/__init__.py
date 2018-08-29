@@ -1,5 +1,6 @@
 #coding: utf8
-# author: Xinyi Wu (xinyi.wu5@pactera.com)
+#author: Xinyi Wu (xinyi.wu5@pactera.com)
+
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait as web_driver_wait
@@ -28,7 +29,8 @@ class Scraper:
       self.driver.get(loginUrl)
       username_field = self.driver.find_element_by_id("username")
       password_field = self.driver.find_element_by_id("password")
-      login_button = self.driver.find_element_by_class_name("basic-login-submit")
+      login_button = \
+        self.driver.find_element_by_class_name("basic-login-submit")
       username_field.clear()
       password_field.clear()
       username_field.send_keys(username)

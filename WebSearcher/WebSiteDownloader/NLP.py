@@ -1,5 +1,5 @@
 #coding: utf8
-# author: Xinyi Wu (xinyi.wu5@pactera.com)
+#author: Xinyi Wu (xinyi.wu5@pactera.com)
 import gensim.summarization
 
 def news_title_filter(title):

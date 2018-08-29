@@ -39,7 +39,7 @@ def scrape_wsj(scrapers, date_list, news_path):
     post_processor = Processor(scrapers.news_list)
     post_processor.summarize()
     save_json(post_processor.news_list, os.path.join(news_path, 'wsj_' +
-                                                     dt.datetime.strftime(date, '%Y-%m-%d')))
+                                      dt.datetime.strftime(date, '%Y-%m-%d')))
 
 def scrape_reuters(scrapers, news_path):
   scrapers.scraper_reuters()
@@ -58,7 +58,7 @@ def scrape_nytimes(scrapers, date_list, news_path):
     post_processor = Processor(scrapers.news_list)
     post_processor.summarize()
     save_json(post_processor.news_list, os.path.join(news_path, 'nytimes_' +
-                                                    dt.datetime.strftime(date, '%Y-%m-%d')))
+                                      dt.datetime.strftime(date, '%Y-%m-%d')))
 
 if __name__ == '__main__':
   today = dt.date.today().strftime("%Y%m%d")
@@ -102,7 +102,8 @@ if __name__ == '__main__':
   # Start scraping
   scrapers = Scraper(options.phantomjs_path, options.wsjusername,
                      options.wsjpassword)
-  date_list = [end_date - dt.timedelta(days=x) for x in range(0, options.num_days)]
+  date_list = [end_date -
+               dt.timedelta(days=x) for x in range(0, options.num_days)]
 
   scrape_wsj(scrapers, date_list, options.news_path)
   scrape_reuters(scrapers, options.news_path)
