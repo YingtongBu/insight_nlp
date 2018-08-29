@@ -3,8 +3,8 @@
 #author: Xin Jin (xin.jin12@pactera.com)
 import random
 
-def wordVectorGeneration(wordVectorFile, trainJiaFangDataFile, 
-                         testJiaFangDataFile):
+def word_vector_generation(wordVectorFile, trainJiaFangDataFile,
+                           testJiaFangDataFile):
   chineseWordVectorFile = open(wordVectorFile, 'w')
   wordList = []
   for line in open(trainJiaFangDataFile):
@@ -40,8 +40,9 @@ def wordVectorGeneration(wordVectorFile, trainJiaFangDataFile,
   
   chineseWordVectorFile.close()
 
-def trainModelDataSetGeneration(trainSetModelFile, testSetModelFile, 
-                                validationSetModelFile, trainJiaFangDataFile): 
+def train_model_data_set_generation(trainSetModelFile, testSetModelFile,
+                                    validationSetModelFile,
+                                    trainJiaFangDataFile):
   fileTrainObj = open(trainSetModelFile, 'w')
   fileTestObj = open(testSetModelFile, 'w')
   fileValidationObj = open(validationSetModelFile, 'w')
@@ -75,8 +76,8 @@ def trainModelDataSetGeneration(trainSetModelFile, testSetModelFile,
   fileTestObj.close()
   fileValidationObj.close()
 
-def taskInputGeneration(predictProbFile, idRecordFile, testJiaFangDataFile, 
-                        inputFile): 
+def task_input_generation(predictProbFile, idRecordFile, testJiaFangDataFile,
+                          inputFile):
   i = 0
   probList = []
   for line in open(predictProbFile):
@@ -129,7 +130,7 @@ def taskInputGeneration(predictProbFile, idRecordFile, testJiaFangDataFile,
   
   inputFileObject.close()
 
-def outputProcessing(idRecordFile, outputFile, groundTruthFile):
+def output_processing(idRecordFile, outputFile, groundTruthFile):
   idRecordObject = open(idRecordFile, 'r')
   idRecordList = [idRecord for idRecord in idRecordObject.read().split('\t') 
                   if idRecord != '']
@@ -182,15 +183,15 @@ def preprocess(wordVectorFile, trainJiaFangDataFile,
                testJiaFangDataFile, trainSetModelFile,
                testSetModelFile, validationSetModelFile,
                predictProbFile, idRecordFile, inputFile):
-  wordVectorGeneration(wordVectorFile, trainJiaFangDataFile, 
-                       testJiaFangDataFile)
-  trainModelDataSetGeneration(trainSetModelFile, testSetModelFile, 
-                              validationSetModelFile, trainJiaFangDataFile)
-  taskInputGeneration(predictProbFile, idRecordFile, testJiaFangDataFile, 
-                      inputFile)
+  word_vector_generation(wordVectorFile, trainJiaFangDataFile,
+                         testJiaFangDataFile)
+  train_model_data_set_generation(trainSetModelFile, testSetModelFile,
+                                  validationSetModelFile, trainJiaFangDataFile)
+  task_input_generation(predictProbFile, idRecordFile, testJiaFangDataFile,
+                        inputFile)
 
 def postprocess(idRecordFile, outputFile, groundTruthFile):
-  outputProcessing(idRecordFile, outputFile, groundTruthFile)
+  output_processing(idRecordFile, outputFile, groundTruthFile)
 
 if __name__ == '__main__':
   pass

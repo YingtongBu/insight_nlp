@@ -5,7 +5,7 @@ from __future__ import print_function
 import re
 import logging
 
-def maxIndexValue(sentences, featureName):
+def max_index_value(sentences, featureName):
   maxItem = 0
   for sentence in sentences:
     for entry in sentence[featureName]:
@@ -13,7 +13,7 @@ def maxIndexValue(sentences, featureName):
             
   return maxItem
 
-def wordNormalize(word):
+def word_normalize(word):
   word = word.lower()
   word = word.replace("--", "-")
   word = re.sub("\"+", '"', word)
@@ -23,7 +23,7 @@ def wordNormalize(word):
   word = re.sub("[0-9.,]+", 'NUMBER_TOKEN', word)
   return word
 
-def mapTokens2Idx(sentences, word2Idx):
+def map_tokens_to_idx(sentences, word2Idx):
   numTokens = 0
   numUnknownTokens = 0
   for sentence in sentences:
@@ -35,8 +35,8 @@ def mapTokens2Idx(sentences, word2Idx):
         wordIdx = word2Idx[token]
       elif token.lower() in word2Idx:
         wordIdx = word2Idx[token.lower()]
-      elif wordNormalize(token) in word2Idx:
-        wordIdx = word2Idx[wordNormalize(token)]
+      elif word_normalize(token) in word2Idx:
+        wordIdx = word2Idx[word_normalize(token)]
       else:
         numUnknownTokens += 1
                        

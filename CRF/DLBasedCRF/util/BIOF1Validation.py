@@ -3,16 +3,16 @@
 #author: Xin Jin (xin.jin12@pactera.com)
 from __future__ import print_function
 import logging
-def computeF1TokenBasis(predictions, correct, OLabel):  
-  prec = computePrecisionTokenBasis(predictions, correct, OLabel)
-  rec = computePrecisionTokenBasis(correct, predictions, OLabel)  
+def compute_f1_token_basis(predictions, correct, OLabel):
+  prec = compute_precision_token_basis(predictions, correct, OLabel)
+  rec = compute_precision_token_basis(correct, predictions, OLabel)
   f1 = 0
   if (rec + prec) > 0:
     f1 = 2.0 * prec * rec / (prec + rec)
   return prec, rec, f1
 
-def computePrecisionTokenBasis(guessedSentences, 
-                               correctSentences, OLabel):
+def compute_precision_token_basis(guessedSentences,
+                                  correctSentences, OLabel):
   assert(len(guessedSentences) == len(correctSentences))
   correctCount = 0
   count = 0
@@ -31,8 +31,8 @@ def computePrecisionTokenBasis(guessedSentences,
     precision = float(correctCount) / count      
   return precision
 
-def computeF1(predictions, correct, idx2Label, correctBIOErrors='No', 
-              encodingScheme='BIO'): 
+def compute_f1(predictions, correct, idx2Label, correctBIOErrors='No',
+               encodingScheme='BIO'):
   labelPred = []    
   for sentence in predictions:
     labelPred.append([idx2Label[element] for element in sentence])
@@ -44,16 +44,16 @@ def computeF1(predictions, correct, idx2Label, correctBIOErrors='No',
   encodingScheme = encodingScheme.upper()
     
   if encodingScheme == 'IOBES':
-    convertIOBEStoBIO(labelPred)
-    convertIOBEStoBIO(labelCorrect)                 
+    convert_iobes_to_bio(labelPred)
+    convert_iobes_to_bio(labelCorrect)
   elif encodingScheme == 'IOB':
-    convertIOBtoBIO(labelPred)
-    convertIOBtoBIO(labelCorrect)
+    convert_iob_to_bio(labelPred)
+    convert_iob_to_bio(labelCorrect)
                       
-  checkBIOEncoding(labelPred, correctBIOErrors)
+  check_bio_encoding(labelPred, correctBIOErrors)
 
-  prec = computePrecision(labelPred, labelCorrect)
-  rec = computePrecision(labelCorrect, labelPred)
+  prec = compute_precision(labelPred, labelCorrect)
+  rec = compute_precision(labelCorrect, labelPred)
     
   f1 = 0
   if (rec + prec) > 0:
@@ -61,7 +61,7 @@ def computeF1(predictions, correct, idx2Label, correctBIOErrors='No',
         
   return prec, rec, f1
 
-def convertIOBtoBIO(dataset):
+def convert_iob_to_bio(dataset):
   for sentence in dataset:
     prevVal = 'O'
     for pos in range(len(sentence)):
@@ -72,7 +72,7 @@ def convertIOBtoBIO(dataset):
 
       prevVal = sentence[pos]
 
-def convertIOBEStoBIO(dataset):  
+def convert_iobes_to_bio(dataset):
   for sentence in dataset:
     for pos in range(len(sentence)):
       firstChar = sentence[pos][0]
@@ -81,7 +81,7 @@ def convertIOBEStoBIO(dataset):
       elif firstChar == 'E':
         sentence[pos] = 'I' + sentence[pos][1:]
                 
-def computePrecision(guessedSentences, correctSentences):
+def compute_precision(guessedSentences, correctSentences):
   assert(len(guessedSentences) == len(correctSentences))
   correctCount = 0
   count = 0  
@@ -122,7 +122,7 @@ def computePrecision(guessedSentences, correctSentences):
         
   return precision
 
-def checkBIOEncoding(predictions, correctBIOErrors):
+def check_bio_encoding(predictions, correctBIOErrors):
   errors = 0
   labels = 0
     
@@ -159,7 +159,7 @@ def checkBIOEncoding(predictions, correctBIOErrors):
     logging.info("Wrong BIO-Encoding %d/%d labels, %.2f%%" 
                  % (errors, labels, errors / float(labels) * 100),)
 
-def testEncodings():
+def test_encodings():
   goldBIO = [['O', 'B-PER', 'I-PER', 'O', 'B-PER', 'B-PER', 'I-PER'],
              ['O', 'B-PER', 'B-LOC', 'I-LOC', 'O', 'B-PER', 'I-PER', 'I-PER'],
              ['B-LOC', 'I-LOC', 'I-LOC', 'B-PER', 'B-PER', 'I-PER', 'I-PER', 
@@ -171,7 +171,7 @@ def testEncodings():
                 'E-PER'],
                ['B-LOC', 'I-LOC', 'E-LOC', 'S-PER', 'B-PER', 'I-PER', 'E-PER', 
                 'O', 'S-LOC', 'S-PER']]
-  convertIOBEStoBIO(goldIOBES)
+  convert_iobes_to_bio(goldIOBES)
 
   for sentenceIdx in range(len(goldBIO)):
     for tokenIdx in range(len(goldBIO[sentenceIdx])):
@@ -183,7 +183,7 @@ def testEncodings():
              ['O', 'I-PER', 'I-LOC', 'I-LOC', 'O', 'I-PER', 'I-PER', 'I-PER'],
              ['I-LOC', 'I-LOC', 'I-LOC', 'I-PER', 'B-PER', 'I-PER', 'I-PER', 
               'O', 'I-LOC', 'I-PER']]
-  convertIOBtoBIO(goldIOB)
+  convert_iob_to_bio(goldIOB)
 
   for sentenceIdx in range(len(goldBIO)):
     for tokenIdx in range(len(goldBIO[sentenceIdx])):
@@ -191,6 +191,3 @@ def testEncodings():
               goldIOB[sentenceIdx][tokenIdx])
 
   print("test encodings completed")
-
-if __name__ == "__main__":
-  testEncodings()

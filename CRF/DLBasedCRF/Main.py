@@ -13,7 +13,7 @@ def main(wordVectorFile, trainJiaFangDataFile, testJiaFangDataFile,
                             testJiaFangDataFile, trainSetModelFile,
                             testSetModelFile, validationSetModelFile,
                             predictProbFile, idRecordFile, inputFile)
-  TrainModel.trainModel()
+  TrainModel.train_model()
   RunModel.runModel(inputFile, outputFile)
   DataProcessing.postprocess(idRecordFile, outputFile, groundTruthFile)
   

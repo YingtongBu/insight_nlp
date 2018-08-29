@@ -5,11 +5,12 @@ from __future__ import print_function
 import os
 import logging
 import sys
-from NeuralNets.BiLSTM import BiLSTM
-from util.PreProcessing import prepareDataset, loadDatasetPickle
+from Insight_NLP.CRF.DLBasedCRF.NeuralNets.BiLSTM import BiLSTM
+from Insight_NLP.CRF.DLBasedCRF.util.PreProcessing \
+  import prepare_dataset, load_dataset_pickle
 from keras import backend as K
 
-def trainModel():
+def train_model():
   abspath = os.path.abspath(__file__)
   dname = os.path.dirname(abspath)
   os.chdir(dname)
@@ -33,19 +34,16 @@ def trainModel():
       }
   }
 
-  embeddingsPath = 'chineseWordVector'
-  pickleFile = prepareDataset(embeddingsPath, datasets)
-  embeddings, mappings, data = loadDatasetPickle(pickleFile)
+  embeddings_path = 'chinese_word_vector'
+  pickle_file = prepare_dataset(embeddings_path, datasets)
+  embeddings, mappings, data = load_dataset_pickle(pickle_file)
   params = {'classifier': ['CRF'], 'LSTM-Size': [100, 100], 
             'dropout': (0.25, 0.25), 'charEmbeddings': None, 
             'maxCharLength': 50}
 
   model = BiLSTM(params)
-  model.setMappings(mappings, embeddings)
-  model.setDataset(datasets, data)
-  model.storeResults('results/Chinese_NER_results.csv')
-  model.modelSavePath = "models/[ModelName]_[DevScore]_[TestScore]_[Epoch].h5"
+  model.set_mappings(mappings, embeddings)
+  model.set_dataset(datasets, data)
+  model.store_results('results/Chinese_NER_results.csv')
+  model.model_save_path = "models/[ModelName]_[DevScore]_[TestScore]_[Epoch].h5"
   model.fit(epochs=25)
-
-if __name__ == '__main__':
-  pass

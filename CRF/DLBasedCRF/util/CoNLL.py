@@ -4,7 +4,7 @@
 from __future__ import print_function
 import os
 
-def conllWrite(outputPath, sentences, headers):
+def conll_write(outputPath, sentences, headers):
   if not os.path.exists(os.path.dirname(outputPath)):
     os.makedirs(os.path.dirname(outputPath))
   fOut = open(outputPath, 'w')
@@ -19,7 +19,7 @@ def conllWrite(outputPath, sentences, headers):
       fOut.write("\n")
     fOut.write("\n")
               
-def readCoNLL(inputPath, cols, commentSymbol=None, valTransformation=None):
+def read_co_nll(inputPath, cols, commentSymbol=None, valTransformation=None):
   sentences = []    
   sentenceTemplate = {name: [] for name in cols.values()}   
   sentence = {name: [] for name in sentenceTemplate.keys()}   

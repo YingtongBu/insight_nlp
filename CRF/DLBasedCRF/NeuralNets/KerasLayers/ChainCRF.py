@@ -38,7 +38,6 @@ def sparse_chain_crf_loss(y, x, U, bStart=None, bEnd=None, mask=None):
   energy -= free_energy0(x, U, mask)
   return K.expand_dims(-energy, -1)
 
-
 def chain_crf_loss(y, x, U, bStart=None, bEnd=None, mask=None):
   ySparse = K.argmax(y, -1)
   ySparse = K.cast(ySparse, 'int32')
@@ -116,7 +115,6 @@ def batch_gather(reference, indices):
   nClasses = refShape[1]
   flatIndices = K.arange(0, batchSize) * nClasses + K.flatten(indices)
   return K.gather(K.flatten(reference), flatIndices)
-
 
 def _backward(gamma, mask):
   gamma = K.cast(gamma, 'int32')

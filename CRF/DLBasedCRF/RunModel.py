@@ -9,7 +9,7 @@ from NeuralNets.BiLSTM import BiLSTM
 import sys
 import os
 
-def runModel(inputFile, outputFile):
+def run_model(inputFile, outputFile):
 
   modelPathList = os.listdir('./models')
   accuracyList = []
@@ -23,7 +23,7 @@ def runModel(inputFile, outputFile):
   with open(inputFile, 'r') as f:
     text = f.read()
 
-  lstmModel = BiLSTM.loadModel(modelFile)
+  lstmModel = BiLSTM.load_model(modelFile)
   textList = [con for con in text.split('\n') if con != '']
   sentences = [{'tokens': nltk.word_tokenize(words)} for words in textList]
 
@@ -31,7 +31,7 @@ def runModel(inputFile, outputFile):
   addCasingInformation(sentences)
   dataMatrix = createMatrices(sentences, lstmModel.mappings, True)
 
-  tags = lstmModel.tagSentences(dataMatrix)
+  tags = lstmModel.tag_sentences(dataMatrix)
   outputFileObject = open(outputFile, 'w')
   for sentenceIdx in range(len(sentences)):
     tokens = sentences[sentenceIdx]['tokens']
@@ -44,6 +44,3 @@ def runModel(inputFile, outputFile):
     outputFileObject.write('\n')
   
   outputFileObject.close()
-
-if __name__ == '__main__':
-  runModel('input.txt', 'output.txt')
