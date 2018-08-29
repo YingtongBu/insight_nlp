@@ -6,9 +6,10 @@ import os
 from Insight_NLP.Classifier.CNN.Train import preprocess
 from Insight_NLP.Classifier.CNN.Train import train
 
-def main(argv=None):
-  x_train, y_train, vocab_processor, x_dev, y_dev, x_ori_dev = preprocess()
-  train(x_train, y_train, vocab_processor, x_dev, y_dev, x_ori_dev)
+def main(options):
+  x_train, y_train, vocab_processor, x_dev, y_dev, x_ori_dev = preprocess(
+    options)
+  train(x_train, y_train, vocab_processor, x_dev, y_dev, x_ori_dev, options)
 
 if __name__ == '__main__':
   usage = 'usage = %prog [options]'
@@ -44,4 +45,4 @@ if __name__ == '__main__':
   options, args = parser.parse_args()
 
   os.environ["CUDA_VISIBLE_DEVICES"] = options.GPU
-  main()
+  main(options)

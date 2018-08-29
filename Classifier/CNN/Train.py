@@ -11,7 +11,7 @@ from Insight_NLP.Classifier.CNN.CNNClassifier import CNNClassifier
 from tensorflow.contrib import learn
 import optparse
 
-def preprocess():
+def preprocess(options):
   print('Loading Data ...')
   if options.language_type == 'ENG':
     x_text, y, x_original = PreProcess.load_data_eng(options.train_data,
@@ -72,7 +72,7 @@ def preprocess():
   else:
     assert False
 
-def train(x_train, y_train, vocab_processor, x_dev, y_dev, x_ori_dev):
+def train(x_train, y_train, vocab_processor, x_dev, y_dev, x_ori_dev, options):
   # Training
   with tf.Graph().as_default():
     sess = tf.Session()
