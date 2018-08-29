@@ -53,6 +53,6 @@ def text_to_speech(content, prefix, app_id='5b7f49bd',
       _write_file(prefix + '.' + sid + '.wav', r.content)
     else:
       _write_file(prefix + '.' + sid + '.mp3', r.content)
-    print('success, sid = ' + sid)
+    print('success, sid: ' + sid)
   else:
     print(r.text)
