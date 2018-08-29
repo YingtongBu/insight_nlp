@@ -6,8 +6,8 @@ import numpy as np
 import os
 import time
 import datetime
-import PreProcess
-from TextCNN import TextCNN
+from  Insight_NLP.Classifier import PreProcess
+from Insight_NLP.Classifier import TextCNN
 from tensorflow.contrib import learn
 import optparse
 
@@ -212,5 +212,6 @@ if __name__ == '__main__':
   parser.add_option("--GPU", type=str, default='3',
                     help='GPU device you use')
   options, args = parser.parse_args()
+
   os.environ["CUDA_VISIBLE_DEVICES"] = options.GPU
-  tf.app.run()
+  main()
