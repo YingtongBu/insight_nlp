@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-# coding: utf8
-# author: Xin Jin (xin.jin12@pactera.com)
+#coding: utf8
+#author: Xin Jin (xin.jin12@pactera.com)
 
 import Insight_NLP.Speech.TextToSpeech as TextToSpeech
 
