@@ -31,5 +31,3 @@ if __name__ == "__main__":
     is_existed = os.path.exists(full_name)
     print(f"{full_name}, {is_existed}")
     assert is_existed
-
-

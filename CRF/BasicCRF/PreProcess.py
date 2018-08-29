@@ -1,6 +1,6 @@
+#!/usr/bin/env python3
 #coding: utf8
 #author: Xinyi Wu (xinyi.wu5@pactera.com)
-
 import pycrfsuite
 
 def word2features(doc, i, model):
@@ -30,8 +30,7 @@ def word2features(doc, i, model):
                      'word.gongcheng={}'.format(bool("工程" in word))
                      ])
 
-  # Features for words that are not
-  # at the beginning of a document
+  # Features for words that are not at the beginning of a document
   if i > 0:
     word1 = doc[i-1][0]
     postag1 = doc[i-1][1]
@@ -74,8 +73,7 @@ def word2features(doc, i, model):
     # Indicate that it is the 'beginning of a document'
     features.append('BOS')
 
-  # Features for words that are not
-  # at the end of a document
+  # Features for words that are not at the end of a document
   if i < len(doc)-1:
     word1 = doc[i+1][0]
     postag1 = doc[i+1][1]
@@ -123,11 +121,11 @@ def word2features(doc, i, model):
   return features
 
 # A function for extracting features in documents
-def extractFeatures(doc, model):
+def extract_features(doc, model):
   return [word2features(doc, i, model) for i in range(len(doc))]
 
 # A function fo generating the list of labels for each document
-def getLabels(doc):
+def get_labels(doc):
   return [label for (token, postag, label) in doc]
 
 def train(X_train, y_train, model_name):
@@ -160,31 +158,28 @@ def train(X_train, y_train, model_name):
 
   return None
 
-def getLongest(X, Y):
+def get_longest(X, Y):
   n = len(Y)
-  currentLen = 0  # To store the length of current substring
-  maxLen = 0  # To store the result
-  prevIndex = -2  # To store the previous index
-  currentStart = -1
-  maxStart = -1
+  current_len = 0  # To store the length of current substring
+  max_len = 0  # To store the result
+  prev_index = -2  # To store the previous index
+  current_start = -1
+  max_start = -1
 
   for i in range(n):
     if Y[i] == "Y":
-      if prevIndex == i - 1:
-        currentLen += 1
-        prevIndex = i
+      if prev_index == i - 1:
+        current_len += 1
+        prev_index = i
       else:
-        prevIndex = i
-        currentLen = 1
-        currentStart = i
-      if currentLen > maxLen:
-        maxLen = currentLen
-        maxStart = currentStart
+        prev_index = i
+        current_len = 1
+        current_start = i
+      if current_len > max_len:
+        max_len = current_len
+        max_start = current_start
 
-  if maxStart == -1:
+  if max_start == -1:
     return ''
   else:
-    return ''.join(X[maxStart:(maxStart+maxLen)])
-
-if __name__ == '__main__':
-  pass
+    return ''.join(X[max_start:(max_start+max_len)])

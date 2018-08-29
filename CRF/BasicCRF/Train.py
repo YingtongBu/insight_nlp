@@ -1,32 +1,32 @@
+#!/usr/bin/env python3
 #coding: utf8
 #author: Xinyi Wu (xinyi.wu5@pactera.com)
-
 import sys
 sys.path.append("")
-from InforExtractionFramework.CRF.PreProcess import *
+from Insight_NLP.CRF.BasicCRF.PreProcess import *
 import optparse
 
 if __name__ == '__main__':
   usage = "usage: %prog [options]"
   parser = optparse.OptionParser(usage=usage)
-  parser.add_option("-i", "--trainFile", type=str,
+  parser.add_option("-i", "--train_file", type=str,
                     help="the INPUT FILE of training data")
-  parser.add_option("-m", "--modelType", type=str,
+  parser.add_option("-m", "--model_type", type=str,
                     help="MODEL TYPE: company, contract, project or other")
-  parser.add_option("-n", "--modelName", type=str,
+  parser.add_option("-n", "--model_name", type=str,
                     help="MODEL NAME: save CRF model as MODEL NAME")
   (options, args) = parser.parse_args()
 
   # Read training file
-  trainingFile = open(options.trainFile)
+  training_file = open(options.train_file)
   data = list()
-  trueAnswer = list()
+  true_answer = list()
   sentences = list()
   index = list()
-  for line in trainingFile:
+  for line in training_file:
     items = line.split('\t')
     index.append(items[0])
-    trueAnswer.append(items[1])
+    true_answer.append(items[1])
     sentences.append(items[2])
     words = items[3].split(' ')[:-1]
     l = list()
@@ -40,10 +40,10 @@ if __name__ == '__main__':
       else:
         l.append(w.split('/'))
     data.append(l)
-  trainingFile.close()
+  training_file.close()
 
   # Training
-  X = [extractFeatures(sample, options.modelType) for sample in data]
-  y = [getLabels(sample) for sample in data]
+  X = [extract_features(sample, options.model_type) for sample in data]
+  y = [get_labels(sample) for sample in data]
 
-  train(X, y, options.modelName)
+  train(X, y, options.model_name)

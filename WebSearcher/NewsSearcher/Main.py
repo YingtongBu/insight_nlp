@@ -1,3 +1,7 @@
+#!/usr/bin/env python
+#coding: utf8
+#author: Yu Liu (yu.liu55@pactera.com)
+
 from Crawler import Crawler
 import argparse
 import os
@@ -5,8 +9,9 @@ import os
 # from QueryClassifier import QueryClassifier
 
 def main():
-  parser = argparse.ArgumentParser(description = 'Process Parameters for searching')
-  parser.add_argument('key', type = str, help= 'Input the keys of Google API')
+  parser = \
+    argparse.ArgumentParser(description='Process Parameters for searching')
+  parser.add_argument('key', type=str, help='Input the keys of Google API')
   args = parser.parse_args()
   # command loop
   while True:
@@ -52,7 +57,6 @@ def main():
       else:
           print('Command error, please input your option again\n')
           continue
-
 
 if __name__ == '__main__':
   main()
