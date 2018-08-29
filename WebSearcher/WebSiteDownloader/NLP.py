@@ -14,8 +14,11 @@ class Processor:
 
   def summarize(self):
     for news in self.list_news:
-      news['summaryGensim'] = gensim.summarization.summarize(news['article'],
+      try:
+        news['summaryGensim'] = gensim.summarization.summarize(news['article'],
                                                              word_count=100)
+      except KeyError:
+        continue
 
   @property
   def news_list(self):

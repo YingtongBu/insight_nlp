@@ -74,7 +74,7 @@ if __name__ == '__main__':
             help="save log file to FOLDER")
   parser.add_option("-p", "--phantomjs_path",
             default=
-            "/Users/xinyiwu/Downloads/phantomjs-2.1.1-macosx/bin/phantomjs",
+            "/Users/Olivia/Downloads/phantomjs-2.1.1-macosx/bin/phantomjs",
             help="change executable path of PhantomJS to PATH")
   parser.add_option("-u", "--wsjusername",
                     default='redoakrichard@gmail.com',
