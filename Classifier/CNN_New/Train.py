@@ -20,7 +20,8 @@ def preprocess():
     #TODO: to see if the performance is good or not
     #max_document_length = max([len(x.split(" ")) for x in x_text])
     max_document_length = options.num_words
-    vocab_processor = learn.preprocessing.VocabularyProcessor(max_document_length)
+    vocab_processor = \
+      learn.preprocessing.VocabularyProcessor(max_document_length)
     x = np.array(list(vocab_processor.fit_transform(x_text)))
     x_original = np.array(x_original)
     # Randomly shuffle data
@@ -33,8 +34,10 @@ def preprocess():
     # Split train/test set
     # TODO: This is very crude, should use cross-validation
     dev_sample_index = -1 * int(options.dev_sample_percentage * float(len(y)))
-    x_train, x_dev = x_shuffled[:dev_sample_index], x_shuffled[dev_sample_index:]
-    y_train, y_dev = y_shuffled[:dev_sample_index], y_shuffled[dev_sample_index:]
+    x_train, x_dev = \
+      x_shuffled[:dev_sample_index], x_shuffled[dev_sample_index:]
+    y_train, y_dev = \
+      y_shuffled[:dev_sample_index], y_shuffled[dev_sample_index:]
     x_ori_dev = x_ori_shuffled[dev_sample_index:]
 
     del x, y, x_shuffled, y_shuffled
@@ -58,8 +61,10 @@ def preprocess():
     # Split train/dev set
     dev_sample_index = -1 * int(
       options.dev_sample_percentage * float(len(y_shuffled)))
-    x_train, x_dev = x_shuffled[:dev_sample_index], x_shuffled[dev_sample_index:]
-    y_train, y_dev = y_shuffled[:dev_sample_index], y_shuffled[dev_sample_index:]
+    x_train, x_dev = \
+      x_shuffled[:dev_sample_index], x_shuffled[dev_sample_index:]
+    y_train, y_dev = \
+      y_shuffled[:dev_sample_index], y_shuffled[dev_sample_index:]
     x_ori_dev = text_shuffled[dev_sample_index:]
     del x_shuffled, y_shuffled, data, label, text_shuffled
     return x_train, y_train, 5000, x_dev, y_dev, x_ori_dev

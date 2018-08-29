@@ -59,8 +59,8 @@ def load_data_chi(file_path, lowRate, len_sentence, num_of_class):
   for line in open(file_path, 'r').readlines()[1:]:
     if int(line.replace('\ufeff', '').replace('\n', '').split('\t')[0]) \
                                                                 < num_of_class:
-      train_x.append((line.replace('\ufeff', '').replace('\n', '').split('\t')[1]
-                     + '*' * 200)[:len_sentence])
+      train_x.append((line.replace('\ufeff', '').replace('\n', '').split(
+        '\t')[1] + '*' * 200)[:len_sentence])
       train_y.append(
         int(line.replace('\ufeff', '').replace('\n', '').split('\t')[0]))
       raw_text.append(line.replace('\ufeff', '').replace('\n', '').split('\t'))
