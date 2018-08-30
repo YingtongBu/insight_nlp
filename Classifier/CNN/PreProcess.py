@@ -4,7 +4,6 @@
 import numpy as np
 import re
 from sklearn import preprocessing
-from tqdm import tqdm
 
 def _clean_str(string):
   """
