@@ -33,7 +33,8 @@ def preprocess(parameters):
 
     # Split train/test set
     # TODO: This is very crude, should use cross-validation
-    dev_sample_index = -1 * int(parameters.dev_sample_percentage * float(len(y)))
+    dev_sample_index = \
+      -1 * int(parameters.dev_sample_percentage * float(len(y)))
     x_train, x_dev = \
       x_shuffled[:dev_sample_index], x_shuffled[dev_sample_index:]
     y_train, y_dev = \
@@ -175,7 +176,8 @@ def train(
         print('File generated!')
       # Generate batches
       batches = PreProcess.batch_iter(
-        list(zip(x_train, y_train)), parameters.batch_size, parameters.num_epochs)
+        list(zip(x_train, y_train)),
+        parameters.batch_size, parameters.num_epochs)
       # Training loop. For each batch...
       for batch in batches:
         x_batch, y_batch = zip(*batch)
