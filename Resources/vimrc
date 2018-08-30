@@ -1,0 +1,20 @@
+set nu
+set nowrap
+syntax on
+filetype indent on
+filetype plugin on
+set autoindent
+set hlsearch
+set ignorecase
+set mouse=a
+set nobackup
+set incsearch
+set showmatch
+set backspace=indent,eol,start
+"set horizontal scrollbind.
+set scrollopt+=hor
+set expandtab
+set tabstop=2
+set shiftwidth=2
+set shiftround
+
