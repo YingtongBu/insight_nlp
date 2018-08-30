@@ -25,7 +25,7 @@ def _clean_str(string):
   string = re.sub(r"\s{2,}", " ", string)
   return string.strip().lower()
 
-def load_data_eng(file_path, num_of_class):
+def load_data_english(file_path, num_of_class):
   x_text, train_y, y = [], [], []
   data = open(file_path, 'r', encoding='latin').readlines()[1:]
   data = [sample.strip() for sample in data]
@@ -53,7 +53,7 @@ def load_data_eng(file_path, num_of_class):
   y = enc.transform(y).toarray()
   return [x_text, y, x_original]
 
-def load_data_chi(file_path, lowRate, len_sentence, num_of_class):
+def load_data_chinese(file_path, low_rate, len_sentence, num_of_class):
   train_x, train_y = [], []
   raw_text = []
   for line in open(file_path, 'r').readlines()[1:]:
@@ -78,7 +78,7 @@ def load_data_chi(file_path, lowRate, len_sentence, num_of_class):
         word_count[char] = 1
       else:
         word_count[char] += 1
-      if char not in word_dict and word_count[char] > lowRate:
+      if char not in word_dict and word_count[char] > low_rate:
         word_dict[char] = index
         index += 1
   dict_length = len(word_dict)
