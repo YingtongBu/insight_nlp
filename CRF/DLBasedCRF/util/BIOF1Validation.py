@@ -3,57 +3,57 @@
 #author: Xin Jin (xin.jin12@pactera.com)
 from __future__ import print_function
 import logging
-def compute_f1_token_basis(predictions, correct, OLabel):
-  prec = compute_precision_token_basis(predictions, correct, OLabel)
-  rec = compute_precision_token_basis(correct, predictions, OLabel)
+def compute_f1_token_basis(predictions, correct, o_label):
+  prec = compute_precision_token_basis(predictions, correct, o_label)
+  rec = compute_precision_token_basis(correct, predictions, o_label)
   f1 = 0
   if (rec + prec) > 0:
     f1 = 2.0 * prec * rec / (prec + rec)
   return prec, rec, f1
 
-def compute_precision_token_basis(guessedSentences,
-                                  correctSentences, OLabel):
-  assert(len(guessedSentences) == len(correctSentences))
-  correctCount = 0
+def compute_precision_token_basis(guessed_sentences,
+                                  correct_sentences, o_label):
+  assert(len(guessed_sentences) == len(correct_sentences))
+  correct_count = 0
   count = 0
-  for sentenceIdx in range(len(guessedSentences)):
-    guessed = guessedSentences[sentenceIdx]
-    correct = correctSentences[sentenceIdx]
+  for sentence_idx in range(len(guessed_sentences)):
+    guessed = guessed_sentences[sentence_idx]
+    correct = correct_sentences[sentence_idx]
     assert(len(guessed) == len(correct))
     for idx in range(len(guessed)):
-      if guessed[idx] != OLabel:
+      if guessed[idx] != o_label:
         count += 1
         if guessed[idx] == correct[idx]:
-          correctCount += 1
+          correct_count += 1
     
   precision = 0
   if count > 0:    
-    precision = float(correctCount) / count      
+    precision = float(correct_count) / count
   return precision
 
-def compute_f1(predictions, correct, idx2Label, correctBIOErrors='No',
-               encodingScheme='BIO'):
-  labelPred = []    
+def compute_f1(predictions, correct, idx_to_label, correct_bio_errors='No',
+               encoding_scheme='BIO'):
+  label_pred = []
   for sentence in predictions:
-    labelPred.append([idx2Label[element] for element in sentence])
+    label_pred.append([idx_to_label[element] for element in sentence])
         
-  labelCorrect = []    
+  label_correct = []
   for sentence in correct:
-    labelCorrect.append([idx2Label[element] for element in sentence])
+    label_correct.append([idx_to_label[element] for element in sentence])
             
-  encodingScheme = encodingScheme.upper()
+  encoding_scheme = encoding_scheme.upper()
     
-  if encodingScheme == 'IOBES':
-    convert_iobes_to_bio(labelPred)
-    convert_iobes_to_bio(labelCorrect)
-  elif encodingScheme == 'IOB':
-    convert_iob_to_bio(labelPred)
-    convert_iob_to_bio(labelCorrect)
+  if encoding_scheme == 'IOBES':
+    convert_iobes_to_bio(label_pred)
+    convert_iobes_to_bio(label_correct)
+  elif encoding_scheme == 'IOB':
+    convert_iob_to_bio(label_pred)
+    convert_iob_to_bio(label_correct)
                       
-  check_bio_encoding(labelPred, correctBIOErrors)
+  check_bio_encoding(label_pred, correct_bio_errors)
 
-  prec = compute_precision(labelPred, labelCorrect)
-  rec = compute_precision(labelCorrect, labelPred)
+  prec = compute_precision(label_pred, label_correct)
+  rec = compute_precision(label_correct, label_pred)
     
   f1 = 0
   if (rec + prec) > 0:
@@ -63,31 +63,31 @@ def compute_f1(predictions, correct, idx2Label, correctBIOErrors='No',
 
 def convert_iob_to_bio(dataset):
   for sentence in dataset:
-    prevVal = 'O'
+    prev_val = 'O'
     for pos in range(len(sentence)):
-      firstChar = sentence[pos][0]
-      if firstChar == 'I':
-        if prevVal == 'O' or prevVal[1:] != sentence[pos][1:]:
+      first_char = sentence[pos][0]
+      if first_char == 'I':
+        if prev_val == 'O' or prev_val[1:] != sentence[pos][1:]:
           sentence[pos] = 'B' + sentence[pos][1:] 
 
-      prevVal = sentence[pos]
+      prev_val = sentence[pos]
 
 def convert_iobes_to_bio(dataset):
   for sentence in dataset:
     for pos in range(len(sentence)):
-      firstChar = sentence[pos][0]
-      if firstChar == 'S':
+      first_char = sentence[pos][0]
+      if first_char == 'S':
         sentence[pos] = 'B' + sentence[pos][1:]
-      elif firstChar == 'E':
+      elif first_char == 'E':
         sentence[pos] = 'I' + sentence[pos][1:]
                 
-def compute_precision(guessedSentences, correctSentences):
-  assert(len(guessedSentences) == len(correctSentences))
-  correctCount = 0
+def compute_precision(guessed_sentences, correct_sentences):
+  assert(len(guessed_sentences) == len(correct_sentences))
+  correct_count = 0
   count = 0  
-  for sentenceIdx in range(len(guessedSentences)):
-    guessed = guessedSentences[sentenceIdx]
-    correct = correctSentences[sentenceIdx]
+  for sentence_idx in range(len(guessed_sentences)):
+    guessed = guessed_sentences[sentence_idx]
+    correct = correct_sentences[sentence_idx]
          
     assert(len(guessed) == len(correct))
     idx = 0
@@ -97,20 +97,20 @@ def compute_precision(guessedSentences, correctSentences):
                 
         if guessed[idx] == correct[idx]:
           idx += 1
-          correctlyFound = True
+          correctly_found = True
                     
           while idx < len(guessed) and guessed[idx][0] == 'I':  
             if guessed[idx] != correct[idx]:
-              correctlyFound = False
+              correctly_found = False
                         
             idx += 1
                     
           if idx < len(guessed):
             if correct[idx][0] == 'I':  
-              correctlyFound = False
+              correctly_found = False
                         
-          if correctlyFound:
-            correctCount += 1
+          if correctly_found:
+            correct_count += 1
         else:
           idx += 1
       else:  
@@ -118,39 +118,39 @@ def compute_precision(guessedSentences, correctSentences):
     
   precision = 0
   if count > 0:    
-    precision = float(correctCount) / count
+    precision = float(correct_count) / count
         
   return precision
 
-def check_bio_encoding(predictions, correctBIOErrors):
+def check_bio_encoding(predictions, correct_bio_errors):
   errors = 0
   labels = 0
     
-  for sentenceIdx in range(len(predictions)):
-    labelStarted = False
-    labelClass = None
+  for sentence_idx in range(len(predictions)):
+    label_started = False
+    label_class = None
         
-    for labelIdx in range(len(predictions[sentenceIdx])): 
-      label = predictions[sentenceIdx][labelIdx]      
+    for label_idx in range(len(predictions[sentence_idx])):
+      label = predictions[sentence_idx][label_idx]
       if label.startswith('B-'):
         labels += 1
-        labelStarted = True
-        labelClass = label[2:]
+        label_started = True
+        label_class = label[2:]
             
       elif label == 'O':
-        labelStarted = False
-        labelClass = None
+        label_started = False
+        label_class = None
       elif label.startswith('I-'):
-        if not labelStarted or label[2:] != labelClass:
+        if not label_started or label[2:] != label_class:
           errors += 1        
-          if correctBIOErrors.upper() == 'B':
-            predictions[sentenceIdx][labelIdx] = 'B-' + label[2:]
-            labelStarted = True
-            labelClass = label[2:]
-          elif correctBIOErrors.upper() == 'O':
-            predictions[sentenceIdx][labelIdx] = 'O'
-            labelStarted = False
-            labelClass = None
+          if correct_bio_errors.upper() == 'B':
+            predictions[sentence_idx][label_idx] = 'B-' + label[2:]
+            label_started = True
+            label_class = label[2:]
+          elif correct_bio_errors.upper() == 'O':
+            predictions[sentence_idx][label_idx] = 'O'
+            label_started = False
+            label_class = None
           else:
             assert(False)  
             
@@ -160,34 +160,34 @@ def check_bio_encoding(predictions, correctBIOErrors):
                  % (errors, labels, errors / float(labels) * 100),)
 
 def test_encodings():
-  goldBIO = [['O', 'B-PER', 'I-PER', 'O', 'B-PER', 'B-PER', 'I-PER'],
+  gold_bio = [['O', 'B-PER', 'I-PER', 'O', 'B-PER', 'B-PER', 'I-PER'],
              ['O', 'B-PER', 'B-LOC', 'I-LOC', 'O', 'B-PER', 'I-PER', 'I-PER'],
              ['B-LOC', 'I-LOC', 'I-LOC', 'B-PER', 'B-PER', 'I-PER', 'I-PER', 
               'O', 'B-LOC', 'B-PER']]
 
   print("--Test IOBES--")
-  goldIOBES = [['O', 'B-PER', 'E-PER', 'O', 'S-PER', 'B-PER', 'E-PER'],
+  gold_iobes = [['O', 'B-PER', 'E-PER', 'O', 'S-PER', 'B-PER', 'E-PER'],
                ['O', 'S-PER', 'B-LOC', 'E-LOC', 'O', 'B-PER', 'I-PER', 
                 'E-PER'],
                ['B-LOC', 'I-LOC', 'E-LOC', 'S-PER', 'B-PER', 'I-PER', 'E-PER', 
                 'O', 'S-LOC', 'S-PER']]
-  convert_iobes_to_bio(goldIOBES)
+  convert_iobes_to_bio(gold_iobes)
 
-  for sentenceIdx in range(len(goldBIO)):
-    for tokenIdx in range(len(goldBIO[sentenceIdx])):
-      assert (goldBIO[sentenceIdx][tokenIdx] == goldIOBES[sentenceIdx]
-              [tokenIdx])
+  for sentence_idx in range(len(gold_bio)):
+    for token_idx in range(len(gold_bio[sentence_idx])):
+      assert (gold_bio[sentence_idx][token_idx] == gold_iobes[sentence_idx]
+              [token_idx])
 
   print("--Test IOB--")
-  goldIOB = [['O', 'I-PER', 'I-PER', 'O', 'I-PER', 'B-PER', 'I-PER'],
+  gold_iob = [['O', 'I-PER', 'I-PER', 'O', 'I-PER', 'B-PER', 'I-PER'],
              ['O', 'I-PER', 'I-LOC', 'I-LOC', 'O', 'I-PER', 'I-PER', 'I-PER'],
              ['I-LOC', 'I-LOC', 'I-LOC', 'I-PER', 'B-PER', 'I-PER', 'I-PER', 
               'O', 'I-LOC', 'I-PER']]
-  convert_iob_to_bio(goldIOB)
+  convert_iob_to_bio(gold_iob)
 
-  for sentenceIdx in range(len(goldBIO)):
-    for tokenIdx in range(len(goldBIO[sentenceIdx])):
-      assert (goldBIO[sentenceIdx][tokenIdx] == 
-              goldIOB[sentenceIdx][tokenIdx])
+  for sentence_idx in range(len(gold_bio)):
+    for token_idx in range(len(gold_bio[sentence_idx])):
+      assert (gold_bio[sentence_idx][token_idx] ==
+              gold_iob[sentence_idx][token_idx])
 
   print("test encodings completed")

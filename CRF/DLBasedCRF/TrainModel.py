@@ -15,12 +15,12 @@ def train_model():
   dname = os.path.dirname(abspath)
   os.chdir(dname)
 
-  loggingLevel = logging.INFO
+  logging_level = logging.INFO
   logger = logging.getLogger()
-  logger.setLevel(loggingLevel)
+  logger.setLevel(logging_level)
 
   ch = logging.StreamHandler(sys.stdout)
-  ch.setLevel(loggingLevel)
+  ch.setLevel(logging_level)
   formatter = logging.Formatter('%(message)s')
   ch.setFormatter(formatter)
   logger.addHandler(ch)

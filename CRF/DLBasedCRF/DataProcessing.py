@@ -3,195 +3,193 @@
 #author: Xin Jin (xin.jin12@pactera.com)
 import random
 
-def word_vector_generation(wordVectorFile, trainJiaFangDataFile,
-                           testJiaFangDataFile):
-  chineseWordVectorFile = open(wordVectorFile, 'w')
-  wordList = []
-  for line in open(trainJiaFangDataFile):
+def word_vector_generation(word_vector_file, train_jia_fang_data_file,
+                           test_jia_fang_data_file):
+  chinese_word_vector_file = open(word_vector_file, 'w')
+  word_list = []
+  for line in open(train_jia_fang_data_file):
     content = line.rstrip('\n').split('\t')[3]
     content = content.split(' ')
     for item in content:
       if item.split('/')[0] != '':
-        wordList.append(item.split('/')[0])
+        word_list.append(item.split('/')[0])
   
-  for line in open(testJiaFangDataFile):
+  for line in open(test_jia_fang_data_file):
     content = line.rstrip('\n').split('\t')[2]
     content = content.split(' ')
     for item in content:
       if item.split('/')[0] != '':
-        wordList.append(item.split('/')[0])
+        word_list.append(item.split('/')[0])
   
-  wordDict = dict()
-  for item in set(wordList):
-    randomList = []
+  word_dict = dict()
+  for item in set(word_list):
+    random_list = []
     for i in range(300):
-      randomList.append(round(random.uniform(-1, 1), 6))
-    wordDict[item] = randomList
+      random_list.append(round(random.uniform(-1, 1), 6))
+    word_dict[item] = random_list
   
-  for i in range(len(wordDict)):
-    wordList = list(wordDict.keys())
-    randomNumList = list(wordDict.values())
+  for i in range(len(word_dict)):
+    word_list = list(word_dict.keys())
+    random_num_list = list(word_dict.values())
     vector = ''
-    for index in range(len(randomNumList[i])):
-      vector += (str(randomNumList[i][index]) + ' ')
-    wordVector = wordList[i] + ' ' + vector
-    chineseWordVectorFile.writelines(wordVector)
-    chineseWordVectorFile.write('\n')
+    for index in range(len(random_num_list[i])):
+      vector += (str(random_num_list[i][index]) + ' ')
+    word_vector = word_list[i] + ' ' + vector
+    chinese_word_vector_file.writelines(word_vector)
+    chinese_word_vector_file.write('\n')
   
-  chineseWordVectorFile.close()
+  chinese_word_vector_file.close()
 
-def train_model_data_set_generation(trainSetModelFile, testSetModelFile,
-                                    validationSetModelFile,
-                                    trainJiaFangDataFile):
-  fileTrainObj = open(trainSetModelFile, 'w')
-  fileTestObj = open(testSetModelFile, 'w')
-  fileValidationObj = open(validationSetModelFile, 'w')
+def train_model_data_set_generation(train_set_model_file, test_set_model_file,
+                                    validation_set_model_file,
+                                    train_jia_fang_data_file):
+  file_train_obj = open(train_set_model_file, 'w')
+  file_test_obj = open(test_set_model_file, 'w')
+  file_validation_obj = open(validation_set_model_file, 'w')
 
   index = 0
-  for line in open(trainJiaFangDataFile):
+  for line in open(train_jia_fang_data_file):
     content = line.rstrip('\n').split('\t')[3]
     content = content.split(' ')
     i = 0
-    lineContent = ''
+    line_content = ''
     for item in content:
-      itemList = item.split('/')
-      if i == 0 and itemList[2] == 'Y':
-        tempNER = 'B-PER'
-      elif itemList[2] == 'Y':
-        tempNER = 'I-PER'
+      item_list = item.split('/')
+      if i == 0 and item_list[2] == 'Y':
+        temp_ner = 'B-PER'
+      elif item_list[2] == 'Y':
+        temp_ner = 'I-PER'
       else:
-        tempNER = 'O'
-      if itemList[0] != '':
-        lineContent += str(i + 1) + '\t' + itemList[0] + '\t' + tempNER + '\n'
+        temp_ner = 'O'
+      if item_list[0] != '':
+        line_content += str(i + 1) + '\t' + item_list[0] + '\t' + temp_ner + '\n'
       i += 1
     if index < 3200:
-      fileTrainObj.write(lineContent + '\n')
+      file_train_obj.write(line_content + '\n')
     elif index >= 3200 and index < 4000:
-        fileTestObj.write(lineContent + '\n')
+        file_test_obj.write(line_content + '\n')
     else:
-      fileValidationObj.write(lineContent + '\n')
+      file_validation_obj.write(line_content + '\n')
     index += 1
 
-  fileTrainObj.close()
-  fileTestObj.close()
-  fileValidationObj.close()
+  file_train_obj.close()
+  file_test_obj.close()
+  file_validation_obj.close()
 
-def task_input_generation(predictProbFile, idRecordFile, testJiaFangDataFile,
-                          inputFile):
+def task_input_generation(predict_prob_file, id_record_file,
+                          test_jia_fang_data_file, input_file):
   i = 0
-  probList = []
-  for line in open(predictProbFile):
-    probList.append(str(i) + '\t' + line.strip('\n'))
+  prob_list = []
+  for line in open(predict_prob_file):
+    prob_list.append(str(i) + '\t' + line.strip('\n'))
     i += 1
   
-  sentenceDict = dict()
-  for idProbPair in probList:
-    tempList = idProbPair.split('\t')
-    if tempList[1] not in sentenceDict.keys():
-      sentenceDict[tempList[1]] = tempList[2]
-    elif float(sentenceDict[tempList[1]]) <= float(tempList[2]):
-      sentenceDict[tempList[1]] = tempList[2]
+  sentence_dict = dict()
+  for id_prob_pair in prob_list:
+    temp_list = id_prob_pair.split('\t')
+    if temp_list[1] not in sentence_dict.keys():
+      sentence_dict[temp_list[1]] = temp_list[2]
+    elif float(sentence_dict[temp_list[1]]) <= float(temp_list[2]):
+      sentence_dict[temp_list[1]] = temp_list[2]
 
-  indexIdPairDict = dict()
-  for idProbPair in probList:
-    tempList = idProbPair.split('\t')
-    for id in list(sentenceDict.keys()):
-      if tempList[1] == id and tempList[2] == sentenceDict[id]:
-        indexIdPairDict[tempList[0]] = tempList[1]
+  index_id_pair_dict = dict()
+  for id_prob_pair in prob_list:
+    temp_list = id_prob_pair.split('\t')
+    for id in list(sentence_dict.keys()):
+      if temp_list[1] == id and temp_list[2] == sentence_dict[id]:
+        index_id_pair_dict[temp_list[0]] = temp_list[1]
   
-  tempDict = {indexIdPairDict[key]: key for key in indexIdPairDict}
-  indexList = list(tempDict.values())
+  temp_dict = {index_id_pair_dict[key]: key for key in index_id_pair_dict}
+  index_list = list(temp_dict.values())
 
-  idRecordObject = open(idRecordFile, 'w')
-  for idRecord in list(tempDict.keys()):
-    idRecordObject.writelines(idRecord + '\t')
-  idRecordObject.close()
+  id_record_object = open(id_record_file, 'w')
+  for id_record in list(temp_dict.keys()):
+    id_record_object.writelines(id_record + '\t')
+  id_record_object.close()
 
-  sentenceList = []
-  indexFinal = 0
-  for line in open(testJiaFangDataFile):
-    if str(indexFinal) in indexList:
+  sentence_list = []
+  index_final = 0
+  for line in open(test_jia_fang_data_file):
+    if str(index_final) in index_list:
       content = line.rstrip('\n').split('\t')[2]
       content = content.split(' ')
-      wordList = []
+      word_list = []
       for item in content:
         if item.split('/')[0] != '':
-          wordList.append(item.split('/')[0])
-      sentenceList.append(wordList)
-    indexFinal += 1
+          word_list.append(item.split('/')[0])
+      sentence_list.append(word_list)
+    index_final += 1
   
-  inputFileObject = open(inputFile, 'w')
-  for sentence in sentenceList:
-    tempSentence = ''
+  input_file_object = open(input_file, 'w')
+  for sentence in sentence_list:
+    temp_sentence = ''
     for word in sentence:
-      tempSentence += (word + ' ')
-    inputFileObject.writelines(tempSentence)
-    inputFileObject.write('\n')
+      temp_sentence += (word + ' ')
+    input_file_object.writelines(temp_sentence)
+    input_file_object.write('\n')
   
-  inputFileObject.close()
+  input_file_object.close()
 
-def output_processing(idRecordFile, outputFile, groundTruthFile):
-  idRecordObject = open(idRecordFile, 'r')
-  idRecordList = [idRecord for idRecord in idRecordObject.read().split('\t') 
-                  if idRecord != '']
+def output_processing(id_record_file, output_file, ground_truth_file):
+  id_record_object = open(id_record_file, 'r')
+  id_record_list = [id_record for id_record in
+                    id_record_object.read().split('\t') if id_record != '']
   
-  outputObject = open(outputFile, 'r')
-  output = [out for out in outputObject.read().split('\n\n') 
+  output_object = open(output_file, 'r')
+  output = [out for out in output_object.read().split('\n\n')
             if out != '']
   
-  outputList = []
+  output_list = []
   for out in output:
-    tempOutList = out.split('\n')
-    tempOutputList = []
-    for tempOut in tempOutList:
-      if '-PER' in tempOut:
-        tempOutputList.append(tempOut)
-    outputList.append(tempOutputList)
+    temp_out_list = out.split('\n')
+    temp_output_list = []
+    for temp_out in temp_out_list:
+      if '-PER' in temp_out:
+        temp_output_list.append(temp_out)
+    output_list.append(temp_output_list)
   
-  finalOutputList = []
-  for outputItem in outputList:
-    tempStr = ''
-    for item in outputItem:
-      tempStr += item.split('\t')[0]
-    finalOutputList.append(tempStr)
+  final_output_list = []
+  for output_item in output_list:
+    temp_str = ''
+    for item in output_item:
+      temp_str += item.split('\t')[0]
+    final_output_list.append(temp_str)
   
-  resultDict = dict(zip(idRecordList, finalOutputList))
+  result_dict = dict(zip(id_record_list, final_output_list))
 
-  idTestsetList = []
-  resultTestsetList = []
-  for line in open(groundTruthFile):
+  id_testset_list = []
+  result_testset_list = []
+  for line in open(ground_truth_file):
     content = line.rstrip('\n').split('\t')
-    idTestsetList.append(content[0].split('=')[1])
-    resultTestsetList.append(content[1].split('=')[1])
+    id_testset_list.append(content[0].split('=')[1])
+    result_testset_list.append(content[1].split('=')[1])
   
-  predictResultList = []
-  for i in range(len(idTestsetList)):
+  predict_result_list = []
+  for i in range(len(id_testset_list)):
     try:
-      predictResultList.append(resultDict[idTestsetList[i]])
+      predict_result_list.append(result_dict[id_testset_list[i]])
     except:
-      predictResultList.append('')
+      predict_result_list.append('')
   
-  accurateNum = 0
-  for i in range(len(resultTestsetList)):
-    if predictResultList[i] == resultTestsetList[i]:
-      accurateNum += 1
+  accurate_num = 0
+  for i in range(len(result_testset_list)):
+    if predict_result_list[i] == result_testset_list[i]:
+      accurate_num += 1
   
-  accuracy = accurateNum / 1120
+  accuracy = accurate_num / 1120
   print(f'accuracy: {accuracy}')
 
-def preprocess(wordVectorFile, trainJiaFangDataFile, 
-               testJiaFangDataFile, trainSetModelFile,
-               testSetModelFile, validationSetModelFile,
-               predictProbFile, idRecordFile, inputFile):
-  word_vector_generation(wordVectorFile, trainJiaFangDataFile,
-                         testJiaFangDataFile)
-  train_model_data_set_generation(trainSetModelFile, testSetModelFile,
-                                  validationSetModelFile, trainJiaFangDataFile)
-  task_input_generation(predictProbFile, idRecordFile, testJiaFangDataFile,
-                        inputFile)
+def preprocess(word_vector_file, train_jia_fang_data_file,
+               test_jia_fang_data_file, train_set_model_file,
+               test_set_model_file, validation_set_model_file,
+               predict_prob_file, id_record_file, input_file):
+  word_vector_generation(word_vector_file, train_jia_fang_data_file,
+                         test_jia_fang_data_file)
+  train_model_data_set_generation(train_set_model_file, test_set_model_file,
+                                  validation_set_model_file,
+                                  train_jia_fang_data_file)
+  task_input_generation(predict_prob_file, id_record_file,
+                        test_jia_fang_data_file, input_file)
 
-def postprocess(idRecordFile, outputFile, groundTruthFile):
-  output_processing(idRecordFile, outputFile, groundTruthFile)
-
-if __name__ == '__main__':
-  pass
+def postprocess(id_record_file, output_file, ground_truth_file):
+  output_processing(id_record_file, output_file, ground_truth_file)

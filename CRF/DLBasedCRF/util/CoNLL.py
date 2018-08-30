@@ -4,93 +4,93 @@
 from __future__ import print_function
 import os
 
-def conll_write(outputPath, sentences, headers):
-  if not os.path.exists(os.path.dirname(outputPath)):
-    os.makedirs(os.path.dirname(outputPath))
-  fOut = open(outputPath, 'w')
+def conll_write(output_path, sentences, headers):
+  if not os.path.exists(os.path.dirname(output_path)):
+    os.makedirs(os.path.dirname(output_path))
+  f_out = open(output_path, 'w')
       
   for sentence in sentences:
-    fOut.write("#")
-    fOut.write("\t".join(headers))
-    fOut.write("\n")
-    for tokenIdx in range(len(sentence[headers[0]])):
-      aceData = [sentence[key][tokenIdx] for key in headers]
-      fOut.write("\t".join(aceData))
-      fOut.write("\n")
-    fOut.write("\n")
+    f_out.write("#")
+    f_out.write("\t".join(headers))
+    f_out.write("\n")
+    for token_idx in range(len(sentence[headers[0]])):
+      ace_data = [sentence[key][token_idx] for key in headers]
+      f_out.write("\t".join(ace_data))
+      f_out.write("\n")
+    f_out.write("\n")
               
-def read_co_nll(inputPath, cols, commentSymbol=None, valTransformation=None):
+def read_co_nll(input_path, cols, comment_symbol=None, val_transformation=None):
   sentences = []    
-  sentenceTemplate = {name: [] for name in cols.values()}   
-  sentence = {name: [] for name in sentenceTemplate.keys()}   
-  newData = False
+  sentence_template = {name: [] for name in cols.values()}
+  sentence = {name: [] for name in sentence_template.keys()}
+  new_data = False
     
-  for line in open(inputPath):
+  for line in open(input_path):
     line = line.strip()
-    if len(line) == 0 or (commentSymbol is not 
-                          None and line.startswith(commentSymbol)):
-      if newData:      
+    if len(line) == 0 or (comment_symbol is not
+                          None and line.startswith(comment_symbol)):
+      if new_data:
         sentences.append(sentence)
-        sentence = {name: [] for name in sentenceTemplate.keys()}
-        newData = False
+        sentence = {name: [] for name in sentence_template.keys()}
+        new_data = False
       continue
         
     splits = line.split()
-    for colIdx, colName in cols.items():
-      val = splits[colIdx]
-      if valTransformation is not None:
-        val = valTransformation(colName, val, splits)
-      sentence[colName].append(val)  
+    for col_idx, col_name in cols.items():
+      val = splits[col_idx]
+      if val_transformation is not None:
+        val = val_transformation(col_name, val, splits)
+      sentence[col_name].append(val)
             
-    newData = True  
+    new_data = True
         
-  if newData:        
+  if new_data:
     sentences.append(sentence)
             
   for name in cols.values():
     if name.endswith('_BIO'):
-      iobesName = name[0:-4] + '_class'  
+      iobes_name = name[0:-4] + '_class'
 
-      className = name[0:-4] + '_class'
+      class_name = name[0:-4] + '_class'
       for sentence in sentences:
-        sentence[className] = []
+        sentence[class_name] = []
         for val in sentence[name]:
-          valClass = val[2:] if val != 'O' else 'O'
-          sentence[className].append(valClass)
+          val_class = val[2:] if val != 'O' else 'O'
+          sentence[class_name].append(val_class)
 
-      iobName = name[0:-4] + '_IOB'
+      iob_name = name[0:-4] + '_IOB'
       for sentence in sentences:
-        sentence[iobName] = []
-        oldVal = 'O'
+        sentence[iob_name] = []
+        old_val = 'O'
         for val in sentence[name]:
-          newVal = val
+          new_val = val
                     
-          if newVal[0] == 'B':
-            if oldVal != 'I' + newVal[1:]:
-              newVal = 'I' + newVal[1:]
+          if new_val[0] == 'B':
+            if old_val != 'I' + new_val[1:]:
+              new_val = 'I' + new_val[1:]
                         
-          sentence[iobName].append(newVal)                    
-          oldVal = newVal
+          sentence[iob_name].append(new_val)
+          old_val = new_val
 
-      iobesName = name[0:-4] + '_IOBES'
+      iobes_name = name[0:-4] + '_IOBES'
       for sentence in sentences:
-        sentence[iobesName] = []
+        sentence[iobes_name] = []
                 
         for pos in range(len(sentence[name])):                    
           val = sentence[name][pos]
           if (pos + 1) < len(sentence[name]):
-            nextVal = sentence[name][pos + 1]
+            next_val = sentence[name][pos + 1]
           else:
-            nextVal = 'O'
+            next_val = 'O'
 
-          newVal = val
+          new_val = val
           if val[0] == 'B':
-            if nextVal[0] != 'I':
-              newVal = 'S' + val[1:]
+            if next_val[0] != 'I':
+              new_val = 'S' + val[1:]
           elif val[0] == 'I':
-            if nextVal[0] != 'I':
-              newVal = 'E' + val[1:]
+            if next_val[0] != 'I':
+              new_val = 'E' + val[1:]
 
-          sentence[iobesName].append(newVal)                    
+          sentence[iobes_name].append(new_val)
                    
   return sentences  

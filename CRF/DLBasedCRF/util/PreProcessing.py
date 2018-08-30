@@ -10,8 +10,8 @@ import os.path
 import nltk
 import logging
 from nltk import FreqDist
-from .WordEmbeddings import word_normalize
-from .CoNLL import read_co_nll
+from Insight_NLP.CRF.DLBasedCRF.util.WordEmbeddings import word_normalize
+from Insight_NLP.CRF.DLBasedCRF.util.CoNLL import read_co_nll
 import sys
 
 if (sys.version_info > (3, 0)):
@@ -20,137 +20,138 @@ else:
   import cPickle as pkl
   from io import open
 
-def prepare_dataset(embeddingsPath, datasets,
-                    frequencyThresholdUnknownTokens=50,
-                    reducePretrainedEmbeddings=False, valTransformations=None,
-                    padOneTokenSentence=True):
-  embeddingsName = os.path.splitext(embeddingsPath)[0]
-  pklName = "_".join(sorted(datasets.keys()) + [embeddingsName])
-  outputPath = 'pkl/' + pklName + '.pkl'
+def prepare_dataset(embeddings_path, datasets,
+                    frequency_threshold_unknown_tokens=50,
+                    reduce_pretrained_embeddings=False,
+                    val_transformations=None,
+                    pad_one_token_sentence=True):
+  embeddings_name = os.path.splitext(embeddings_path)[0]
+  pkl_name = "_".join(sorted(datasets.keys()) + [embeddings_name])
+  output_path = 'pkl/' + pkl_name + '.pkl'
 
-  if os.path.isfile(outputPath):
-    logging.info("Using existent pickle file: %s" % outputPath)
-    return outputPath
+  if os.path.isfile(output_path):
+    logging.info("Using existent pickle file: %s" % output_path)
+    return output_path
 
-  casing2Idx = get_casing_vocab()
-  embeddings, word2Idx = read_embeddings(embeddingsPath, datasets,
-                                         frequencyThresholdUnknownTokens,
-                                         reducePretrainedEmbeddings)
+  casing_to_idx = get_casing_vocab()
+  embeddings, word_to_idx = read_embeddings(embeddings_path, datasets,
+                                         frequency_threshold_unknown_tokens,
+                                         reduce_pretrained_embeddings)
     
-  mappings = {'tokens': word2Idx, 'casing': casing2Idx}
-  pklObjects = {'embeddings': embeddings, 'mappings': mappings, 
+  mappings = {'tokens': word_to_idx, 'casing': casing_to_idx}
+  pkl_objects = {'embeddings': embeddings, 'mappings': mappings,
                 'datasets': datasets, 'data': {}}
 
-  for datasetName, dataset in datasets.items():
-    datasetColumns = dataset['columns']
-    commentSymbol = dataset['commentSymbol']
+  for dataset_name, dataset in datasets.items():
+    dataset_columns = dataset['columns']
+    comment_symbol = dataset['commentSymbol']
 
-    trainData = 'DataForModelTraining/%s/train.txt' % datasetName 
-    devData = 'DataForModelTraining/%s/validation.txt' % datasetName 
-    testData = 'DataForModelTraining/%s/test.txt' % datasetName 
-    paths = [trainData, devData, testData]
+    train_data = 'DataForModelTraining/%s/train.txt' % dataset_name
+    dev_data = 'DataForModelTraining/%s/validation.txt' % dataset_name
+    test_data = 'DataForModelTraining/%s/test.txt' % dataset_name
+    paths = [train_data, dev_data, test_data]
 
-    logging.info(":: Transform " + datasetName + " dataset ::")
-    pklObjects['data'][datasetName] = create_pkl_files(paths, mappings,
-                                                       datasetColumns,
-                                                       commentSymbol,
-                                                       valTransformations,
-                                                       padOneTokenSentence)
+    logging.info(":: Transform " + dataset_name + " dataset ::")
+    pkl_objects['data'][dataset_name] = create_pkl_files(paths, mappings,
+                                                       dataset_columns,
+                                                       comment_symbol,
+                                                       val_transformations,
+                                                       pad_one_token_sentence)
 
-  f = open(outputPath, 'wb')
-  pkl.dump(pklObjects, f, -1)
+  f = open(output_path, 'wb')
+  pkl.dump(pkl_objects, f, -1)
   f.close()
     
-  logging.info("DONE - Embeddings file saved: %s" % outputPath)
+  logging.info("DONE - Embeddings file saved: %s" % output_path)
     
-  return outputPath
+  return output_path
 
-def load_dataset_pickle(embeddingsPickle):
-  f = open(embeddingsPickle, 'rb')
-  pklObjects = pkl.load(f)
+def load_dataset_pickle(embeddings_pickle):
+  f = open(embeddings_pickle, 'rb')
+  pkl_objects = pkl.load(f)
   f.close()
 
-  return pklObjects['embeddings'], pklObjects['mappings'], pklObjects['data']
+  return pkl_objects['embeddings'], pkl_objects['mappings'], pkl_objects['data']
 
-def read_embeddings(embeddingsPath, datasetFiles,
-                    frequencyThresholdUnknownTokens,
-                    reducePretrainedEmbeddings):
-  if not os.path.isfile(embeddingsPath):
-    if embeddingsPath in ['komninos_english_embeddings.gz', 
+def read_embeddings(embeddings_path, dataset_files,
+                    frequency_threshold_unknown_tokens,
+                    reduce_pretrained_embeddings):
+  if not os.path.isfile(embeddings_path):
+    if embeddings_path in ['komninos_english_embeddings.gz',
                           'levy_english_dependency_embeddings.gz', 
                           'reimers_german_embeddings.gz']:
-      get_embeddings(embeddingsPath)
+      get_embeddings(embeddings_path)
     else:
-      print("The embeddings file %s was not found" % embeddingsPath)
+      print("The embeddings file %s was not found" % embeddings_path)
       exit()
 
-  logging.info("Generate new embeddings files for a dataset")
+  logging.info("Generate CNN embeddings files for a dataset")
 
-  neededVocab = {}
-  if reducePretrainedEmbeddings:
+  needed_vocab = {}
+  if reduce_pretrained_embeddings:
     logging.info("Compute which tokens are required for the experiment")
 
-    def create_dict(filename, tokenPos, vocab):
+    def create_dict(filename, token_pos, vocab):
       for line in open(filename):
         if line.startswith('#'):
           continue
         splits = line.strip().split()
         if len(splits) > 1:
-          word = splits[tokenPos]
-          wordLower = word.lower()
-          wordNormalized = word_normalize(wordLower)
+          word = splits[token_pos]
+          word_lower = word.lower()
+          word_normalized = word_normalize(word_lower)
 
           vocab[word] = True
-          vocab[wordLower] = True
-          vocab[wordNormalized] = True
+          vocab[word_lower] = True
+          vocab[word_normalized] = True
 
-    for dataset in datasetFiles:
-      dataColumnsIdx = {y: x for x, y in dataset['cols'].items()}
-      tokenIdx = dataColumnsIdx['tokens']
-      datasetPath = 'DataForModelTraining/%s/' % dataset['name']
+    for dataset in dataset_files:
+      data_columns_idx = {y: x for x, y in dataset['cols'].items()}
+      token_idx = data_columns_idx['tokens']
+      dataset_path = 'DataForModelTraining/%s/' % dataset['name']
 
       for dataset in ['train.txt', 'validation.txt', 'test.txt']:
-        create_dict(datasetPath + dataset, tokenIdx, neededVocab)
+        create_dict(dataset_path + dataset, token_idx, needed_vocab)
 
-  logging.info("Read file: %s" % embeddingsPath)
-  word2Idx = {}
+  logging.info("Read file: %s" % embeddings_path)
+  word_to_idx = {}
   embeddings = []
 
-  if embeddingsPath.endswith('.gz'):
-    embeddingsIn = gzip.open(embeddingsPath, "rt")
+  if embeddings_path.endswith('.gz'):
+    embeddings_in = gzip.open(embeddings_path, "rt")
   else:
-    embeddingsIn = open(embeddingsPath, encoding="utf8")
+    embeddings_in = open(embeddings_path, encoding="utf8")
 
-  embeddingsDimension = None
+  embeddings_dimension = None
 
-  for line in embeddingsIn:
+  for line in embeddings_in:
     split = line.rstrip().split(" ")
     word = split[0]
 
-    if embeddingsDimension is None:
-      embeddingsDimension = len(split) - 1
+    if embeddings_dimension is None:
+      embeddings_dimension = len(split) - 1
 
-    if (len(split) - 1) != embeddingsDimension:  
+    if (len(split) - 1) != embeddings_dimension:
       print("ERROR: A line in the embeddings file had more or less", 
             "dimensions than expected. Skip token.")
       continue
 
-    if len(word2Idx) == 0:  
-      word2Idx["PADDING_TOKEN"] = len(word2Idx)
-      vector = np.zeros(embeddingsDimension)
+    if len(word_to_idx) == 0:
+      word_to_idx["PADDING_TOKEN"] = len(word_to_idx)
+      vector = np.zeros(embeddings_dimension)
       embeddings.append(vector)
-      word2Idx["UNKNOWN_TOKEN"] = len(word2Idx)
-      vector = np.random.uniform(-0.25, 0.25, embeddingsDimension)  
+      word_to_idx["UNKNOWN_TOKEN"] = len(word_to_idx)
+      vector = np.random.uniform(-0.25, 0.25, embeddings_dimension)
       embeddings.append(vector)
 
     vector = np.array([float(num) for num in split[1:]])
 
-    if len(neededVocab) == 0 or word in neededVocab:
-      if word not in word2Idx:
+    if len(needed_vocab) == 0 or word in needed_vocab:
+      if word not in word_to_idx:
         embeddings.append(vector)
-        word2Idx[word] = len(word2Idx)
+        word_to_idx[word] = len(word_to_idx)
 
-  def create_fd(filename, tokenIndex, fd, word2Idx):
+  def create_fd(filename, token_index, fd, word_to_idx):
     for line in open(filename):
       if line.startswith('#'):
         continue
@@ -158,69 +159,69 @@ def read_embeddings(embeddingsPath, datasetFiles,
       splits = line.strip().split()
 
       if len(splits) > 1:
-        word = splits[tokenIndex]
-        wordLower = word.lower()
-        wordNormalized = word_normalize(wordLower)
+        word = splits[token_index]
+        word_lower = word.lower()
+        word_normalized = word_normalize(word_lower)
 
-        if (word not in word2Idx and wordLower not in word2Idx and 
-           wordNormalized not in word2Idx):
-          fd[wordNormalized] += 1
+        if (word not in word_to_idx and word_lower not in word_to_idx and
+           word_normalized not in word_to_idx):
+          fd[word_normalized] += 1
 
-  if (frequencyThresholdUnknownTokens is not None and 
-     frequencyThresholdUnknownTokens >= 0):
+  if (frequency_threshold_unknown_tokens is not None and
+     frequency_threshold_unknown_tokens >= 0):
     fd = nltk.FreqDist()
-    for datasetName, datasetFile in datasetFiles.items():
-      dataColumnsIdx = {y: x for x, y in datasetFile['columns'].items()}
-      tokenIdx = dataColumnsIdx['tokens']
-      datasetPath = 'DataForModelTraining/%s/' % datasetName
-      create_fd(datasetPath + 'train.txt', tokenIdx, fd, word2Idx)
+    for dataset_name, dataset_file in dataset_files.items():
+      data_columns_idx = {y: x for x, y in dataset_file['columns'].items()}
+      token_idx = data_columns_idx['tokens']
+      dataset_path = 'DataForModelTraining/%s/' % dataset_name
+      create_fd(dataset_path + 'train.txt', token_idx, fd, word_to_idx)
 
-    addedWords = 0
+    added_words = 0
     for word, freq in fd.most_common(10000):
-      if freq < frequencyThresholdUnknownTokens:
+      if freq < frequency_threshold_unknown_tokens:
         break
 
-      addedWords += 1
-      word2Idx[word] = len(word2Idx)
-      vector = np.random.uniform(-0.25, 0.25, len(split) - 1)  
+      added_words += 1
+      word_to_idx[word] = len(word_to_idx)
+      vector = np.random.uniform(-0.25, 0.25, len(split) - 1)
       embeddings.append(vector)
 
-      assert (len(word2Idx) == len(embeddings))
+      assert (len(word_to_idx) == len(embeddings))
 
-    logging.info("Added words: %d" % addedWords)
+    logging.info("Added words: %d" % added_words)
   embeddings = np.array(embeddings)
 
-  return embeddings, word2Idx
+  return embeddings, word_to_idx
 
 def add_char_information(sentences):
-  for sentenceIdx in range(len(sentences)):
-    sentences[sentenceIdx]['characters'] = []
-    for tokenIdx in range(len(sentences[sentenceIdx]['tokens'])):
-      token = sentences[sentenceIdx]['tokens'][tokenIdx]
+  for sentence_idx in range(len(sentences)):
+    sentences[sentence_idx]['characters'] = []
+    for token_idx in range(len(sentences[sentence_idx]['tokens'])):
+      token = sentences[sentence_idx]['tokens'][token_idx]
       chars = [c for c in token]
-      sentences[sentenceIdx]['characters'].append(chars)
+      sentences[sentence_idx]['characters'].append(chars)
 
 def add_casing_information(sentences):
-  for sentenceIdx in range(len(sentences)):
-    sentences[sentenceIdx]['casing'] = []
-    for tokenIdx in range(len(sentences[sentenceIdx]['tokens'])):
-      token = sentences[sentenceIdx]['tokens'][tokenIdx]
-      sentences[sentenceIdx]['casing'].append(get_casing(token))
-  return sentences[sentenceIdx]['casing']
+  for sentence_idx in range(len(sentences)):
+    sentences[sentence_idx]['casing'] = []
+    for token_idx in range(len(sentences[sentence_idx]['tokens'])):
+      token = sentences[sentence_idx]['tokens'][token_idx]
+      sentences[sentence_idx]['casing'].append(get_casing(token))
+  return sentences[sentence_idx]['casing']
        
 def get_casing(word):
   casing = 'other'
     
-  numDigits = 0
+  num_digits = 0
   for char in word:
     if char.isdigit():
-      numDigits += 1
+      num_digits += 1
             
-  digitFraction = numDigits / float(len(word))
+  digit_fraction = num_digits / float(len(word))
     
   if word.isdigit():  
     casing = 'numeric'
-  elif digitFraction > 0.5:
+  elif digit_fraction > 0.5:
     casing = 'mainly_numeric'
   elif word.islower():  
     casing = 'allLower'
@@ -228,7 +229,7 @@ def get_casing(word):
     casing = 'allUpper'
   elif word[0].isupper():  
     casing = 'initialUpper'
-  elif numDigits > 0:
+  elif num_digits > 0:
     casing = 'contains_digit'
     
   return casing
@@ -238,52 +239,52 @@ def get_casing_vocab():
              'allUpper', 'initialUpper', 'contains_digit']
   return {entries[idx]: idx for idx in range(len(entries))}
 
-def create_matrices(sentences, mappings, padOneTokenSentence):
+def create_matrices(sentences, mappings, pad_one_token_sentence):
   data = []
-  numTokens = 0
-  numUnknownTokens = 0    
-  missingTokens = FreqDist()
-  paddedSentences = 0
+  num_tokens = 0
+  num_unknown_tokens = 0
+  missing_tokens = FreqDist()
+  padded_sentences = 0
 
   for sentence in sentences:
     row = {name: [] for name in list(mappings.keys()) + ['raw_tokens']}
         
-    for mapping, str2Idx in mappings.items():    
+    for mapping, str_to_idx in mappings.items():
       if mapping not in sentence:
         continue
                     
       for entry in sentence[mapping]:                
         if mapping.lower() == 'tokens':
-          numTokens += 1
-          idx = str2Idx['UNKNOWN_TOKEN']
+          num_tokens += 1
+          idx = str_to_idx['UNKNOWN_TOKEN']
                     
-          if entry in str2Idx:
-            idx = str2Idx[entry]
-          elif entry.lower() in str2Idx:
-            idx = str2Idx[entry.lower()]
-          elif word_normalize(entry) in str2Idx:
-            idx = str2Idx[word_normalize(entry)]
+          if entry in str_to_idx:
+            idx = str_to_idx[entry]
+          elif entry.lower() in str_to_idx:
+            idx = str_to_idx[entry.lower()]
+          elif word_normalize(entry) in str_to_idx:
+            idx = str_to_idx[word_normalize(entry)]
           else:
-            numUnknownTokens += 1    
-            missingTokens[word_normalize(entry)] += 1
+            num_unknown_tokens += 1
+            missing_tokens[word_normalize(entry)] += 1
                         
           row['raw_tokens'].append(entry)
         elif mapping.lower() == 'characters':  
           idx = []
           for c in entry:
-            if c in str2Idx:
-              idx.append(str2Idx[c])
+            if c in str_to_idx:
+              idx.append(str_to_idx[c])
             else:
-              idx.append(str2Idx['UNKNOWN'])                           
+              idx.append(str_to_idx['UNKNOWN'])
                                       
         else:
-          idx = str2Idx[entry]
+          idx = str_to_idx[entry]
                                     
         row[mapping].append(idx)
                 
-    if len(row['tokens']) == 1 and padOneTokenSentence:
-      paddedSentences += 1
-      for mapping, str2Idx in mappings.items():
+    if len(row['tokens']) == 1 and pad_one_token_sentence:
+      padded_sentences += 1
+      for mapping, str_to_idx in mappings.items():
         if mapping.lower() == 'tokens':
           row['tokens'].append(mappings['tokens']['PADDING_TOKEN'])
           row['raw_tokens'].append('PADDING_TOKEN')
@@ -294,60 +295,60 @@ def create_matrices(sentences, mappings, padOneTokenSentence):
             
     data.append(row)
     
-  if numTokens > 0:           
+  if num_tokens > 0:
     logging.info("Unknown-Tokens: %.2f%%" % 
-                 (numUnknownTokens / float(numTokens) * 100))
+                 (num_unknown_tokens / float(num_tokens) * 100))
         
   return data
 
-def create_pkl_files(datasetFiles, mappings, cols, commentSymbol,
-                     valTransformation, padOneTokenSentence):
-  trainSentences = read_co_nll(datasetFiles[0], cols, commentSymbol,
-                               valTransformation)
-  devSentences = read_co_nll(datasetFiles[1], cols, commentSymbol,
-                             valTransformation)
-  testSentences = read_co_nll(datasetFiles[2], cols, commentSymbol,
-                              valTransformation)
+def create_pkl_files(dataset_files, mappings, cols, comment_symbol,
+                     val_transformation, pad_one_token_sentence):
+  train_sentences = read_co_nll(dataset_files[0], cols, comment_symbol,
+                               val_transformation)
+  dev_sentences = read_co_nll(dataset_files[1], cols, comment_symbol,
+                             val_transformation)
+  test_sentences = read_co_nll(dataset_files[2], cols, comment_symbol,
+                              val_transformation)
    
-  extend_mappings(mappings, trainSentences + devSentences + testSentences)
+  extend_mappings(mappings, train_sentences + dev_sentences + test_sentences)
   charset = {"PADDING": 0, "UNKNOWN": 1}
   for c in (" 0123456789abcdefghijklmnopqrstuvwxyz", 
             "ABCDEFGHIJKLMNOPQRSTUVWXYZ.,-_()[]{}!?:;#'\"/\\%$`&=*+@^~|"):
     charset[c] = len(charset)
   mappings['characters'] = charset
     
-  add_char_information(trainSentences)
-  add_casing_information(trainSentences)
+  add_char_information(train_sentences)
+  add_casing_information(train_sentences)
     
-  add_char_information(devSentences)
-  add_casing_information(devSentences)
+  add_char_information(dev_sentences)
+  add_casing_information(dev_sentences)
     
-  add_char_information(testSentences)
-  add_casing_information(testSentences)
+  add_char_information(test_sentences)
+  add_casing_information(test_sentences)
 
   logging.info(":: Create Train Matrix ::")
-  trainMatrix = create_matrices(trainSentences, mappings, padOneTokenSentence)
+  train_matrix = create_matrices(train_sentences, mappings, pad_one_token_sentence)
 
   logging.info(":: Create Dev Matrix ::")
-  devMatrix = create_matrices(devSentences, mappings, padOneTokenSentence)
+  dev_matrix = create_matrices(dev_sentences, mappings, pad_one_token_sentence)
 
   logging.info(":: Create Test Matrix ::")
-  testMatrix = create_matrices(testSentences, mappings, padOneTokenSentence)
+  test_matrix = create_matrices(test_sentences, mappings, pad_one_token_sentence)
     
   data = {
-      'trainMatrix': trainMatrix,
-      'devMatrix': devMatrix,
-      'testMatrix': testMatrix
+      'trainMatrix': train_matrix,
+      'devMatrix': dev_matrix,
+      'testMatrix': test_matrix
   }        
     
   return data
 
 def extend_mappings(mappings, sentences):
-  sentenceKeys = list(sentences[0].keys())
-  sentenceKeys.remove('tokens') 
+  sentence_keys = list(sentences[0].keys())
+  sentence_keys.remove('tokens')
 
   for sentence in sentences:
-    for name in sentenceKeys:
+    for name in sentence_keys:
       if name not in mappings:
         mappings[name] = {'O': 0} 
 
@@ -392,26 +393,26 @@ def download(url, destination=os.curdir, silent=False):
 
   def get_size():
     meta = urllib2.urlopen(url).info()
-    metaFunc = meta.getheaders if hasattr(
+    meta_func = meta.getheaders if hasattr(
         meta, 'getheaders') else meta.get_all
-    metaLength = metaFunc('Content-Length')
+    meta_length = meta_func('Content-Length')
     try:
-      return int(metaLength[0])
+      return int(meta_length[0])
     except:
       return 0
 
   def kb_to_mb(kb):
     return kb / 1024.0 / 1024.0
 
-  def callback(blocks, blockSize, totalSize):
-    current = blocks * blockSize
-    percent = 100.0 * current / totalSize
+  def callback(blocks, block_size, total_size):
+    current = blocks * block_size
+    percent = 100.0 * current / total_size
     line = '[{0}{1}]'.format(
         '=' * int(percent / 2), ' ' * (50 - int(percent / 2)))
     status = '\r{0:3.0f}%{1} {2:3.1f}/{3:3.1f} MB'
     sys.stdout.write(
         status.format(
-            percent, line, kb_to_mb(current), kb_to_mb(totalSize)))
+            percent, line, kb_to_mb(current), kb_to_mb(total_size)))
 
   path = os.path.join(destination, filename)
 

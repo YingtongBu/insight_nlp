@@ -5,13 +5,13 @@ from __future__ import print_function
 import re
 import logging
 
-def max_index_value(sentences, featureName):
-  maxItem = 0
+def max_index_value(sentences, feature_name):
+  max_item = 0
   for sentence in sentences:
-    for entry in sentence[featureName]:
-      maxItem = max(maxItem, entry)
+    for entry in sentence[feature_name]:
+      max_item = max(max_item, entry)
             
-  return maxItem
+  return max_item
 
 def word_normalize(word):
   word = word.lower()
@@ -23,25 +23,25 @@ def word_normalize(word):
   word = re.sub("[0-9.,]+", 'NUMBER_TOKEN', word)
   return word
 
-def map_tokens_to_idx(sentences, word2Idx):
-  numTokens = 0
-  numUnknownTokens = 0
+def map_tokens_to_idx(sentences, word_to_idx):
+  num_tokens = 0
+  num_unknown_tokens = 0
   for sentence in sentences:
     for idx in range(len(sentence['raw_tokens'])):    
       token = sentence['raw_tokens'][idx]       
-      wordIdx = word2Idx['UNKNOWN_TOKEN']
-      numTokens += 1
-      if token in word2Idx:
-        wordIdx = word2Idx[token]
-      elif token.lower() in word2Idx:
-        wordIdx = word2Idx[token.lower()]
-      elif word_normalize(token) in word2Idx:
-        wordIdx = word2Idx[word_normalize(token)]
+      word_idx = word_to_idx['UNKNOWN_TOKEN']
+      num_tokens += 1
+      if token in word_to_idx:
+        word_idx = word_to_idx[token]
+      elif token.lower() in word_to_idx:
+        word_idx = word_to_idx[token.lower()]
+      elif word_normalize(token) in word_to_idx:
+        word_idx = word_to_idx[word_normalize(token)]
       else:
-        numUnknownTokens += 1
+        num_unknown_tokens += 1
                        
-      sentence['tokens'][idx] = wordIdx
+      sentence['tokens'][idx] = word_idx
             
-  if numTokens > 0:
+  if num_tokens > 0:
     logging.info("Unknown-Tokens: %.2f%%" % 
-                 (numUnknownTokens / float(numTokens) * 100))
+                 (num_unknown_tokens / float(num_tokens) * 100))
