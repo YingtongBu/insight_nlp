@@ -28,11 +28,11 @@ if __name__ == '__main__':
   parser.add_option('-e', '--test_jia_fang_data_file',
                     default='./DataForTaskTest/JiaFang/testTemp1.data')
   parser.add_option('-t', '--train_set_model_file',
-                    default='./DataForModelTraining/Chinese/train.txt')
+                    default='./DataForModelTraining/Chinese/train.data')
   parser.add_option('-x', '--test_set_model_file',
-                    default='./DataForModelTraining/Chinese/test.txt')
+                    default='./DataForModelTraining/Chinese/test.data')
   parser.add_option('-v', '--validation_set_model_file',
-                    default='./DataForModelTraining/Chinese/validation.txt')
+                    default='./DataForModelTraining/Chinese/validation.data')
   parser.add_option('-p', '--predict_prob_file',
                     default='./DataForTaskTest/JiaFang/predictProb1.data') 
   parser.add_option('-d', '--id_record_file',

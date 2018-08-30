@@ -46,9 +46,9 @@ def prepare_dataset(embeddings_path, datasets,
     dataset_columns = dataset['columns']
     comment_symbol = dataset['commentSymbol']
 
-    train_data = 'DataForModelTraining/%s/train.txt' % dataset_name
-    dev_data = 'DataForModelTraining/%s/validation.txt' % dataset_name
-    test_data = 'DataForModelTraining/%s/test.txt' % dataset_name
+    train_data = 'DataForModelTraining/%s/train.data' % dataset_name
+    dev_data = 'DataForModelTraining/%s/validation.data' % dataset_name
+    test_data = 'DataForModelTraining/%s/test.data' % dataset_name
     paths = [train_data, dev_data, test_data]
 
     logging.info(":: Transform " + dataset_name + " dataset ::")
@@ -110,7 +110,7 @@ def read_embeddings(embeddings_path, dataset_files,
       token_idx = data_columns_idx['tokens']
       dataset_path = 'DataForModelTraining/%s/' % dataset['name']
 
-      for dataset in ['train.txt', 'validation.txt', 'test.txt']:
+      for dataset in ['train.data', 'validation.data', 'test.data']:
         create_dict(dataset_path + dataset, token_idx, needed_vocab)
 
   logging.info("Read file: %s" % embeddings_path)
@@ -174,7 +174,7 @@ def read_embeddings(embeddings_path, dataset_files,
       data_columns_idx = {y: x for x, y in dataset_file['columns'].items()}
       token_idx = data_columns_idx['tokens']
       dataset_path = 'DataForModelTraining/%s/' % dataset_name
-      create_fd(dataset_path + 'train.txt', token_idx, fd, word_to_idx)
+      create_fd(dataset_path + 'train.data', token_idx, fd, word_to_idx)
 
     added_words = 0
     for word, freq in fd.most_common(10000):
