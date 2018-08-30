@@ -11,7 +11,7 @@ def mkdir(path):
   folder_exist = os.path.exists(path)
   if not folder_exist:
       os.mkdir(path)
-      print('Attention: new folder created')
+      print('Attention: CNN folder created')
   else:
       print('Folder existed, data will be stored later')
 

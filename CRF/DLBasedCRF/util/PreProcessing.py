@@ -84,7 +84,7 @@ def read_embeddings(embeddingsPath, datasetFiles,
       print("The embeddings file %s was not found" % embeddingsPath)
       exit()
 
-  logging.info("Generate new embeddings files for a dataset")
+  logging.info("Generate CNN embeddings files for a dataset")
 
   neededVocab = {}
   if reducePretrainedEmbeddings:
