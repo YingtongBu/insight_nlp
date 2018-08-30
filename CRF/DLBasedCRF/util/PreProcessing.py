@@ -327,13 +327,16 @@ def create_pkl_files(dataset_files, mappings, cols, comment_symbol,
   add_casing_information(test_sentences)
 
   logging.info(":: Create Train Matrix ::")
-  train_matrix = create_matrices(train_sentences, mappings, pad_one_token_sentence)
+  train_matrix = create_matrices(train_sentences, mappings,
+                                 pad_one_token_sentence)
 
   logging.info(":: Create Dev Matrix ::")
-  dev_matrix = create_matrices(dev_sentences, mappings, pad_one_token_sentence)
+  dev_matrix = create_matrices(dev_sentences, mappings,
+                               pad_one_token_sentence)
 
   logging.info(":: Create Test Matrix ::")
-  test_matrix = create_matrices(test_sentences, mappings, pad_one_token_sentence)
+  test_matrix = create_matrices(test_sentences, mappings,
+                                pad_one_token_sentence)
     
   data = {
       'trainMatrix': train_matrix,

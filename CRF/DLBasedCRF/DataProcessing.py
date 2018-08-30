@@ -62,7 +62,8 @@ def train_model_data_set_generation(train_set_model_file, test_set_model_file,
       else:
         temp_ner = 'O'
       if item_list[0] != '':
-        line_content += str(i + 1) + '\t' + item_list[0] + '\t' + temp_ner + '\n'
+        line_content += str(i + 1) + '\t' + \
+                        item_list[0] + '\t' + temp_ner + '\n'
       i += 1
     if index < 3200:
       file_train_obj.write(line_content + '\n')
