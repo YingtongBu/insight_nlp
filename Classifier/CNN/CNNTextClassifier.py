@@ -10,7 +10,7 @@ class CNNTextClassifier(object):
     self.GPU = str(GPU)
     os.environ["CUDA_VISIBLE_DEVICES"] = self.GPU
 
-  def trainCNN(self,
+  def train_CNN(self,
     dev_sample_percentage=0.3,train_data='CNN/TotalEvents.data',
     num_classes=44, embedding_dim=128, kernel_sizes='1,1,1,2,3',
     num_kernels=128, dropout_keep_prob=0.5, l2_reg_lambda=0.0, num_words=64,

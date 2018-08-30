@@ -9,4 +9,4 @@ def main():
 
 if __name__ == '__main__':
   cnn_project = CNNTextClassifier(GPU=3)
-  cnn_project.trainCNN()
+  cnn_project.train_CNN()
