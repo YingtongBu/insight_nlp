@@ -45,3 +45,6 @@ def run_model(input_file, output_file):
     output_file_object.write('\n')
   
   output_file_object.close()
+
+if __name__ == '__main__':
+  run_model('input.txt', 'output.txt')

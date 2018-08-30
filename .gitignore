@@ -24,7 +24,7 @@ out/
 *.h5
 *.pkl
 *.wav
-chineseWordVector
+chinese_word_vector
 
 *.iml
 META-INF

@@ -22,7 +22,7 @@ if __name__ == '__main__':
   usage = "usage: %prog [options]"
   parser = optparse.OptionParser(usage=usage)
   parser.add_option('-w', '--word_vector_file',
-                    default='./chineseWordVector')
+                    default='./chinese_word_vector')
   parser.add_option('-r', '--train_jia_fang_data_file',
                     default='./DataForTaskTest/JiaFang/trainTemp1.data')
   parser.add_option('-e', '--test_jia_fang_data_file',

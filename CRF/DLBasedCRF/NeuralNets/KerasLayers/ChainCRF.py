@@ -139,20 +139,20 @@ def _backward(gamma, mask):
 
 class ChainCRF(Layer):
   def __init__(self, init='glorot_uniform',
-               u_regularizer=None,
+               U_regularizer=None,
                b_start_regularizer=None,
                b_end_regularizer=None,
-               u_constraint=None,
+               U_constraint=None,
                b_start_constraint=None,
                b_end_constraint=None,
                weights=None,
                **kwargs):
     super(ChainCRF, self).__init__(**kwargs)
     self.init = initializers.get(init)
-    self.u_regularizer = regularizers.get(u_regularizer)
+    self.U_regularizer = regularizers.get(U_regularizer)
     self.b_start_regularizer = regularizers.get(b_start_regularizer)
     self.b_end_regularizer = regularizers.get(b_end_regularizer)
-    self.u_constraint = constraints.get(u_constraint)
+    self.U_constraint = constraints.get(U_constraint)
     self.b_start_constraint = constraints.get(b_start_constraint)
     self.b_end_constraint = constraints.get(b_end_constraint)
     self.initial_weights = weights
@@ -187,8 +187,8 @@ class ChainCRF(Layer):
     self.u = self.add_weight((n_classes, n_classes),
                              initializer=self.init,
                              name='U',
-                             regularizer=self.u_regularizer,
-                             constraint=self.u_constraint)
+                             regularizer=self.U_regularizer,
+                             constraint=self.U_constraint)
 
     self.b_start = self.add_weight((n_classes, ),
                                    initializer='zero',
@@ -229,11 +229,11 @@ class ChainCRF(Layer):
   def get_config(self):
     config = {
         'init': initializers.serialize(self.init),
-        'U_regularizer': regularizers.serialize(self.u_regularizer),
+        'U_regularizer': regularizers.serialize(self.U_regularizer),
         'b_start_regularizer': regularizers.serialize(self.
                                                       b_start_regularizer),
         'b_end_regularizer': regularizers.serialize(self.b_end_regularizer),
-        'U_constraint': constraints.serialize(self.u_constraint),
+        'U_constraint': constraints.serialize(self.U_constraint),
         'b_start_constraint': constraints.serialize(self.
                                                     b_start_constraint),
         'b_end_constraint': constraints.serialize(self.b_end_constraint)
