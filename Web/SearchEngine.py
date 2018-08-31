@@ -3,14 +3,11 @@
 
 from googleapiclient.discovery import build
 
-#code review: update what I told you.
-
 class SearchEngine(object):
   def __init__(self, custom_search_key='005808576341306023160:yojc6z7o63u',
                developer_key="AIzaSyC1o8pJAwMvaRugaRp9nWtvrGQs2_llEps"):
     self.customSearchkey = custom_search_key
     self.developerKey = developer_key
-
 
   def search(self, keywords:str, item_nums=100):
     """
