@@ -57,7 +57,7 @@ def prepare_dataset(embeddings_path, datasets,
                                                        comment_symbol,
                                                        val_transformations,
                                                        pad_one_token_sentence)
-
+  os.mkdir('./pkl')
   f = open(output_path, 'wb')
   pkl.dump(pkl_objects, f, -1)
   f.close()
