@@ -4,21 +4,25 @@
 from googleapiclient.discovery import build
 
 class SearchEngine(object):
-  def __init__(self, key):
+  def __init__(self, key='005808576341306023160:yojc6z7o63u'):
     self.key = key
 
-  def search(self, search_keyword, item_num=20):
-    loop_num = item_num // 10 + 1
+  def search(self, keywords:str, page_num=2):
+    """
+    :param keywords:
+    :param page_num:
+    :return: [{"link": "www.sina.com.cn", "snippet": "today...."}, {...}]
+    """
     service = build("customsearch", "v1",
                     developerKey="AIzaSyC1o8pJAwMvaRugaRp9nWtvrGQs2_llEps")
-    keyword_res_list = []
-    for i in range(loop_num):
+    result = []
+    for i in range(page_num):
       # q: search item
       # cx: search engine key
       # num: search items returned in each search
       # highRange: the last item number of search result, used for paging
       res = service.cse().list(
-        q=search_keyword,
+        q=keywords,
         cx=self.key,
         num=10,
         highRange=(i + 1) * 10
@@ -26,7 +30,9 @@ class SearchEngine(object):
       for i in range(len(res['items'])):
         snippet = res['items'][i]['snippet'].replace('\n', '')
         link = res['items'][i]['displayLink']
-        single_result = snippet + link
-        keyword_res_list.append(single_result)
-    result = [search_keyword, keyword_res_list]
+        single_result = {
+          "link": link,
+          "snippet": snippet,
+        }
+        result.append(single_result)
     return result
