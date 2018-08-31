@@ -1,54 +1,28 @@
 #coding: utf8
 #author: Yu Liu (yu.liu55@pactera.com)
 
-#code review: there is not _TEST.py
-
 from googleapiclient.discovery import build
 
-#todo: code review: rename as "SearchEngine".
-class Searcher:
-  #code review: remove page_num_max, and set as a constant.
-  def __init__(self, key, page_num_max=10):
+class SearchEngine(object):
+  def __init__(self, key):
     self.key = key
-    # the search item for each page
-    self.page_num = page_num_max
 
-  #code review: an interface?
-  def mkdir(self, path):
-    folder_exist = os.path.exists(path)
-    if not folder_exist:
-      os.mkdir(path)
-      print('Attention: folder created')
-    else:
-      print('Folder existed, data will be stored later')
-
-  def search(self, item_num, search_keywords):
-    loop_num = eval(item_num) // 10 + 1
+  def search(self, search_keyword, item_num=20):
+    loop_num = item_num // 10 + 1
     service = build("customsearch", "v1",
                     developerKey="AIzaSyC1o8pJAwMvaRugaRp9nWtvrGQs2_llEps")
-    #code review: remove the following two print.
-    print(f'loop_num: {loop_num}')
-    print(search_keywords)
-    res_dict = {}
     keyword_res_list = []
-    #code review: ... why you search keywords one by one?
-    for item in search_keywords:
-      for i in range(loop_num):
-        res = service.cse().list(
-          q = item,
-          cx = self.key,
-          num = self.page_num,
-          high_range = (i + 1) * 10
-        ).execute()
-        # print(res)
-        # with open("result.json","w") as newfile:
-        #   newfile.write(str(res))
-        # start saving
-        keyword_res_list = []
-        for i in range(len(res['items'])):
-          s = res['items'][i]['snippet'].replace('\n', '')
-          link = res['items'][i]['displayLink']
-          final_result = s + link
-          keyword_res_list.append(final_result)
-      res_dict[item] = keyword_res_list
-    return res_dict
+    for i in range(loop_num):
+      res = service.cse().list(
+        q=search_keyword,
+        cx=self.key,
+        num=10,
+        highRange=(i + 1) * 10
+      ).execute()
+      for i in range(len(res['items'])):
+        snippet = res['items'][i]['snippet'].replace('\n', '')
+        link = res['items'][i]['displayLink']
+        single_result = snippet + link
+        keyword_res_list.append(single_result)
+    result = [search_keyword, keyword_res_list]
+    return result
