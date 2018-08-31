@@ -1,22 +1,37 @@
 #coding: utf8
 #author: Yu Liu (yu.liu55@pactera.com)
 
+#code review: there is not _TEST.py
+
 from googleapiclient.discovery import build
 
-class Searcher(object):
+#todo: code review: rename as "SearchEngine".
+class Searcher:
+  #code review: remove page_num_max, and set as a constant.
   def __init__(self, key, page_num_max=10):
     self.key = key
     # the search item for each page
     self.page_num = page_num_max
 
+  #code review: an interface?
+  def mkdir(self, path):
+    folder_exist = os.path.exists(path)
+    if not folder_exist:
+      os.mkdir(path)
+      print('Attention: folder created')
+    else:
+      print('Folder existed, data will be stored later')
+
   def search(self, item_num, search_keywords):
     loop_num = eval(item_num) // 10 + 1
     service = build("customsearch", "v1",
                     developerKey="AIzaSyC1o8pJAwMvaRugaRp9nWtvrGQs2_llEps")
+    #code review: remove the following two print.
     print(f'loop_num: {loop_num}')
     print(search_keywords)
     res_dict = {}
     keyword_res_list = []
+    #code review: ... why you search keywords one by one?
     for item in search_keywords:
       for i in range(loop_num):
         res = service.cse().list(
