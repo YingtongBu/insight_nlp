@@ -70,10 +70,6 @@ class Vocabulary:
   def convert_to_word_ids(self, words: list,
                           remove_OOV=True, mark_OOV=None,
                           output_length=None, mark_empty=None):
-    '''
-    if remove_OOV is False, then empty_mark should be "special position holder"
-    which has been added into vob.
-    '''
     if not remove_OOV:
       assert mark_OOV is not None, "you must set 'mark_OOV'"
       id_OOV = self.get_word_id(mark_OOV)
