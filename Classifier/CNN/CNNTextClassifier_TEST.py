@@ -5,4 +5,4 @@ from Insight_NLP.Classifier.CNN.CNNTextClassifier import CNNTextClassifier
 
 if __name__ == '__main__':
   cnn_project = CNNTextClassifier(GPU=3)
-  cnn_project.train_CNN()
+  cnn_project.train()
