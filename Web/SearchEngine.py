@@ -1,24 +1,13 @@
-#!/usr/bin/env python
 #coding: utf8
 #author: Yu Liu (yu.liu55@pactera.com)
 
 from googleapiclient.discovery import build
-import csv
-import os
 
-class Searcher:
+class Searcher(object):
   def __init__(self, key, page_num_max=10):
     self.key = key
     # the search item for each page
     self.page_num = page_num_max
-
-  def mkdir(self, path):
-    folder_exist = os.path.exists(path)
-    if not folder_exist:
-      os.mkdir(path)
-      print('Attention: folder created')
-    else:
-      print('Folder existed, data will be stored later')
 
   def search(self, item_num, search_keywords):
     loop_num = eval(item_num) // 10 + 1
