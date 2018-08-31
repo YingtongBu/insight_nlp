@@ -7,7 +7,7 @@ import os
 import time
 import datetime
 from Insight_NLP.Classifier.CNN import PreProcess
-from Insight_NLP.Classifier.CNN.TextCNN import TextCNN
+from Insight_NLP.Classifier.CNN.ModelCNN import ModelCNN
 from tensorflow.contrib import learn
 
 class CNNTextClassifier(object):
@@ -16,8 +16,8 @@ class CNNTextClassifier(object):
     os.environ["CUDA_VISIBLE_DEVICES"] = self.GPU
 
   def train(self,
+    train_data='Insight_NLP/Classifier/CNN/TotalEvents.data',
     dev_sample_percentage=0.3,
-            train_data='Insight_NLP/Classifier/CNN/TotalEvents.data',
     num_classes=44, embedding_dim=128, kernel_sizes='1,1,1,2,3',
     num_kernels=128, dropout_keep_prob=0.5, l2_reg_lambda=0.0, num_words=64,
     batch_size=1024, num_epochs=2, evaluate_every=100, language_type="ENG"):
@@ -45,7 +45,7 @@ class CNNTextClassifier(object):
           vocab_len = 5000
         else:
           assert False
-        cnn = TextCNN(
+        cnn = ModelCNN(
           sequence_length=x_train.shape[1],
           num_classes=y_train.shape[1],
           vocab_size=vocab_len,
