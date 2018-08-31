@@ -1,6 +1,7 @@
 #coding: utf8
 #author: Yu Liu (yu.liu55@pactera.com)
 
+#code review: update what I told you.
 import tensorflow as tf
 import numpy as np
 import os
