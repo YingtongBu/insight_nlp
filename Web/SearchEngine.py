@@ -13,6 +13,10 @@ class SearchEngine(object):
                     developerKey="AIzaSyC1o8pJAwMvaRugaRp9nWtvrGQs2_llEps")
     keyword_res_list = []
     for i in range(loop_num):
+      # q: search item
+      # cx: search engine key
+      # num: search items returned in each search
+      # highRange: the last item number of search result, used for paging
       res = service.cse().list(
         q=search_keyword,
         cx=self.key,
