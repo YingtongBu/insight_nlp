@@ -6,7 +6,7 @@ import numpy as np
 import os
 import time
 import datetime
-from  Insight_NLP.Classifier.CNN import PreProcess
+from Insight_NLP.Classifier.CNN import PreProcess
 from Insight_NLP.Classifier.CNN.TextCNN import TextCNN
 from tensorflow.contrib import learn
 
