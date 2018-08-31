@@ -20,7 +20,7 @@ class SearchEngine(object):
     self.customSearchkey = custom_search_key
     self.developerKey = developer_key
 
-  def search(self, keywords:str, item_nums=100):
+  def search(self, keywords: str, item_nums=100):
     """
     :param keywords:
     :param item_num:
@@ -28,6 +28,7 @@ class SearchEngine(object):
     """
     service = build("customsearch", "v1",developerKey=self.developerKey)
     result = []
+    #code review: use math.ceil().
     page_nums = item_nums // 10
     if item_nums % 10 > 0:
       page_nums = page_nums + 1
@@ -42,6 +43,7 @@ class SearchEngine(object):
         num=10,
         highRange=(i+1)*10
       ).execute()
+      #code review: do NOT use res['items'] everywhere.
       for i in range(len(res['items'])):
         snippet = res['items'][i]['snippet'].replace('\n', '')
         link = res['items'][i]['displayLink']
