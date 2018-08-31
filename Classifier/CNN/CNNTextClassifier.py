@@ -17,11 +17,11 @@ class CNNTextClassifier(object):
     os.environ["CUDA_VISIBLE_DEVICES"] = self.GPU
 
   def train(self,
-    train_data='Insight_NLP/Classifier/CNN/TotalEvents.data',
-    dev_sample_percentage=0.3,
-    num_classes=44, embedding_dim=128, kernel_sizes='1,1,1,2,3',
-    num_kernels=128, dropout_keep_prob=0.5, l2_reg_lambda=0.0, num_words=64,
-    batch_size=1024, num_epochs=2, evaluate_every=100, language_type="ENG"):
+            train_data='Insight_NLP/Classifier/CNN/TotalEvents.data',
+            dev_sample_percentage=0.3,
+            num_classes=44, embedding_dim=128, kernel_sizes='1,1,1,2,3',
+            num_kernels=128, dropout_keep_prob=0.5, l2_reg_lambda=0.0, num_words=64,
+            batch_size=1024, num_epochs=2, evaluate_frequency=100, language_type="ENG"):
 
     x_train, y_train, vocab_processor, x_dev, y_dev, origin_text_dev = \
       self._pre_process(dev_sample_percentage, train_data, num_classes,
@@ -30,12 +30,12 @@ class CNNTextClassifier(object):
     self._train(x_train, y_train, vocab_processor, x_dev, y_dev,
                 origin_text_dev, embedding_dim, kernel_sizes, num_kernels,
                 dropout_keep_prob, l2_reg_lambda, batch_size, num_epochs,
-                evaluate_every, language_type)
+                evaluate_frequency, language_type)
 
   def _train(self, x_train, y_train, vocab_processor, x_dev, y_dev,
              origin_text_dev, embedding_dim, kernel_sizes, num_kernels,
              dropout_keep_prob, l2_reg_lambda, batch_size, num_epochs,
-             evaluate_every, language_type):
+             evaluate_frequency, language_type):
     # Training
     with tf.Graph().as_default():
       sess = tf.Session()
@@ -144,7 +144,7 @@ class CNNTextClassifier(object):
           x_batch, y_batch = zip(*batch)
           train_step(x_batch, y_batch)
           current_step = tf.train.global_step(sess, global_step)
-          if current_step % evaluate_every == 0:
+          if current_step % evaluate_frequency == 0:
             print("\nEvaluation:")
             dev_step(x_dev, y_dev)
             print("")
@@ -164,7 +164,8 @@ class CNNTextClassifier(object):
                   embedding_dim, num_words, language_type):
     print('Loading Data ...')
     if language_type == 'ENG':
-      x_text, y, x_original = PreProcess.load_data_english(train_data_path,
+      raw_data = open(train_data_path, 'r', encoding='latin').readlines()[1:]
+      x_text, y, x_original = PreProcess.load_data_english(raw_data,
                                                            num_classes)
       # Build vocabulary
       # TODO: to see if the performance is good or not
@@ -198,9 +199,10 @@ class CNNTextClassifier(object):
       return x_train, y_train, vocab_processor, x_dev, y_dev, origin_text_dev
 
     elif language_type == 'CHI':
+      raw_data = open(train_data_path, 'r').readlines()[1:]
       data, label, dictLength, wordDict, rawText = \
         PreProcess.load_data_chinese(
-          train_data_path, low_rate=0, len_sentence=num_words,
+          raw_data, low_rate=0, len_sentence=num_words,
           num_of_class=num_classes
         )
       np.random.seed(10)

@@ -24,9 +24,14 @@ def _clean_str(string):
   string = re.sub(r"\s{2,}", " ", string)
   return string.strip().lower()
 
-def load_data_english(file_path, num_of_class):
+def load_data_english(data, num_of_class:int=45):
+  """
+
+  :param data: [[10, Ping An is in Palo Alto], [44, welcome to ping an lab]]
+  :param num_of_class: from 0 to num_of_class
+  :return:
+  """
   x_text, train_y, y = [], [], []
-  data = open(file_path, 'r', encoding='latin').readlines()[1:]
   data = [sample.strip() for sample in data]
   for row in data:
     row = row.split('\t')
@@ -45,17 +50,17 @@ def load_data_english(file_path, num_of_class):
       item = 0
     y.append(item)
 
-  # Generate labels
+  # Generate labelså
   y = [[item] for item in y]
   enc = preprocessing.OneHotEncoder()
   enc.fit(y)
   y = enc.transform(y).toarray()
   return [x_text, y, x_original]
 
-def load_data_chinese(file_path, low_rate, len_sentence, num_of_class):
+def load_data_chinese(data, low_rate, len_sentence, num_of_class:int=45):
   train_x, train_y = [], []
   raw_text = []
-  for line in open(file_path, 'r').readlines()[1:]:
+  for line in data:
     if int(line.replace('\ufeff', '').replace('\n', '').split('\t')[0]) \
                                                                 < num_of_class:
       train_x.append((line.replace('\ufeff', '').replace('\n', '').split(
