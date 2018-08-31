@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 #coding: utf8
 #author: Xinyi Wu (xinyi.wu5@pactera.com)
+
+#install python-crfsuite
 import pycrfsuite
 
 def word2features(doc, i, model):
