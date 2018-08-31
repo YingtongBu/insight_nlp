@@ -37,9 +37,11 @@ class SearchEngine(object):
       for i in range(len(res['items'])):
         snippet = res['items'][i]['snippet'].replace('\n', '')
         link = res['items'][i]['displayLink']
+        title = res['items'][i]['title']
         single_result = {
           "link": link,
           "snippet": snippet,
+          "title": title
         }
         result.append(single_result)
     return result
