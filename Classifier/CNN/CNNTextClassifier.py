@@ -22,7 +22,12 @@ class CNNTextClassifier(object):
             num_classes=44, embedding_dim=128, kernel_sizes='1,1,1,2,3',
             num_kernels=128, dropout_keep_prob=0.5, l2_reg_lambda=0.0, num_words=64,
             batch_size=1024, num_epochs=2, evaluate_frequency=100, language_type="ENG"):
-
+    '''
+    step: word --> word Idx
+    step: create batch data : treat as a function(): random.sample(data, N)
+    step: create the model: self_model = CNNModel(...), and optimizer ...
+          _create_model(....)
+    '''
     x_train, y_train, vocab_processor, x_dev, y_dev, origin_text_dev = \
       self._pre_process(dev_sample_percentage, train_data, num_classes,
                  embedding_dim, num_words, language_type)
@@ -37,9 +42,11 @@ class CNNTextClassifier(object):
              dropout_keep_prob, l2_reg_lambda, batch_size, num_epochs,
              evaluate_frequency, language_type):
     # Training
+    # remove with tf.Graph().as_default()
     with tf.Graph().as_default():
       sess = tf.Session()
       with sess.as_default():
+        #code review: remove language related processing.
         if language_type == 'ENG':
           vocab_len = len(vocab_processor.vocabulary_)
         elif language_type == 'CHI':

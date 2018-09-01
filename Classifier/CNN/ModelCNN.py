@@ -3,6 +3,7 @@
 
 import tensorflow as tf
 
+#code review: should be "_CNNModel".
 class ModelCNN(object):
   """
   A CNN for text classification.
