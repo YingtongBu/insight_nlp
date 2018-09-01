@@ -29,7 +29,6 @@ class SearchEngine(object):
     """
     service = build("customsearch", "v1",developerKey=self.developerKey)
     result = []
-    #code review: use math.ceil().
     page_nums = math.ceil(item_nums / 10)
     for i in range(page_nums):
       # q: search item
