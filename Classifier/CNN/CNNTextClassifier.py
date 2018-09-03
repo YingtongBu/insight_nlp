@@ -1,14 +1,13 @@
 #coding: utf8
 #author: Yu Liu (yu.liu55@pactera.com)
 
-#code review: update what I told you.
 import tensorflow as tf
 import numpy as np
 import os
 import time
 import datetime
 from Insight_NLP.Classifier.CNN import PreProcess
-from Insight_NLP.Classifier.CNN.ModelCNN import ModelCNN
+from Insight_NLP.Classifier.CNN.ModelCNN import _CNNModel
 from tensorflow.contrib import learn
 
 class CNNTextClassifier(object):
@@ -59,14 +58,13 @@ class CNNTextClassifier(object):
              evaluate_frequency, language_type):
     # Training
     sess = tf.Session()
-    #code review: remove language related processing.
     if language_type == 'ENG':
       vocab_len = len(vocab_processor.vocabulary_)
     elif language_type == 'CHI':
       vocab_len = 5000
     else:
       assert False
-    cnn = ModelCNN(
+    cnn = _CNNModel(
       sequence_length=x_train.shape[1],
       num_classes=y_train.shape[1],
       vocab_size=vocab_len,

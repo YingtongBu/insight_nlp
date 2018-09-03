@@ -3,8 +3,7 @@
 
 import tensorflow as tf
 
-#code review: should be "_CNNModel".
-class ModelCNN(object):
+class _CNNModel(object):
   """
   A CNN for text classification.
   Uses an embedding layer, followed by a convolutional, max-pooling and softmax
