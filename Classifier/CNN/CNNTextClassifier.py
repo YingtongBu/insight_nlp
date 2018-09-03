@@ -11,14 +11,16 @@ from Insight_NLP.Classifier.CNN.ModelCNN import _CNNModel
 from tensorflow.contrib import learn
 
 class CNNTextClassifier(object):
-  def __init__(self, train_file='Insight_NLP/Classifier/CNN/Sample.data',
-            dev_sample_percentage=0.3,
-            num_classes=44, embedding_dim=128, kernel_sizes='1,1,1,2,3',
-            num_kernels=128, dropout_keep_prob=0.5, l2_reg_lambda=0.0,
-            max_words_len=64, batch_size=1024, num_epochs=2,
-            evaluate_frequency=100, language_type="ENG", GPU=3):
+  def __init__(self,
+               train_file='Insight_NLP/Classifier/CNN/Sample.data',
+               test_file='Insight_NLP/Classifier/CNN/Sample.data',
+               dev_sample_percentage=0.3, num_classes=44, embedding_dim=128,
+               kernel_sizes='1,1,1,2,3', num_kernels=128, dropout_keep_prob=0.5,
+               l2_reg_lambda=0.0, max_words_len=64, batch_size=1024,
+               num_epochs=2,evaluate_frequency=100, language_type="ENG", GPU=3):
     self.GPU = str(GPU)
-    self.train_file = train_file
+    self.train_file = open(train_file, 'r', encoding='latin').readlines()[1:]
+    self.test_file = open(test_file, 'r', encoding='latin').readlines()[1:]
     self.dev_sample_percentage = dev_sample_percentage
     self.num_classes = num_classes
     self.embedding_dim = embedding_dim
@@ -93,7 +95,6 @@ class CNNTextClassifier(object):
     checkpoint_dir = os.path.abspath(os.path.join(out_dir, "checkpoints"))
     checkpoint_prefix = os.path.join(checkpoint_dir, "model")
     if not os.path.exists(checkpoint_dir):
-      print('create here!!!!!!!!!!!!!!')
       os.makedirs(checkpoint_dir)
     saver = tf.train.Saver(tf.global_variables(), max_to_keep=5)
 
@@ -186,11 +187,9 @@ class CNNTextClassifier(object):
       x_text, y, x_original = PreProcess.load_data_english(raw_data,
                                                            num_classes)
       # Build vocabulary
-      # TODO: to see if the performance is good or not
-      # max_document_length = max([len(x.split(" ")) for x in x_text])
-      max_document_length = max_words_len
+      # max_words_len = max([len(x.split(" ")) for x in x_text])
       vocab_processor = \
-        learn.preprocessing.VocabularyProcessor(max_document_length)
+        learn.preprocessing.VocabularyProcessor(max_words_len)
       x = np.array(list(vocab_processor.fit_transform(x_text)))
       x_original = np.array(x_original)
       # Randomly shuffle data
