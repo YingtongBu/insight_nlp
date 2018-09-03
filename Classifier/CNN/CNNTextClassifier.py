@@ -12,8 +12,8 @@ from tensorflow.contrib import learn
 
 class CNNTextClassifier(object):
   def __init__(self,
-               train_file='Insight_NLP/Classifier/CNN/Sample.data',
-               test_file='Insight_NLP/Classifier/CNN/Sample.data',
+               train_file='Insight_NLP/Classifier/CNN/Sample.Train.data',
+               test_file='Insight_NLP/Classifier/CNN/Sample.Test.data',
                num_classes=44, embedding_dim=128,
                kernel_sizes='1,1,1,2,3', num_kernels=128, dropout_keep_prob=0.5,
                l2_reg_lambda=0.0, max_words_len=64, batch_size=1024,
@@ -127,7 +127,7 @@ class CNNTextClassifier(object):
       print("{}: step {}, loss {:g}, acc {:g}".format(time_str,
                                                       step, loss, accuracy))
 
-    def final_dev_step(x_batch, y_batch, x_ori_dev):
+    def final_dev_step(x_batch, y_batch):
       """
       Evaluates model on a dev set, generate the output
       """
@@ -142,7 +142,7 @@ class CNNTextClassifier(object):
       time_str = datetime.datetime.now().isoformat()
       print("{}: step {}, loss {:g}, acc {:g}".format(time_str,
                                                       step, loss, accuracy))
-      #TODO: replace this graph
+      #TODO: replace this graph to another place
       # print('Generating the truth & prediction table ...')
       # y_batch = [np.where(r == 1)[0][0] for r in y_batch]
       # truPred = list(zip(y_batch, predictions, x_ori_dev))
@@ -191,8 +191,6 @@ class CNNTextClassifier(object):
       x_shuffled = x[shuffle_indices]
       y_shuffled = y[shuffle_indices]
       x_ori_shuffled = x_original[shuffle_indices]
-
-      del x, y, x_shuffled, y_shuffled
 
       print("Vocabulary Size: {:d}".format(len(vocab_processor.vocabulary_)))
       return x_shuffled, y_shuffled, vocab_processor
