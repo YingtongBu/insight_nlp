@@ -45,7 +45,7 @@ class CNNTextClassifier(object):
     '''
     x_train, y_train, vocab_processor, x_dev, y_dev, origin_text_dev = \
       self._pre_process(self.dev_sample_percentage, self.train_file,
-                        self.num_classes,self.embedding_dim, self.max_words_len,
+                        self.num_classes, self.max_words_len,
                         self.language_type)
 
     sess = tf.Session()
@@ -73,7 +73,7 @@ class CNNTextClassifier(object):
     train_op = optimizer.apply_gradients(grads_and_vars,
                                          global_step=global_step)
 
-    # Output directory for models and summaries
+    # Output directory for models
     timestamp = str(int(time.time()))
     out_dir = os.path.abspath(
       os.path.join(os.path.curdir, "runs", timestamp))
@@ -82,7 +82,7 @@ class CNNTextClassifier(object):
     # Initialize all variables
     sess.run(tf.global_variables_initializer())
 
-    # Checkpoint directory. Tensorflow assumes this directory already exists
+    # Checkpoint directory for model saving
     checkpoint_dir = os.path.abspath(os.path.join(out_dir, "checkpoints"))
     checkpoint_prefix = os.path.join(checkpoint_dir, "model")
     if not os.path.exists(checkpoint_dir):
@@ -136,14 +136,14 @@ class CNNTextClassifier(object):
       time_str = datetime.datetime.now().isoformat()
       print("{}: step {}, loss {:g}, acc {:g}".format(time_str,
                                                       step, loss, accuracy))
+      #TODO: replace this graph
       print('Generating the truth & prediction table ...')
       y_batch = [np.where(r == 1)[0][0] for r in y_batch]
       truPred = list(zip(y_batch, predictions, x_ori_dev))
       with open('TruPred', 'w') as newFile:
         for index, item in enumerate(truPred):
-          newFile.write(str(index) + '\t' + '\t'.join(str(v) for
-                                                      v in
-                                                      item) + '\n')
+          newFile.write(str(index) + '\t' +
+                        '\t'.join(str(v) for v in item) + '\n')
       print('File generated!')
 
     # Generate batches
@@ -171,7 +171,7 @@ class CNNTextClassifier(object):
     pass
 
   def _pre_process(self, dev_sample_percentage, train_file, num_classes,
-                   embedding_dim, max_words_len, language_type):
+                   max_words_len, language_type):
     print('Loading Data ...')
     if language_type == 'ENG':
       raw_data = train_file
