@@ -14,14 +14,13 @@ class CNNTextClassifier(object):
   def __init__(self,
                train_file='Insight_NLP/Classifier/CNN/Sample.data',
                test_file='Insight_NLP/Classifier/CNN/Sample.data',
-               dev_sample_percentage=0.3, num_classes=44, embedding_dim=128,
+               num_classes=44, embedding_dim=128,
                kernel_sizes='1,1,1,2,3', num_kernels=128, dropout_keep_prob=0.5,
                l2_reg_lambda=0.0, max_words_len=64, batch_size=1024,
                num_epochs=2,evaluate_frequency=100, language_type="ENG", GPU=3):
     self.GPU = str(GPU)
-    self.train_file = open(train_file, 'r', encoding='latin').readlines()[1:]
-    self.test_file = open(test_file, 'r', encoding='latin').readlines()[1:]
-    self.dev_sample_percentage = dev_sample_percentage
+    self.train_data = open(train_file, 'r', encoding='latin').readlines()[1:]
+    self.test_data = open(test_file, 'r', encoding='latin').readlines()[1:]
     self.num_classes = num_classes
     self.embedding_dim = embedding_dim
     self.kernel_sizes = kernel_sizes
@@ -43,11 +42,18 @@ class CNNTextClassifier(object):
     step: create the model: self_model = CNNModel(...), and optimizer ...
           _create_model(....)
     '''
-    x_train, y_train, vocab_processor, x_dev, y_dev, origin_text_dev = \
-      self._pre_process(self.dev_sample_percentage, self.train_file,
-                        self.num_classes, self.max_words_len,
+    x_train, y_train, vocab_processor = \
+      self._pre_process(self.train_data, self.num_classes, self.max_words_len,
+                        self.language_type)
+    x_dev, y_dev, vocab_processor = \
+      self._pre_process(self.test_data, self.num_classes, self.max_words_len,
                         self.language_type)
 
+    # Generate batches
+    batches = self._batch_iter(
+      list(zip(x_train, y_train)), self.batch_size, self.num_epochs)
+
+    # initial tensorflow session
     sess = tf.Session()
     if self.language_type == 'ENG':
       vocab_len = len(vocab_processor.vocabulary_)
@@ -137,18 +143,15 @@ class CNNTextClassifier(object):
       print("{}: step {}, loss {:g}, acc {:g}".format(time_str,
                                                       step, loss, accuracy))
       #TODO: replace this graph
-      print('Generating the truth & prediction table ...')
-      y_batch = [np.where(r == 1)[0][0] for r in y_batch]
-      truPred = list(zip(y_batch, predictions, x_ori_dev))
-      with open('TruPred', 'w') as newFile:
-        for index, item in enumerate(truPred):
-          newFile.write(str(index) + '\t' +
-                        '\t'.join(str(v) for v in item) + '\n')
-      print('File generated!')
+      # print('Generating the truth & prediction table ...')
+      # y_batch = [np.where(r == 1)[0][0] for r in y_batch]
+      # truPred = list(zip(y_batch, predictions, x_ori_dev))
+      # with open('TruPred', 'w') as newFile:
+      #   for index, item in enumerate(truPred):
+      #     newFile.write(str(index) + '\t' +
+      #                   '\t'.join(str(v) for v in item) + '\n')
+      # print('File generated!')
 
-    # Generate batches
-    batches = PreProcess.batch_iter(
-      list(zip(x_train, y_train)), self.batch_size, self.num_epochs)
     # Training loop. For each batch...
     for batch in batches:
       x_batch, y_batch = zip(*batch)
@@ -164,17 +167,16 @@ class CNNTextClassifier(object):
     print("Saved model checkpoint to {}\n".format(path))
 
     print("\nFinal Evaluation:")
-    final_dev_step(x_dev, y_dev, origin_text_dev)
+    final_dev_step(x_dev, y_dev)
     print("")
 
   def predict(self):
     pass
 
-  def _pre_process(self, dev_sample_percentage, train_file, num_classes,
-                   max_words_len, language_type):
+  def _pre_process(self, data, num_classes, max_words_len, language_type):
     print('Loading Data ...')
     if language_type == 'ENG':
-      raw_data = train_file
+      raw_data = data
       x_text, y, x_original = PreProcess.load_data_english(raw_data,
                                                            num_classes)
       # Build vocabulary
@@ -190,24 +192,13 @@ class CNNTextClassifier(object):
       y_shuffled = y[shuffle_indices]
       x_ori_shuffled = x_original[shuffle_indices]
 
-      # Split train/test set
-      # TODO: This is very crude, should use cross-validation
-      dev_sample_index = \
-        -1 * int(dev_sample_percentage * float(len(y)))
-      x_train, x_dev = \
-        x_shuffled[:dev_sample_index], x_shuffled[dev_sample_index:]
-      y_train, y_dev = \
-        y_shuffled[:dev_sample_index], y_shuffled[dev_sample_index:]
-      origin_text_dev = x_ori_shuffled[dev_sample_index:]
-
       del x, y, x_shuffled, y_shuffled
 
       print("Vocabulary Size: {:d}".format(len(vocab_processor.vocabulary_)))
-      print("Train/Dev split: {:d}/{:d}".format(len(y_train), len(y_dev)))
-      return x_train, y_train, vocab_processor, x_dev, y_dev, origin_text_dev
+      return x_shuffled, y_shuffled, vocab_processor
 
     elif language_type == 'CHI':
-      raw_data = open(train_file, 'r').readlines()[1:]
+      raw_data = data
       data, label, dictLength, wordDict, rawText = \
         PreProcess.load_data_chinese(
           raw_data, low_rate=0, len_sentence=max_words_len,
@@ -220,15 +211,34 @@ class CNNTextClassifier(object):
       text_shuffled = np.array(rawText)[shuffle_indices]
 
       # Split train/dev set
-      dev_sample_index = -1 * int(
-        dev_sample_percentage * float(len(y_shuffled)))
-      x_train, x_dev = \
-        x_shuffled[:dev_sample_index], x_shuffled[dev_sample_index:]
-      y_train, y_dev = \
-        y_shuffled[:dev_sample_index], y_shuffled[dev_sample_index:]
-      origin_text_dev = text_shuffled[dev_sample_index:]
-      del x_shuffled, y_shuffled, data, label, text_shuffled
-      return x_train, y_train, 5000, x_dev, y_dev, origin_text_dev
+      # dev_sample_index = -1 * int(
+      #   dev_sample_percentage * float(len(y_shuffled)))
+      # x_train, x_dev = \
+      #   x_shuffled[:dev_sample_index], x_shuffled[dev_sample_index:]
+      # y_train, y_dev = \
+      #   y_shuffled[:dev_sample_index], y_shuffled[dev_sample_index:]
+      # origin_text_dev = text_shuffled[dev_sample_index:]
+      # del x_shuffled, y_shuffled, data, label, text_shuffled
+      return x_shuffled, y_shuffled, 5000
 
     else:
       assert False
+
+  def _batch_iter(self, data, batch_size, num_epochs, shuffle=True):
+    """
+    Generates a batch iterator for a dataset.
+    """
+    data = np.array(data)
+    data_size = len(data)
+    num_batches_per_epoch = int((len(data) - 1) / batch_size) + 1
+    for epoch in range(num_epochs):
+      # Shuffle the data at each epoch
+      if shuffle:
+        shuffle_indices = np.random.permutation(np.arange(data_size))
+        shuffled_data = data[shuffle_indices]
+      else:
+        shuffled_data = data
+      for batch_num in range(num_batches_per_epoch):
+        start_index = batch_num * batch_size
+        end_index = min((batch_num + 1) * batch_size, data_size)
+        yield shuffled_data[start_index:end_index]
