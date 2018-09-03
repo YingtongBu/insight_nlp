@@ -12,16 +12,30 @@ from Insight_NLP.Classifier.CNN.ModelCNN import ModelCNN
 from tensorflow.contrib import learn
 
 class CNNTextClassifier(object):
-  def __init__(self, GPU=3):
-    self.GPU = str(GPU)
-    os.environ["CUDA_VISIBLE_DEVICES"] = self.GPU
-
-  def train(self,
-            train_data='Insight_NLP/Classifier/CNN/TotalEvents.data',
+  def __init__(self, train_file='Insight_NLP/Classifier/CNN/Sample.data',
             dev_sample_percentage=0.3,
             num_classes=44, embedding_dim=128, kernel_sizes='1,1,1,2,3',
-            num_kernels=128, dropout_keep_prob=0.5, l2_reg_lambda=0.0, num_words=64,
-            batch_size=1024, num_epochs=2, evaluate_frequency=100, language_type="ENG"):
+            num_kernels=128, dropout_keep_prob=0.5, l2_reg_lambda=0.0,
+            max_words_len=64, batch_size=1024, num_epochs=2,
+            evaluate_frequency=100, language_type="ENG", GPU=3):
+    self.GPU = str(GPU)
+    self.train_file = train_file
+    self.dev_sample_percentage = dev_sample_percentage
+    self.num_classes = num_classes
+    self.embedding_dim = embedding_dim
+    self.kernel_sizes = kernel_sizes
+    self.num_kernels = num_kernels
+    self.dropout_keep_prob = dropout_keep_prob
+    self.l2_reg_lambda = l2_reg_lambda
+    self.max_words_len = max_words_len
+    self.batch_size = batch_size
+    self.num_epochs = num_epochs
+    self.evaluate_frequency = evaluate_frequency
+    self.language_type = language_type
+    # select the GPU
+    os.environ["CUDA_VISIBLE_DEVICES"] = self.GPU
+
+  def train(self):
     '''
     step: word --> word Idx
     step: create batch data : treat as a function(): random.sample(data, N)
@@ -29,155 +43,154 @@ class CNNTextClassifier(object):
           _create_model(....)
     '''
     x_train, y_train, vocab_processor, x_dev, y_dev, origin_text_dev = \
-      self._pre_process(dev_sample_percentage, train_data, num_classes,
-                 embedding_dim, num_words, language_type)
+      self._pre_process(self.dev_sample_percentage, self.train_file,
+                        self.num_classes,self.embedding_dim, self.max_words_len,
+                        self.language_type)
 
     self._train(x_train, y_train, vocab_processor, x_dev, y_dev,
-                origin_text_dev, embedding_dim, kernel_sizes, num_kernels,
-                dropout_keep_prob, l2_reg_lambda, batch_size, num_epochs,
-                evaluate_frequency, language_type)
+                origin_text_dev, self.embedding_dim, self.kernel_sizes,
+                self.num_kernels, self.dropout_keep_prob, self.l2_reg_lambda,
+                self.batch_size, self.num_epochs, self.evaluate_frequency,
+                self.language_type)
 
   def _train(self, x_train, y_train, vocab_processor, x_dev, y_dev,
              origin_text_dev, embedding_dim, kernel_sizes, num_kernels,
              dropout_keep_prob, l2_reg_lambda, batch_size, num_epochs,
              evaluate_frequency, language_type):
     # Training
-    # remove with tf.Graph().as_default()
-    with tf.Graph().as_default():
-      sess = tf.Session()
-      with sess.as_default():
-        #code review: remove language related processing.
-        if language_type == 'ENG':
-          vocab_len = len(vocab_processor.vocabulary_)
-        elif language_type == 'CHI':
-          vocab_len = 5000
-        else:
-          assert False
-        cnn = ModelCNN(
-          sequence_length=x_train.shape[1],
-          num_classes=y_train.shape[1],
-          vocab_size=vocab_len,
-          embedding_size=embedding_dim,
-          filter_sizes=list(map(int, kernel_sizes.split(","))),
-          num_filters=num_kernels,
-          l2_reg_lambda=l2_reg_lambda)
+    sess = tf.Session()
+    #code review: remove language related processing.
+    if language_type == 'ENG':
+      vocab_len = len(vocab_processor.vocabulary_)
+    elif language_type == 'CHI':
+      vocab_len = 5000
+    else:
+      assert False
+    cnn = ModelCNN(
+      sequence_length=x_train.shape[1],
+      num_classes=y_train.shape[1],
+      vocab_size=vocab_len,
+      embedding_size=embedding_dim,
+      filter_sizes=list(map(int, kernel_sizes.split(","))),
+      num_filters=num_kernels,
+      l2_reg_lambda=l2_reg_lambda)
 
-        # Define Training procedure
-        global_step = tf.Variable(0, name="global_step", trainable=False)
-        optimizer = tf.train.AdamOptimizer(1e-3)
-        grads_and_vars = optimizer.compute_gradients(cnn.loss)
-        train_op = optimizer.apply_gradients(grads_and_vars,
-                                             global_step=global_step)
+    # Define Training procedure
+    global_step = tf.Variable(0, name="global_step", trainable=False)
+    optimizer = tf.train.AdamOptimizer(1e-3)
+    grads_and_vars = optimizer.compute_gradients(cnn.loss)
+    train_op = optimizer.apply_gradients(grads_and_vars,
+                                         global_step=global_step)
 
-        # Output directory for models and summaries
-        timestamp = str(int(time.time()))
-        out_dir = os.path.abspath(
-          os.path.join(os.path.curdir, "runs", timestamp))
-        print(f"Writing to {out_dir}\n")
+    # Output directory for models and summaries
+    timestamp = str(int(time.time()))
+    out_dir = os.path.abspath(
+      os.path.join(os.path.curdir, "runs", timestamp))
+    print(f"Writing to {out_dir}\n")
 
-        # Initialize all variables
-        sess.run(tf.global_variables_initializer())
+    # Initialize all variables
+    sess.run(tf.global_variables_initializer())
 
-        # Checkpoint directory. Tensorflow assumes this directory already exists
-        checkpoint_dir = os.path.abspath(os.path.join(out_dir, "checkpoints"))
-        checkpoint_prefix = os.path.join(checkpoint_dir, "model")
-        if not os.path.exists(checkpoint_dir):
-          print('create here!!!!!!!!!!!!!!')
-          os.makedirs(checkpoint_dir)
-        saver = tf.train.Saver(tf.global_variables(), max_to_keep=5)
+    # Checkpoint directory. Tensorflow assumes this directory already exists
+    checkpoint_dir = os.path.abspath(os.path.join(out_dir, "checkpoints"))
+    checkpoint_prefix = os.path.join(checkpoint_dir, "model")
+    if not os.path.exists(checkpoint_dir):
+      print('create here!!!!!!!!!!!!!!')
+      os.makedirs(checkpoint_dir)
+    saver = tf.train.Saver(tf.global_variables(), max_to_keep=5)
 
-        def train_step(x_batch, y_batch):
-          """
-          A single training step
-          """
-          feed_dict = {
-            cnn.input_x          : x_batch,
-            cnn.input_y          : y_batch,
-            cnn.dropout_keep_prob: dropout_keep_prob
-          }
-          _, step, loss, accuracy = sess.run(
-            [train_op, global_step, cnn.loss, cnn.accuracy],
-            feed_dict)
-          time_str = datetime.datetime.now().isoformat()
-          # print("{}: step {}, loss {:g}, acc {:g}".format(time_str,
-          # step, loss, accuracy))
+    def train_step(x_batch, y_batch):
+      """
+      A single training step
+      """
+      feed_dict = {
+        cnn.input_x          : x_batch,
+        cnn.input_y          : y_batch,
+        cnn.dropout_keep_prob: dropout_keep_prob
+      }
+      _, step, loss, accuracy = sess.run(
+        [train_op, global_step, cnn.loss, cnn.accuracy],
+        feed_dict)
+      time_str = datetime.datetime.now().isoformat()
+      # print("{}: step {}, loss {:g}, acc {:g}".format(time_str,
+      # step, loss, accuracy))
 
-        def dev_step(x_batch, y_batch):
-          """
-          Evaluates model on a dev set
-          """
-          feed_dict = {
-            cnn.input_x          : x_batch,
-            cnn.input_y          : y_batch,
-            cnn.dropout_keep_prob: 1.0
-          }
-          step, loss, accuracy = sess.run(
-            [global_step, cnn.loss, cnn.accuracy],
-            feed_dict)
-          time_str = datetime.datetime.now().isoformat()
-          print("{}: step {}, loss {:g}, acc {:g}".format(time_str,
-                                                          step, loss, accuracy))
+    def dev_step(x_batch, y_batch):
+      """
+      Evaluates model on a dev set
+      """
+      feed_dict = {
+        cnn.input_x          : x_batch,
+        cnn.input_y          : y_batch,
+        cnn.dropout_keep_prob: 1.0
+      }
+      step, loss, accuracy = sess.run(
+        [global_step, cnn.loss, cnn.accuracy],
+        feed_dict)
+      time_str = datetime.datetime.now().isoformat()
+      print("{}: step {}, loss {:g}, acc {:g}".format(time_str,
+                                                      step, loss, accuracy))
 
-        def final_dev_step(x_batch, y_batch, x_ori_dev):
-          """
-          Evaluates model on a dev set, generate the output
-          """
-          feed_dict = {
-            cnn.input_x          : x_batch,
-            cnn.input_y          : y_batch,
-            cnn.dropout_keep_prob: 1.0
-          }
-          step, loss, accuracy, predictions = sess.run(
-            [global_step, cnn.loss, cnn.accuracy, cnn.predictions],
-            feed_dict)
-          time_str = datetime.datetime.now().isoformat()
-          print("{}: step {}, loss {:g}, acc {:g}".format(time_str,
-                                                          step, loss, accuracy))
-          print('Generating the truth & prediction table ...')
-          y_batch = [np.where(r == 1)[0][0] for r in y_batch]
-          truPred = list(zip(y_batch, predictions, x_ori_dev))
-          with open('TruPred', 'w') as newFile:
-            for index, item in enumerate(truPred):
-              newFile.write(str(index) + '\t' + '\t'.join(str(v) for
-                                                          v in
-                                                          item) + '\n')
-          print('File generated!')
+    def final_dev_step(x_batch, y_batch, x_ori_dev):
+      """
+      Evaluates model on a dev set, generate the output
+      """
+      feed_dict = {
+        cnn.input_x          : x_batch,
+        cnn.input_y          : y_batch,
+        cnn.dropout_keep_prob: 1.0
+      }
+      step, loss, accuracy, predictions = sess.run(
+        [global_step, cnn.loss, cnn.accuracy, cnn.predictions],
+        feed_dict)
+      time_str = datetime.datetime.now().isoformat()
+      print("{}: step {}, loss {:g}, acc {:g}".format(time_str,
+                                                      step, loss, accuracy))
+      print('Generating the truth & prediction table ...')
+      y_batch = [np.where(r == 1)[0][0] for r in y_batch]
+      truPred = list(zip(y_batch, predictions, x_ori_dev))
+      with open('TruPred', 'w') as newFile:
+        for index, item in enumerate(truPred):
+          newFile.write(str(index) + '\t' + '\t'.join(str(v) for
+                                                      v in
+                                                      item) + '\n')
+      print('File generated!')
 
-        # Generate batches
-        batches = PreProcess.batch_iter(
-          list(zip(x_train, y_train)), batch_size, num_epochs)
-        # Training loop. For each batch...
-        for batch in batches:
-          x_batch, y_batch = zip(*batch)
-          train_step(x_batch, y_batch)
-          current_step = tf.train.global_step(sess, global_step)
-          if current_step % evaluate_frequency == 0:
-            print("\nEvaluation:")
-            dev_step(x_dev, y_dev)
-            print("")
-
-        final_step = tf.train.global_step(sess, global_step)
-        path = saver.save(sess, checkpoint_prefix, global_step=final_step)
-        print("Saved model checkpoint to {}\n".format(path))
-
-        print("\nFinal Evaluation:")
-        final_dev_step(x_dev, y_dev, origin_text_dev)
+    # Generate batches
+    batches = PreProcess.batch_iter(
+      list(zip(x_train, y_train)), batch_size, num_epochs)
+    # Training loop. For each batch...
+    for batch in batches:
+      x_batch, y_batch = zip(*batch)
+      train_step(x_batch, y_batch)
+      current_step = tf.train.global_step(sess, global_step)
+      if current_step % evaluate_frequency == 0:
+        print("\nEvaluation:")
+        dev_step(x_dev, y_dev)
         print("")
+
+    final_step = tf.train.global_step(sess, global_step)
+    path = saver.save(sess, checkpoint_prefix, global_step=final_step)
+    print("Saved model checkpoint to {}\n".format(path))
+
+    print("\nFinal Evaluation:")
+    final_dev_step(x_dev, y_dev, origin_text_dev)
+    print("")
 
   def predict(self):
     pass
 
-  def _pre_process(self, dev_sample_percentage, train_data_path, num_classes,
-                  embedding_dim, num_words, language_type):
+  def _pre_process(self, dev_sample_percentage, train_file, num_classes,
+                   embedding_dim, max_words_len, language_type):
     print('Loading Data ...')
     if language_type == 'ENG':
-      raw_data = open(train_data_path, 'r', encoding='latin').readlines()[1:]
+      raw_data = open(train_file, 'r', encoding='latin').readlines()[1:]
       x_text, y, x_original = PreProcess.load_data_english(raw_data,
                                                            num_classes)
       # Build vocabulary
       # TODO: to see if the performance is good or not
       # max_document_length = max([len(x.split(" ")) for x in x_text])
-      max_document_length = num_words
+      max_document_length = max_words_len
       vocab_processor = \
         learn.preprocessing.VocabularyProcessor(max_document_length)
       x = np.array(list(vocab_processor.fit_transform(x_text)))
@@ -206,10 +219,10 @@ class CNNTextClassifier(object):
       return x_train, y_train, vocab_processor, x_dev, y_dev, origin_text_dev
 
     elif language_type == 'CHI':
-      raw_data = open(train_data_path, 'r').readlines()[1:]
+      raw_data = open(train_file, 'r').readlines()[1:]
       data, label, dictLength, wordDict, rawText = \
         PreProcess.load_data_chinese(
-          raw_data, low_rate=0, len_sentence=num_words,
+          raw_data, low_rate=0, len_sentence=max_words_len,
           num_of_class=num_classes
         )
       np.random.seed(10)

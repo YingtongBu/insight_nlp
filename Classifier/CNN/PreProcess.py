@@ -5,7 +5,7 @@ import numpy as np
 import re
 from sklearn import preprocessing
 
-def _clean_str(string):
+def tokenization_str(string):
   """
   Tokenization/string cleaning for all datasets except for SST.
   """
@@ -39,7 +39,7 @@ def load_data_english(data, num_of_class:int=45):
     train_y.append(row[0])
   # Split by words
   x_original = x_text
-  x_text = [_clean_str(sent) for sent in x_text]
+  x_text = [tokenization_str(sent) for sent in x_text]
   # clean y
   for item in train_y:
     try:
