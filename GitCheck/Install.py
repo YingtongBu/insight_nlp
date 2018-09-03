@@ -25,7 +25,8 @@ if __name__ == "__main__":
   hook_dir = os.path.join(options.repoPath, ".git/hooks")
   os.system(f"cd {hook_dir};"
             f"rm pre-push;"
-            f"cp {scipt} pre-push")
+            f"cp {scipt} pre-push;"
+            f"chmod u+x pre-push")
   
   print("Successful!")
 
