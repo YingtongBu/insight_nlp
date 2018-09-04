@@ -45,7 +45,7 @@ class CNNTextClassifier(object):
           _create_model(....)
     '''
     x_train, y_train, vocab_size = \
-      self._pre_process(self.train_data, self.num_classes, self.max_words_len)
+      self._pre_process(self.train_data)
 
     # Generate batches
     batches = batch_iter(
@@ -122,7 +122,7 @@ class CNNTextClassifier(object):
     :return:
     """
     x_dev, y_dev, vocab_size = \
-      self._pre_process(self.test_data, self.num_classes, self.max_words_len)
+      self._pre_process(self.test_data)
     # start tf session
     sess = tf.Session()
     saver = tf.train.import_meta_graph(model_path)
@@ -146,11 +146,35 @@ class CNNTextClassifier(object):
     #                   '\t'.join(str(v) for v in item) + '\n')
     # print('File generated!')
 
-  def _pre_process(self, data, num_classes, max_words_len):
+  def _pre_process(self, data):
     print('Loading Data ...')
-    x_text, y = self._load_data(data, num_classes)
+    x_text, train_y, y = [], [], []
+    data = [sample.strip() for sample in data]
+    for row in data:
+      row = row.split('\t')
+      x_text.append(row[1].replace('\ufeff', ''))
+      train_y.append(row[0])
+    # Split by words
+    x_text = [token_str(sent) for sent in x_text]
+    # clean y
+    for item in train_y:
+      try:
+        item = int(item)
+        if item > self.num_classes:
+          item = 0
+      except:
+        item = 0
+      y.append(item)
+
+    # Generate one-hot labels
+    y = [[item] for item in y]
+    enc = preprocessing.OneHotEncoder()
+    enc.fit(y)
+    y = enc.transform(y).toarray()
+
     #Build vocabulary
-    vocab_processor = learn.preprocessing.VocabularyProcessor(max_words_len)
+    vocab_processor = \
+      learn.preprocessing.VocabularyProcessor(self.max_words_len)
     x = np.array(list(vocab_processor.fit_transform(x_text)))
     # summer's
     # vocab_builder = Vocabulary()
