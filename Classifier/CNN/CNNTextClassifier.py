@@ -17,6 +17,7 @@ class CNNTextClassifier(object):
   def __init__(self,
                train_file='Insight_NLP/Classifier/CNN/Sample.Train.data',
                test_file='Insight_NLP/Classifier/CNN/Sample.Test.data',
+               model_path = '',
                num_classes=44, embedding_dim=128,
                kernel_sizes='1,1,1,2,3', num_kernels=128, dropout_keep_prob=0.5,
                l2_reg_lambda=0.0, max_words_len=64, batch_size=1024,
@@ -76,8 +77,7 @@ class CNNTextClassifier(object):
     # Output directory for models
     timestamp = str(int(time.time()))
     out_dir = os.path.abspath(
-      os.path.join(os.path.curdir, "runs", timestamp))
-    print(f"Writing to {out_dir}\n")
+      os.path.join(os.path.curdir, "models", timestamp))
 
     # Initialize all variables
     sess.run(tf.global_variables_initializer())
@@ -163,8 +163,27 @@ class CNNTextClassifier(object):
     final_dev_step(x_dev, y_dev)
     print("")
 
-  def predict(self):
-    pass
+  def predict(self, model_path):
+    """
+    :param model_path: './checkpoint_dir/MyModel-1000.meta'
+    :return:
+    """
+    x_dev, y_dev, vocab_size = \
+      self._pre_process(self.test_data, self.num_classes, self.max_words_len)
+    # start tf session
+    sess = tf.Session()
+    saver = tf.train.import_meta_graph(model_path)
+    saver.restore(sess, tf.train.latest_checkpoint(os.path.pardir(model_path)))
+    feed_dict = {
+      self.model.input_x          : x_dev,
+      self.model.input_y          : y_dev,
+      self.model.dropout_keep_prob: 1.0
+    }
+    loss, accuracy, predictions = sess.run(
+      [self.model.loss, self.model.accuracy,self.model.predictions], feed_dict)
+    time_str = datetime.datetime.now().isoformat()
+    print(f"{time_str}: validation loss {loss}, acc {accuracy}")
+
 
   def _pre_process(self, data, num_classes, max_words_len):
     print('Loading Data ...')
