@@ -198,34 +198,3 @@ class CNNTextClassifier(object):
     x_shuffled = x[shuffle_indices]
     y_shuffled = y[shuffle_indices]
     return x_shuffled, y_shuffled, vocab_size
-
-  def _load_data(self, data, num_of_class: int=45):
-    """
-    :param data: [[10, 'Ping An is in Palo Alto'], [44, 'welcome to ping an']]
-    :param num_of_class: from 0 to num_of_class
-    :return:
-    """
-    x_text, train_y, y = [], [], []
-    data = [sample.strip() for sample in data]
-    for row in data:
-      row = row.split('\t')
-      x_text.append(row[1].replace('\ufeff', ''))
-      train_y.append(row[0])
-    # Split by words
-    x_text = [token_str(sent) for sent in x_text]
-    # clean y
-    for item in train_y:
-      try:
-        item = int(item)
-        if item > num_of_class:
-          item = 0
-      except:
-        item = 0
-      y.append(item)
-
-    # Generate labels
-    y = [[item] for item in y]
-    enc = preprocessing.OneHotEncoder()
-    enc.fit(y)
-    y = enc.transform(y).toarray()
-    return x_text, y
