@@ -137,7 +137,7 @@ class CNNTextClassifier(object):
       [self.model.loss, self.model.accuracy,self.model.predictions], feed_dict)
     time_str = datetime.datetime.now().isoformat()
     print(f"{time_str}: validation loss {loss}, acc {accuracy}")
-    # TODO: replace this graph to another place
+    # TODO: try store all the files together with checkpoint
     # print('Generating the truth & prediction table ...')
     # y_batch = [np.where(r == 1)[0][0] for r in y_batch]
     # truPred = list(zip(y_batch, predictions, x_ori_dev))
