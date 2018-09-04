@@ -8,6 +8,7 @@ import time
 import datetime
 from Insight_NLP.Classifier.CNN import PreProcess
 from Insight_NLP.Classifier.CNN.ModelCNN import _CNNModel
+from Insight_NLP.Vocabulary import Vocabulary
 from tensorflow.contrib import learn
 
 class CNNTextClassifier(object):
@@ -41,10 +42,9 @@ class CNNTextClassifier(object):
     step: create the model: self_model = CNNModel(...), and optimizer ...
           _create_model(....)
     '''
-    x_train, y_train, vocab_processor = \
-      self._pre_process(self.train_data, self.test_data, self.num_classes,
-                        self.max_words_len)
-    x_dev, y_dev, vocab_processor = \
+    x_train, y_train, vocab_size = \
+      self._pre_process(self.train_data, self.num_classes, self.max_words_len)
+    x_dev, y_dev, vocab_size = \
       self._pre_process(self.test_data, self.num_classes, self.max_words_len)
 
     # Generate batches
@@ -53,19 +53,18 @@ class CNNTextClassifier(object):
 
     # initial tensorflow session
     sess = tf.Session()
-    vocab_len = len(vocab_processor.vocabulary_)
 
     # create the model
     self.model = _CNNModel(
       sequence_length=x_train.shape[1],
       num_classes=y_train.shape[1],
-      vocab_size=vocab_len,
+      vocab_size=vocab_size,
       embedding_size=self.embedding_dim,
       filter_sizes=list(map(int, self.kernel_sizes.split(","))),
       num_filters=self.num_kernels,
       l2_reg_lambda=self.l2_reg_lambda)
 
-    # Define Training procedure
+    # Define Training procedure and optimizer
     global_step = tf.Variable(0, name="global_step", trainable=False)
     optimizer = tf.train.AdamOptimizer(1e-3)
     grads_and_vars = optimizer.compute_gradients(self.model.loss)
@@ -165,21 +164,35 @@ class CNNTextClassifier(object):
   def predict(self):
     pass
 
-  def _pre_process(self, train_data, test_data, num_classes, max_words_len):
+  def _pre_process(self, data, num_classes, max_words_len):
     print('Loading Data ...')
-    x_text, y, x_original = PreProcess.load_data(train_data, num_classes)
-    print(x_text)
-    # Build vocabulary
-    # max_words_len = max([len(x.split(" ")) for x in x_text])
+    x_text, y = PreProcess.load_data(data, num_classes)
+    #Build vocabulary
+    #max_words_len = max([len(x.split(" ")) for x in x_text])
     vocab_processor = \
       learn.preprocessing.VocabularyProcessor(max_words_len)
     x = np.array(list(vocab_processor.fit_transform(x_text)))
+    # summer's
+    # vocab_builder = Vocabulary()
+    # vocab_builder.create_vob_from_data(x_text)
+    # vocab_builder.add_word("<empty>")
+    # vocab_builder.add_word("<oov>")
+    # x_text = [vocab_builder.convert_to_word_ids(tokens) for tokens in x_text]
+    # for index, tokens in enumerate(x_text):
+    #   empty_num_add = max_words_len - len(tokens)
+    #   if empty_num_add < 0:
+    #     empty_num_add = 0
+    #     x_text[index] = x_text[index] + empty_num_add * ["<empty>"]
+    # print(x_text)
+    # x = np.array(x_text)
+    # vocab_size = vocab_builder.size()
     # Randomly shuffle data
+    vocab_size = vocab_processor.__sizeof__()
     np.random.seed(10)
     shuffle_indices = np.random.permutation(np.arange(len(y)))
     x_shuffled = x[shuffle_indices]
     y_shuffled = y[shuffle_indices]
-    return x_shuffled, y_shuffled, vocab_processor
+    return x_shuffled, y_shuffled, vocab_size
 
   def _batch_iter(self, data, batch_size, num_epochs, shuffle=True):
     """

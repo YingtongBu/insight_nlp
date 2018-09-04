@@ -6,10 +6,9 @@ import re
 
 def token_str(string):
   """
-  Tokenization/string cleaning for all datasets except for SST.
+  Tokenization/string cleaning for all ENGLISH datasets
   """
-  #string = re.sub(r"[^A-Za-z0-9(),!?\'\`]", " ", string)
-
+  string = re.sub(r"[^A-Za-z0-9(),!?\'\`]", " ", string)
   string = re.sub(r"\'s", " \'s", string)
   string = re.sub(r"\'ve", " \'ve", string)
   string = re.sub(r"n\'t", " n\'t", string)
