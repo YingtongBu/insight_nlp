@@ -29,8 +29,8 @@ class CNNTextClassifier(object):
                evaluate_frequency=100,
                GPU=3):
     self._GPU = str(GPU)
-    self._train_data = open(train_file).readlines()[1:]
-    self._validation_data = open(validation_file).readlines()[1:]
+    self._train_data = train_file
+    self._validation_data = validation_file
     self._num_classes = num_classes
     self._embedding_dim = embedding_dim
     self._kernel_sizes = kernel_sizes
