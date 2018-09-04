@@ -3,7 +3,6 @@
 
 import numpy as np
 from sklearn import preprocessing
-from Insight_NLP.English import token_str
 
 def load_data_english(data, num_of_class:int=45):
   """
@@ -36,6 +35,27 @@ def load_data_english(data, num_of_class:int=45):
   enc.fit(y)
   y = enc.transform(y).toarray()
   return [x_text, y, x_original]
+
+import re
+
+def token_str(string):
+  """
+  Tokenization/string cleaning for Chinese and English data
+  """
+  string = re.sub(r"\'s", " \'s", string)
+  string = re.sub(r"\'ve", " \'ve", string)
+  string = re.sub(r"n\'t", " n\'t", string)
+  string = re.sub(r"\'re", " \'re", string)
+  string = re.sub(r"\'d", " \'d", string)
+  string = re.sub(r"\'ll", " \'ll", string)
+  string = re.sub(r",", " , ", string)
+  string = re.sub(r"!", " ! ", string)
+  string = re.sub(r"\(", " \( ", string)
+  string = re.sub(r"\)", " \) ", string)
+  string = re.sub(r"\?", " \? ", string)
+  string = re.sub(r"\s{2,}", " ", string)
+  # string = re.sub(r"\u4e00-\u9fa5", )
+  return string.strip().lower()
 
 def load_data_chinese(data, low_rate, len_sentence, num_of_class:int=45):
   train_x, train_y = [], []

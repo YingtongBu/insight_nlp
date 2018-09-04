@@ -43,8 +43,8 @@ class CNNTextClassifier(object):
           _create_model(....)
     '''
     x_train, y_train, vocab_processor = \
-      self._pre_process(self.train_data, self.num_classes, self.max_words_len,
-                        self.language_type)
+      self._pre_process(self.train_data, self.test_data, self.num_classes,
+                        self.max_words_len, self.language_type)
     x_dev, y_dev, vocab_processor = \
       self._pre_process(self.test_data, self.num_classes, self.max_words_len,
                         self.language_type)
@@ -152,7 +152,7 @@ class CNNTextClassifier(object):
       #                   '\t'.join(str(v) for v in item) + '\n')
       # print('File generated!')
 
-    # Training loop. For each batch...
+    # Training loops
     for batch in batches:
       x_batch, y_batch = zip(*batch)
       train_step(x_batch, y_batch)
@@ -173,54 +173,22 @@ class CNNTextClassifier(object):
   def predict(self):
     pass
 
-  def _pre_process(self, data, num_classes, max_words_len, language_type):
+  def _pre_process(self, train_data, test_data, num_classes, max_words_len,
+                   language_type):
     print('Loading Data ...')
-    if language_type == 'ENG':
-      raw_data = data
-      x_text, y, x_original = PreProcess.load_data_english(raw_data,
-                                                           num_classes)
-      # Build vocabulary
-      # max_words_len = max([len(x.split(" ")) for x in x_text])
-      vocab_processor = \
-        learn.preprocessing.VocabularyProcessor(max_words_len)
-      x = np.array(list(vocab_processor.fit_transform(x_text)))
-      x_original = np.array(x_original)
-      # Randomly shuffle data
-      np.random.seed(10)
-      shuffle_indices = np.random.permutation(np.arange(len(y)))
-      x_shuffled = x[shuffle_indices]
-      y_shuffled = y[shuffle_indices]
-      x_ori_shuffled = x_original[shuffle_indices]
-
-      print("Vocabulary Size: {:d}".format(len(vocab_processor.vocabulary_)))
-      return x_shuffled, y_shuffled, vocab_processor
-
-    elif language_type == 'CHI':
-      raw_data = data
-      data, label, dictLength, wordDict, rawText = \
-        PreProcess.load_data_chinese(
-          raw_data, low_rate=0, len_sentence=max_words_len,
-          num_of_class=num_classes
-        )
-      np.random.seed(10)
-      shuffle_indices = np.random.permutation(np.arange(len(label)))
-      x_shuffled = data[shuffle_indices]
-      y_shuffled = label[shuffle_indices]
-      text_shuffled = np.array(rawText)[shuffle_indices]
-
-      # Split train/dev set
-      # dev_sample_index = -1 * int(
-      #   dev_sample_percentage * float(len(y_shuffled)))
-      # x_train, x_dev = \
-      #   x_shuffled[:dev_sample_index], x_shuffled[dev_sample_index:]
-      # y_train, y_dev = \
-      #   y_shuffled[:dev_sample_index], y_shuffled[dev_sample_index:]
-      # origin_text_dev = text_shuffled[dev_sample_index:]
-      # del x_shuffled, y_shuffled, data, label, text_shuffled
-      return x_shuffled, y_shuffled, 5000
-
-    else:
-      assert False
+    x_text, y, x_original = PreProcess.load_data_english(train_data,
+                                                         num_classes)
+    # Build vocabulary
+    # max_words_len = max([len(x.split(" ")) for x in x_text])
+    vocab_processor = \
+      learn.preprocessing.VocabularyProcessor(max_words_len)
+    x = np.array(list(vocab_processor.fit_transform(x_text)))
+    # Randomly shuffle data
+    np.random.seed(10)
+    shuffle_indices = np.random.permutation(np.arange(len(y)))
+    x_shuffled = x[shuffle_indices]
+    y_shuffled = y[shuffle_indices]
+    return x_shuffled, y_shuffled, vocab_processor
 
   def _batch_iter(self, data, batch_size, num_epochs, shuffle=True):
     """
