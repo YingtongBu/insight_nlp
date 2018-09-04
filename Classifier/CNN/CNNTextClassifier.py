@@ -17,7 +17,7 @@ class CNNTextClassifier(object):
                num_classes=44, embedding_dim=128,
                kernel_sizes='1,1,1,2,3', num_kernels=128, dropout_keep_prob=0.5,
                l2_reg_lambda=0.0, max_words_len=64, batch_size=1024,
-               num_epochs=2,evaluate_frequency=100, language_type="ENG", GPU=3):
+               num_epochs=2,evaluate_frequency=100, GPU=3):
     self.GPU = str(GPU)
     self.train_data = open(train_file, 'r', encoding='latin').readlines()[1:]
     self.test_data = open(test_file, 'r', encoding='latin').readlines()[1:]
@@ -31,7 +31,6 @@ class CNNTextClassifier(object):
     self.batch_size = batch_size
     self.num_epochs = num_epochs
     self.evaluate_frequency = evaluate_frequency
-    self.language_type = language_type
     # select the GPU
     os.environ["CUDA_VISIBLE_DEVICES"] = self.GPU
 
@@ -44,10 +43,9 @@ class CNNTextClassifier(object):
     '''
     x_train, y_train, vocab_processor = \
       self._pre_process(self.train_data, self.test_data, self.num_classes,
-                        self.max_words_len, self.language_type)
+                        self.max_words_len)
     x_dev, y_dev, vocab_processor = \
-      self._pre_process(self.test_data, self.num_classes, self.max_words_len,
-                        self.language_type)
+      self._pre_process(self.test_data, self.num_classes, self.max_words_len)
 
     # Generate batches
     batches = self._batch_iter(
@@ -55,12 +53,7 @@ class CNNTextClassifier(object):
 
     # initial tensorflow session
     sess = tf.Session()
-    if self.language_type == 'ENG':
-      vocab_len = len(vocab_processor.vocabulary_)
-    elif self.language_type == 'CHI':
-      vocab_len = 5000
-    else:
-      assert False
+    vocab_len = len(vocab_processor.vocabulary_)
 
     # create the model
     self.model = _CNNModel(
@@ -173,8 +166,7 @@ class CNNTextClassifier(object):
   def predict(self):
     pass
 
-  def _pre_process(self, train_data, test_data, num_classes, max_words_len,
-                   language_type):
+  def _pre_process(self, train_data, test_data, num_classes, max_words_len):
     print('Loading Data ...')
     x_text, y, x_original = PreProcess.load_data_english(train_data,
                                                          num_classes)
