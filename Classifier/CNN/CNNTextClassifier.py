@@ -135,15 +135,6 @@ class CNNTextClassifier(object):
       time_str = datetime.datetime.now().isoformat()
       print("{}: step {}, loss {:g}, acc {:g}".format(time_str,
                                                       step, loss, accuracy))
-      #TODO: replace this graph to another place
-      # print('Generating the truth & prediction table ...')
-      # y_batch = [np.where(r == 1)[0][0] for r in y_batch]
-      # truPred = list(zip(y_batch, predictions, x_ori_dev))
-      # with open('TruPred', 'w') as newFile:
-      #   for index, item in enumerate(truPred):
-      #     newFile.write(str(index) + '\t' +
-      #                   '\t'.join(str(v) for v in item) + '\n')
-      # print('File generated!')
 
     # Training loops
     for batch in batches:
@@ -151,17 +142,11 @@ class CNNTextClassifier(object):
       train_step(x_batch, y_batch)
       current_step = tf.train.global_step(sess, global_step)
       if current_step % self.evaluate_frequency == 0:
-        print("\nEvaluation:")
-        dev_step(x_dev, y_dev)
-        print("")
+        print(f"\nstep number till now: {current_step}")
 
     final_step = tf.train.global_step(sess, global_step)
     path = saver.save(sess, checkpoint_prefix, global_step=final_step)
     print("Saved model checkpoint to {}\n".format(path))
-
-    print("\nFinal Evaluation:")
-    final_dev_step(x_dev, y_dev)
-    print("")
 
   def predict(self, model_path):
     """
@@ -183,14 +168,22 @@ class CNNTextClassifier(object):
       [self.model.loss, self.model.accuracy,self.model.predictions], feed_dict)
     time_str = datetime.datetime.now().isoformat()
     print(f"{time_str}: validation loss {loss}, acc {accuracy}")
+    # TODO: replace this graph to another place
+    # print('Generating the truth & prediction table ...')
+    # y_batch = [np.where(r == 1)[0][0] for r in y_batch]
+    # truPred = list(zip(y_batch, predictions, x_ori_dev))
+    # with open('TruPred', 'w') as newFile:
+    #   for index, item in enumerate(truPred):
+    #     newFile.write(str(index) + '\t' +
+    #                   '\t'.join(str(v) for v in item) + '\n')
+    # print('File generated!')
+
 
   def _pre_process(self, data, num_classes, max_words_len):
     print('Loading Data ...')
     x_text, y = self._load_data(data, num_classes)
     #Build vocabulary
-    #max_words_len = max([len(x.split(" ")) for x in x_text])
-    vocab_processor = \
-      learn.preprocessing.VocabularyProcessor(max_words_len)
+    vocab_processor = learn.preprocessing.VocabularyProcessor(max_words_len)
     x = np.array(list(vocab_processor.fit_transform(x_text)))
     # summer's
     # vocab_builder = Vocabulary()
