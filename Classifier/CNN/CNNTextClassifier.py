@@ -214,9 +214,9 @@ class CNNTextClassifier(object):
         end_index = min((batch_num + 1) * batch_size, data_size)
         yield shuffled_data[start_index:end_index]
 
-  def load_data(self, data, num_of_class: int = 45):
+  def load_data(self, data, num_of_class: int=45):
     """
-    :param data: [[10, 'Ping An is in Palo Alto'], [44, 'welcome to ping an lab']]
+    :param data: [[10, 'Ping An is in Palo Alto'], [44, 'welcome to ping an']]
     :param num_of_class: from 0 to num_of_class
     :return:
     """
@@ -245,7 +245,7 @@ class CNNTextClassifier(object):
     y = enc.transform(y).toarray()
     return x_text, y
 
-  def token_str(self, string):
+  def token_str(self, string: str):
     """
     Tokenization/string cleaning for Chinese and English data
     """
