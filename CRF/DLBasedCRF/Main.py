@@ -24,9 +24,9 @@ if __name__ == '__main__':
   parser.add_option('-w', '--word_vector_file',
                     default='./chinese_word_vector')
   parser.add_option('-r', '--train_jia_fang_data_file',
-                    default='./DataForTaskTest/JiaFang/trainTemp1.data')
+                    default='./Data/JiaFang/trainTemp1.data')
   parser.add_option('-e', '--test_jia_fang_data_file',
-                    default='./DataForTaskTest/JiaFang/testTemp1.data')
+                    default='./Data/JiaFang/testTemp1.data')
   parser.add_option('-t', '--train_set_model_file',
                     default='./DataForModelTraining/Chinese/train.data')
   parser.add_option('-x', '--test_set_model_file',
@@ -34,7 +34,7 @@ if __name__ == '__main__':
   parser.add_option('-v', '--validation_set_model_file',
                     default='./DataForModelTraining/Chinese/validation.data')
   parser.add_option('-p', '--predict_prob_file',
-                    default='./DataForTaskTest/JiaFang/predictProb1.data') 
+                    default='./Data/JiaFang/predictProb1.data')
   parser.add_option('-d', '--id_record_file',
                     default='./idRecord.txt')
   parser.add_option('-i', '--input_file',
@@ -42,7 +42,7 @@ if __name__ == '__main__':
   parser.add_option('-o', '--output_file',
                     default='./output.txt')
   parser.add_option('-g', '--ground_truth_file',
-                    default='./DataForTaskTest/label.test_lower.data')
+                    default='./Data/label.test_lower.data')
   (options, args) = parser.parse_args()
 
   main(options.word_vector_file, options.train_jia_fang_data_file,

@@ -3,13 +3,13 @@
 #author: Xin Jin (xin.jin12@pactera.com)
 
 class DataPreprocessing(object):
-  def __init__(self, doc_path):
-    self.doc_path = doc_path
 
-  #code review: process_train_data():
-  def train_doc_process(self):
-    doc_file = open(self.doc_path)
-    data = list()
+  def __init__(self, data):
+    self.data = data
+
+  def process_train_data(self):
+    doc_file = open(self.data)
+    sample = list()
     for line in doc_file:
       words = line.split(' ')[:-1]
       l = list()
@@ -22,14 +22,13 @@ class DataPreprocessing(object):
           l.append([' '] + w[1:].split('/'))
         else:
           l.append(w.split('/'))
-      data.append(l)
+      sample.append(l)
     doc_file.close()
-    print(data)
-    return data
+    return sample
 
-  def test_doc_process(self):
-    doc_file = open(self.doc_path)
-    data = list()
+  def process_test_data(self):
+    doc_file = open(self.data)
+    sample = list()
     for line in doc_file:
       words = line.split(' ')[:-1]
       l = list()
@@ -42,16 +41,15 @@ class DataPreprocessing(object):
           l.append([' ', 'x'])
         else:
           l.append(w.split('/'))
-      data.append(l)
+      sample.append(l)
     doc_file.close()
 
-    return data
+    return sample
 
-  def get_labels(self, data):
-    return [label for (token, postag, label) in data]
+  def get_labels(self, sample):
+    return [label for (token, postag, label) in sample]
 
-  #code review: get_longest_label(...)
-  def get_longest(self, X, Y):
+  def get_longest_label(self, X, Y):
     n = len(Y)
     current_len = 0
     max_len = 0
