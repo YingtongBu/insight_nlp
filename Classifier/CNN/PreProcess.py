@@ -4,7 +4,7 @@
 import numpy as np
 from sklearn import preprocessing
 
-def load_data_english(data, num_of_class:int=45):
+def load_data(data, num_of_class:int=45):
   """
   :param data: [[10, Ping An is in Palo Alto], [44, welcome to ping an lab]]
   :param num_of_class: from 0 to num_of_class
@@ -54,8 +54,12 @@ def token_str(string):
   string = re.sub(r"\)", " \) ", string)
   string = re.sub(r"\?", " \? ", string)
   string = re.sub(r"\s{2,}", " ", string)
-  # string = re.sub(r"\u4e00-\u9fa5", )
-  return string.strip().lower()
+  new_string = ""
+  for char in string:
+    if re.findall(r"\u4e00-\u9fa5", char) != []:
+      char = " " + char + " "
+    new_string += char
+  return new_string.strip().lower()
 
 def load_data_chinese(data, low_rate, len_sentence, num_of_class:int=45):
   train_x, train_y = [], []

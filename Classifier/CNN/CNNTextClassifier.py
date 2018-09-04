@@ -69,7 +69,7 @@ class CNNTextClassifier(object):
     global_step = tf.Variable(0, name="global_step", trainable=False)
     optimizer = tf.train.AdamOptimizer(1e-3)
     grads_and_vars = optimizer.compute_gradients(self.model.loss)
-    train_op = optimizer.apply_gradients(grads_and_vars,
+    train_optimizer = optimizer.apply_gradients(grads_and_vars,
                                          global_step=global_step)
 
     # Output directory for models
@@ -98,7 +98,7 @@ class CNNTextClassifier(object):
         self.model.dropout_keep_prob: self.dropout_keep_prob
       }
       _, step, loss, accuracy = sess.run(
-        [train_op, global_step, self.model.loss, self.model.accuracy],
+        [train_optimizer, global_step, self.model.loss, self.model.accuracy],
         feed_dict)
       time_str = datetime.datetime.now().isoformat()
       # print("{}: step {}, loss {:g}, acc {:g}".format(time_str,
@@ -114,8 +114,7 @@ class CNNTextClassifier(object):
         self.model.dropout_keep_prob: 1.0
       }
       step, loss, accuracy = sess.run(
-        [global_step, self.model.loss, self.model.accuracy],
-        feed_dict)
+        [global_step, self.model.loss, self.model.accuracy], feed_dict)
       time_str = datetime.datetime.now().isoformat()
       print("{}: step {}, loss {:g}, acc {:g}".format(time_str,
                                                       step, loss, accuracy))
@@ -168,8 +167,8 @@ class CNNTextClassifier(object):
 
   def _pre_process(self, train_data, test_data, num_classes, max_words_len):
     print('Loading Data ...')
-    x_text, y, x_original = PreProcess.load_data_english(train_data,
-                                                         num_classes)
+    x_text, y, x_original = PreProcess.load_data(train_data, num_classes)
+    print(x_text)
     # Build vocabulary
     # max_words_len = max([len(x.split(" ")) for x in x_text])
     vocab_processor = \
