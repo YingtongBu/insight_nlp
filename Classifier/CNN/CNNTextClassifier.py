@@ -169,6 +169,8 @@ class CNNTextClassifier(object):
     #                   '\t'.join(str(v) for v in item) + '\n')
     # print('File generated!')
 
+  #code review: should be
+  # def _load_data(data_file):
   def _pre_process(self, data):
     print('Loading Data ...')
     x_text, train_y, y = [], [], []
@@ -202,6 +204,7 @@ class CNNTextClassifier(object):
     #code review: I tested my code, and found nothing. Please debug these wrong
     #code later. Maybe it is not in the first priority, but you should resolve
     #it.
+    #Did you really read my exmple of using Vocabulary class?
     # summer's
     # vocab_builder = Vocabulary()
     # vocab_builder.create_vob_from_data(x_text)
