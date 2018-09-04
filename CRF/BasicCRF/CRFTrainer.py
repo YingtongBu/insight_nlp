@@ -3,16 +3,16 @@
 #author: Xin Jin (xin.jin12@pactera.com)
 
 #install python-crfsuite
+
 import pycrfsuite
 from Insight_NLP.CRF.BasicCRF.DataPreprocessing import DataPreprocessing
 
 class CRFTrainer(object):
 
-  #code review: doc_path, feature_extractor
-  def __init__(self, model_name, doc_path, feature_extraction):
+  def __init__(self, model_name, data, feature_extractor):
     self.model_name = model_name
-    self.doc_path = doc_path
-    self.feature_extraction = feature_extraction
+    self.data = data
+    self.feature_extractor = feature_extractor
 
   def _train(self, X_train, y_train):
     trainer = pycrfsuite.Trainer(verbose=False)
@@ -26,10 +26,9 @@ class CRFTrainer(object):
     })
     trainer.train(self.model_name)
 
-  #code review: train(self):
-  def crf_trainer(self):
-    data_preprocessing = DataPreprocessing(self. doc_path)
-    data = data_preprocessing.train_doc_process()
-    X = [self.feature_extraction.extract_features(sample) for sample in data]
-    y = [data_preprocessing.get_labels(sample) for sample in data]
+  def train(self):
+    data_preprocessing = DataPreprocessing(self. data)
+    sample = data_preprocessing.process_train_data()
+    X = [self.feature_extractor.extract_features(sample) for sample in sample]
+    y = [data_preprocessing.get_labels(sample) for sample in sample]
     self._train(X, y)
