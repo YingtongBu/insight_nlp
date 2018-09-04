@@ -178,7 +178,6 @@ class CNNTextClassifier(object):
     #                   '\t'.join(str(v) for v in item) + '\n')
     # print('File generated!')
 
-
   def _pre_process(self, data, num_classes, max_words_len):
     print('Loading Data ...')
     x_text, y = self._load_data(data, num_classes)
