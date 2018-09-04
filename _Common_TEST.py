@@ -23,9 +23,6 @@ if __name__ == "__main__":
   
   print(get_module_path("NLP.Translation.Translate"))
   
-  print(Measure.calc_precision_recall_fvalue([0, 1, 1, 2],
-                                             [0, 0, 1, 2]))
-  
   path = "."
   for full_name in get_files_in_folder(path, ["py"], True):
     is_existed = os.path.exists(full_name)
