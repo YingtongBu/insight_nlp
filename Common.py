@@ -245,7 +245,7 @@ def batch_iter(data, batch_size: int, num_epochs: int, shuffle=True):
 
 #code review: should NOT mix Chinese and English.
 #put into Chinese.py and English.py respectively.
-def token_str(string: str):
+def tokenize_string(string: str):
   """
   Tokenization/string cleaning for Chinese and English data
   """

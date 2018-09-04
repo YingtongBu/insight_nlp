@@ -8,21 +8,16 @@ import time
 import datetime
 import re
 from sklearn import preprocessing
-from Insight_NLP.Classifier.CNN.ModelCNN import _CNNModel
+from Insight_NLP.Classifier.CNN._Model_CNN import _CNNModel
 from Insight_NLP.Common import *
 from Insight_NLP.Vocabulary import Vocabulary
 from tensorflow.contrib import learn
 
 class CNNTextClassifier(object):
   def __init__(self,
-               #code review: do not use this default value.
-               train_file='Insight_NLP/Classifier/CNN/Sample.Train.data',
-               #code review: do not use this default value.
-               #the name should be "validataion_file"
-               test_file='Insight_NLP/Classifier/CNN/Sample.Test.data',
-               #code review: do not use default value for num_classes. Others
-               #are OK.
-               num_classes=44,
+               train_file,
+               validation_file,
+               num_classes,
                embedding_dim=128,
                kernel_sizes='1,1,1,2,3',
                num_kernels=128,
@@ -33,56 +28,49 @@ class CNNTextClassifier(object):
                num_epochs=2,
                evaluate_frequency=100,
                GPU=3):
-    #code review: all member varibles should be named with the prefix "_",
-    # unless it is supposed to be accessed in public.
-    self.GPU = str(GPU)
-    self.train_data = open(train_file).readlines()[1:]
-    self.test_data = open(test_file).readlines()[1:]
-    self.num_classes = num_classes
-    self.embedding_dim = embedding_dim
-    self.kernel_sizes = kernel_sizes
-    self.num_kernels = num_kernels
-    self.dropout_keep_prob = dropout_keep_prob
-    self.l2_reg_lambda = l2_reg_lambda
-    self.max_words_len = max_words_len
-    self.batch_size = batch_size
-    self.num_epochs = num_epochs
-    self.evaluate_frequency = evaluate_frequency
+    self._GPU = str(GPU)
+    self._train_data = open(train_file).readlines()[1:]
+    self._validation_data = open(validation_file).readlines()[1:]
+    self._num_classes = num_classes
+    self._embedding_dim = embedding_dim
+    self._kernel_sizes = kernel_sizes
+    self._num_kernels = num_kernels
+    self._dropout_keep_prob = dropout_keep_prob
+    self._l2_reg_lambda = l2_reg_lambda
+    self._max_words_len = max_words_len
+    self._batch_size = batch_size
+    self._num_epochs = num_epochs
+    self._evaluate_frequency = evaluate_frequency
     # select the GPU
-    os.environ["CUDA_VISIBLE_DEVICES"] = self.GPU
+    os.environ["CUDA_VISIBLE_DEVICES"] = self._GPU
 
   def train(self):
-    '''
-    step: word --> word Idx
-    step: create batch data : treat as a function(): random.sample(data, N)
-    step: create the model: self_model = CNNModel(...), and optimizer ...
-          _create_model(....)
-    '''
-    x_train, y_train, vocab_size = self._pre_process(self.train_data)
+
+    x_train, y_train, vocab_size = self._load_data(self._train_data)
 
     # Generate batches
     batches = batch_iter(
-      list(zip(x_train, y_train)), self.batch_size, self.num_epochs)
+      list(zip(x_train, y_train)), self._batch_size, self._num_epochs)
 
     # initial tensorflow session
-    sess = tf.Session()
+    self._sess = tf.Session()
 
     # create the model
-    self.model = _CNNModel(
+    self._model = _CNNModel(
       sequence_length=x_train.shape[1],
       num_classes=y_train.shape[1],
       vocab_size=vocab_size,
-      embedding_size=self.embedding_dim,
-      filter_sizes=list(map(int, self.kernel_sizes.split(","))),
-      num_filters=self.num_kernels,
-      l2_reg_lambda=self.l2_reg_lambda)
+      embedding_size=self._embedding_dim,
+      filter_sizes=list(map(int, self._kernel_sizes.split(","))),
+      num_filters=self._num_kernels,
+      l2_reg_lambda=self._l2_reg_lambda)
 
     # Define Training procedure and optimizer
-    global_step = tf.Variable(0, name="global_step", trainable=False)
+    self._global_step = tf.Variable(0, name="global_step", trainable=False)
     optimizer = tf.train.AdamOptimizer(1e-3)
-    grads_and_vars = optimizer.compute_gradients(self.model.loss)
-    train_optimizer = optimizer.apply_gradients(grads_and_vars,
-                                         global_step=global_step)
+    grads_and_vars = optimizer.compute_gradients(self._model.loss)
+    self._train_optimizer = optimizer.apply_gradients(
+      grads_and_vars, global_step=self._global_step)
 
     # Output directory for saving models
     timestamp = str(int(time.time()))
@@ -90,7 +78,7 @@ class CNNTextClassifier(object):
       os.path.join(os.path.curdir, "models", timestamp))
 
     # Initialize all variables
-    sess.run(tf.global_variables_initializer())
+    self._sess.run(tf.global_variables_initializer())
 
     # Checkpoint directory for model saving
     checkpoint_dir = os.path.abspath(os.path.join(out_dir, "checkpoints"))
@@ -99,62 +87,59 @@ class CNNTextClassifier(object):
       os.makedirs(checkpoint_dir)
     saver = tf.train.Saver(tf.global_variables(), max_to_keep=5)
 
-    #code review: do not use as local function. Should use CNNTextClassifier's
-    #member function.
-    def train_step(x_batch, y_batch):
-      """
-      A single training step
-      """
-      feed_dict = {
-        self.model.input_x          : x_batch,
-        self.model.input_y          : y_batch,
-        self.model.dropout_keep_prob: self.dropout_keep_prob
-      }
-      _, step, loss, accuracy = sess.run(
-        [train_optimizer, global_step, self.model.loss, self.model.accuracy],
-        feed_dict)
-      time_str = datetime.datetime.now().isoformat()
-      # print("{}: step {}, loss {:g}, acc {:g}".format(time_str,
-      # step, loss, accuracy))
-
     # Training loops
     for batch in batches:
       x_batch, y_batch = zip(*batch)
-      train_step(x_batch, y_batch)
-      current_step = tf.train.global_step(sess, global_step)
-      if current_step % self.evaluate_frequency == 0:
+      self._train_step(self._sess, x_batch, y_batch)
+      current_step = tf.train.global_step(self._sess, self._global_step)
+      if current_step % self._evaluate_frequency == 0:
+        self.predict(self._validation_data)
         print(f"\nstep number till now: {current_step}")
 
     # save model
     print("training finished, saving the model ...")
-    final_step = tf.train.global_step(sess, global_step)
-    path = saver.save(sess, checkpoint_prefix, global_step=final_step)
-    print("Saved model checkpoint to {}\n".format(path))
+    final_step = tf.train.global_step(self._sess, self._global_step)
+    path = saver.save(self._sess, checkpoint_prefix, global_step=final_step)
+    print(f"Saved model checkpoint to {path}\n")
 
-  #code review: implement this function.
+  def _train_step(self, sess, x_batch, y_batch):
+    """
+    A single training step
+    """
+    feed_dict = {
+      self._model.input_x          : x_batch,
+      self._model.input_y          : y_batch,
+      self._model.dropout_keep_prob: self._dropout_keep_prob
+    }
+    _, step, loss, accuracy = sess.run(
+      [self._train_optimizer,
+       self._global_step,
+       self._model.loss,
+       self._model.accuracy],
+      feed_dict
+    )
+    time_str = datetime.datetime.now().isoformat()
+
   def load_model(self, model_path):
-    pass
-
-  #code review: predict what? No extra parameters?
-  #think about, in a production, how to invoke your predict function?
-  # def predict(self, model_path):
-  def predict(self, one_sample):
-    """
-    :param model_path: 'models/1536034094/checkpoints/model-8.meta'
-    :return:
-    """
-    x_dev, y_dev, vocab_size = self._pre_process(self.test_data)
-    # start tf session
     sess = tf.Session()
     saver = tf.train.import_meta_graph(model_path)
     saver.restore(sess, tf.train.latest_checkpoint(os.path.pardir(model_path)))
+    self._sess = sess
+
+  def predict(self, sample_path):
+    x_dev, y_dev, vocab_size = self._load_data(sample_path)
+    # start tf session
     feed_dict = {
-      self.model.input_x          : x_dev,
-      self.model.input_y          : y_dev,
-      self.model.dropout_keep_prob: 1.0
+      self._model.input_x          : x_dev,
+      self._model.input_y          : y_dev,
+      self._model.dropout_keep_prob: 1.0
     }
-    loss, accuracy, predictions = sess.run(
-      [self.model.loss, self.model.accuracy,self.model.predictions], feed_dict)
+    loss, accuracy, predictions = self._sess.run(
+      [self._model.loss,
+       self._model.accuracy,
+       self._model.predictions],
+      feed_dict
+    )
     time_str = datetime.datetime.now().isoformat()
     print(f"{time_str}: validation loss {loss}, acc {accuracy}")
     # TODO: try store all the files together with checkpoint
@@ -167,10 +152,13 @@ class CNNTextClassifier(object):
     #                   '\t'.join(str(v) for v in item) + '\n')
     # print('File generated!')
 
-  #code review: should be
-  # def _load_data(data_file):
-  def _pre_process(self, data):
+  def _load_data(self, data_file):
+    """
+    :param data_file: the path to the data_file
+    :return: x_shuffled, y_shuffled, vocab_size
+    """
     print('Loading Data ...')
+    data = open(data_file, encoding='latin').readlines()[1:]
     x_text, train_y, y = [], [], []
     data = [sample.strip() for sample in data]
     for row in data:
@@ -178,12 +166,12 @@ class CNNTextClassifier(object):
       x_text.append(row[1].replace('\ufeff', ''))
       train_y.append(row[0])
     # Split by words
-    x_text = [token_str(sent) for sent in x_text]
+    x_text = [tokenize_string(sample) for sample in x_text]
     # clean y
     for item in train_y:
       try:
         item = int(item)
-        if item > self.num_classes:
+        if item > self._num_classes:
           item = 0
       except:
         item = 0
@@ -197,12 +185,8 @@ class CNNTextClassifier(object):
 
     #Build vocabulary
     vocab_processor = \
-      learn.preprocessing.VocabularyProcessor(self.max_words_len)
+      learn.preprocessing.VocabularyProcessor(self._max_words_len)
     x = np.array(list(vocab_processor.fit_transform(x_text)))
-    #code review: I tested my code, and found nothing. Please debug these wrong
-    #code later. Maybe it is not in the first priority, but you should resolve
-    #it.
-    #Did you really read my exmple of using Vocabulary class?
     # summer's
     # vocab_builder = Vocabulary()
     # vocab_builder.create_vob_from_data(x_text)
