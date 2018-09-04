@@ -9,6 +9,7 @@ import datetime
 import re
 from sklearn import preprocessing
 from Insight_NLP.Classifier.CNN.ModelCNN import _CNNModel
+from Insight_NLP.Common import batch_iter
 from Insight_NLP.Vocabulary import Vocabulary
 from tensorflow.contrib import learn
 
@@ -49,7 +50,7 @@ class CNNTextClassifier(object):
       self._pre_process(self.test_data, self.num_classes, self.max_words_len)
 
     # Generate batches
-    batches = self._batch_iter(
+    batches = batch_iter(
       list(zip(x_train, y_train)), self.batch_size, self.num_epochs)
 
     # initial tensorflow session
@@ -187,32 +188,14 @@ class CNNTextClassifier(object):
     # print(x_text)
     # x = np.array(x_text)
     # vocab_size = vocab_builder.size()
+
     # Randomly shuffle data
-    vocab_size = vocab_processor.__sizeof__()
+    vocab_size = len(vocab_processor.vocabulary_)
     np.random.seed(10)
     shuffle_indices = np.random.permutation(np.arange(len(y)))
     x_shuffled = x[shuffle_indices]
     y_shuffled = y[shuffle_indices]
     return x_shuffled, y_shuffled, vocab_size
-
-  def _batch_iter(self, data, batch_size, num_epochs, shuffle=True):
-    """
-    Generates a batch iterator for a dataset.
-    """
-    data = np.array(data)
-    data_size = len(data)
-    num_batches_per_epoch = int((len(data) - 1) / batch_size) + 1
-    for epoch in range(num_epochs):
-      # Shuffle the data at each epoch
-      if shuffle:
-        shuffle_indices = np.random.permutation(np.arange(data_size))
-        shuffled_data = data[shuffle_indices]
-      else:
-        shuffled_data = data
-      for batch_num in range(num_batches_per_epoch):
-        start_index = batch_num * batch_size
-        end_index = min((batch_num + 1) * batch_size, data_size)
-        yield shuffled_data[start_index:end_index]
 
   def load_data(self, data, num_of_class: int=45):
     """

@@ -23,6 +23,7 @@ import pprint
 import queue
 import random
 import re
+import numpy
 import struct
 import sys
 import time
@@ -221,3 +222,23 @@ def log_f_prime(fss, weight):
     pdw += math.exp(weight.dot(fs) - dn) * fs
   return pdw
 
+def batch_iter(data, batch_size: int, num_epochs: int, shuffle=True):
+  """
+  Generates a batch iterator for a dataset.
+  :param data: [[a,b,c], [c,d,e]]
+  :return: [[c,d,e], [a,b,c]]
+  """
+  data = numpy.array(data)
+  data_size = len(data)
+  num_batches_per_epoch = int((len(data) - 1) / batch_size) + 1
+  for epoch in range(num_epochs):
+    # Shuffle the data at each epoch
+    if shuffle:
+      shuffle_indices = numpy.random.permutation(numpy.arange(data_size))
+      shuffled_data = data[shuffle_indices]
+    else:
+      shuffled_data = data
+    for batch_num in range(num_batches_per_epoch):
+      start_index = batch_num * batch_size
+      end_index = min((batch_num + 1) * batch_size, data_size)
+      yield shuffled_data[start_index:end_index]
