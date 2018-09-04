@@ -242,3 +242,28 @@ def batch_iter(data, batch_size: int, num_epochs: int, shuffle=True):
       start_index = batch_num * batch_size
       end_index = min((batch_num + 1) * batch_size, data_size)
       yield shuffled_data[start_index:end_index]
+
+def token_str(string: str):
+  """
+  Tokenization/string cleaning for Chinese and English data
+  """
+  string = re.sub(r"[^A-Za-z0-9\u4e00-\u9fa5()（）！？，,!?\'\`]", " ", string)
+  string = re.sub(r"\'s", " \'s", string)
+  string = re.sub(r"\'ve", " \'ve", string)
+  string = re.sub(r"n\'t", " n\'t", string)
+  string = re.sub(r"\'re", " \'re", string)
+  string = re.sub(r"\'d", " \'d", string)
+  string = re.sub(r"\'ll", " \'ll", string)
+  string = re.sub(r",", " , ", string)
+  string = re.sub(r"!", " ! ", string)
+  string = re.sub(r"\(", " \( ", string)
+  string = re.sub(r"\)", " \) ", string)
+  string = re.sub(r"\?", " \? ", string)
+  string = re.sub(r"\s{2,}", " ", string)
+  # clean for chinese character
+  new_string = ""
+  for char in string:
+    if re.findall(r"[\u4e00-\u9fa5]", char) != []:
+      char = " " + char + " "
+    new_string += char
+  return new_string.strip().lower().replace('\ufeff', '')
