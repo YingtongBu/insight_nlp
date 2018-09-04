@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 #coding: utf8
 #author: Xin Jin (xin.jin12@pactera.com)
-class DataPreprocessing(object):
 
+class DataPreprocessing(object):
   def __init__(self, doc_path):
     self.doc_path = doc_path
 
+  #code review: process_train_data():
   def train_doc_process(self):
     doc_file = open(self.doc_path)
     data = list()
@@ -49,6 +50,7 @@ class DataPreprocessing(object):
   def get_labels(self, data):
     return [label for (token, postag, label) in data]
 
+  #code review: get_longest_label(...)
   def get_longest(self, X, Y):
     n = len(Y)
     current_len = 0

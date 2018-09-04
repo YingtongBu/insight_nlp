@@ -91,12 +91,13 @@ if __name__ == '__main__':
   parser = optparse.OptionParser(usage=usage)
   parser.add_option('-m', '--model_name',
                     default='company')
-  parser.add_option('-d', '--doc_path',
+  parser.add_option('-d', '--data',
                     default='./DataForTaskTest/JiaFang/testTempJiafang.data')
   parser.add_option('-o', '--output_file',
                     default='./output.txt')
   (options, args) = parser.parse_args()
 
+  #code review:
   feature_extraction = SpecificFeatureExtraction(options.doc_path)
   crf_predictor = CRFPredictor(options.model_name, options.doc_path,
                            feature_extraction, options.output_file)

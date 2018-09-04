@@ -8,6 +8,7 @@ from Insight_NLP.CRF.BasicCRF.DataPreprocessing import DataPreprocessing
 
 class CRFTrainer(object):
 
+  #code review: doc_path, feature_extractor
   def __init__(self, model_name, doc_path, feature_extraction):
     self.model_name = model_name
     self.doc_path = doc_path
@@ -25,6 +26,7 @@ class CRFTrainer(object):
     })
     trainer.train(self.model_name)
 
+  #code review: train(self):
   def crf_trainer(self):
     data_preprocessing = DataPreprocessing(self. doc_path)
     data = data_preprocessing.train_doc_process()

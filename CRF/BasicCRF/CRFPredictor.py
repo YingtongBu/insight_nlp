@@ -5,8 +5,8 @@
 #install python-crfsuite
 import pycrfsuite
 from Insight_NLP.CRF.BasicCRF.DataPreprocessing import DataPreprocessing
-class CRFPredictor(object):
 
+class CRFPredictor(object):
   def __init__(self, model_name, doc_path, feature_extraction, output_file):
     self.model_name = model_name
     self.doc_path = doc_path
