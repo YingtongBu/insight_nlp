@@ -20,7 +20,7 @@ class CNNTextClassifier(object):
                num_classes=44, embedding_dim=128,
                kernel_sizes='1,1,1,2,3', num_kernels=128, dropout_keep_prob=0.5,
                l2_reg_lambda=0.0, max_words_len=64, batch_size=1024,
-               num_epochs=2,evaluate_frequency=100, GPU=3):
+               num_epochs=2, evaluate_frequency=100, GPU=3):
     #code review: all member varibles should be named with the prefix "_",
     # unless it is supposed to be accessed in public.
     self.GPU = str(GPU)
@@ -46,8 +46,7 @@ class CNNTextClassifier(object):
     step: create the model: self_model = CNNModel(...), and optimizer ...
           _create_model(....)
     '''
-    x_train, y_train, vocab_size = \
-      self._pre_process(self.train_data)
+    x_train, y_train, vocab_size = self._pre_process(self.train_data)
 
     # Generate batches
     batches = batch_iter(
@@ -127,8 +126,7 @@ class CNNTextClassifier(object):
     :param model_path: 'models/1536034094/checkpoints/model-8.meta'
     :return:
     """
-    x_dev, y_dev, vocab_size = \
-      self._pre_process(self.test_data)
+    x_dev, y_dev, vocab_size = self._pre_process(self.test_data)
     # start tf session
     sess = tf.Session()
     saver = tf.train.import_meta_graph(model_path)
