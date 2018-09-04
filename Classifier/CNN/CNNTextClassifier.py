@@ -8,7 +8,7 @@ import time
 import datetime
 import re
 from sklearn import preprocessing
-from Insight_NLP.Classifier.CNN._Model_CNN import _CNNModel
+from Insight_NLP.Classifier.CNN._ModelCNN import _CNNModel
 from Insight_NLP.Common import *
 from Insight_NLP.Vocabulary import Vocabulary
 from tensorflow.contrib import learn
