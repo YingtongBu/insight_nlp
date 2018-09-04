@@ -1,7 +1,7 @@
 #coding: utf8
 #author: Yu Liu (yu.liu55@pactera.com)
 
-import numpy as np
+import re
 from sklearn import preprocessing
 
 def load_data(data, num_of_class:int=45):
@@ -34,8 +34,6 @@ def load_data(data, num_of_class:int=45):
   enc.fit(y)
   y = enc.transform(y).toarray()
   return [x_text, y]
-
-import re
 
 def token_str(string):
   """
