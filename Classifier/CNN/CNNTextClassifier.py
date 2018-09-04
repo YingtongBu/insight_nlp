@@ -184,7 +184,6 @@ class CNNTextClassifier(object):
     time_str = datetime.datetime.now().isoformat()
     print(f"{time_str}: validation loss {loss}, acc {accuracy}")
 
-
   def _pre_process(self, data, num_classes, max_words_len):
     print('Loading Data ...')
     x_text, y = self._load_data(data, num_classes)
