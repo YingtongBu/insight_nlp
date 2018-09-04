@@ -66,12 +66,13 @@ def token_str(string):
 #   raw_text = []
 #   for line in data:
 #     if int(line.replace('\ufeff', '').replace('\n', '').split('\t')[0]) \
-#                                                                 < num_of_class:
+#                                                                < num_of_class:
 #       train_x.append((line.replace('\ufeff', '').replace('\n', '').split(
 #         '\t')[1] + '*' * 200)[:len_sentence])
 #       train_y.append(
 #         int(line.replace('\ufeff', '').replace('\n', '').split('\t')[0]))
-#       raw_text.append(line.replace('\ufeff', '').replace('\n', '').split('\t'))
+#       raw_text.append(
+#                     line.replace('\ufeff', '').replace('\n', '').split('\t'))
 #   word_dict = {}
 #   word_count = {}
 #   index = 0
