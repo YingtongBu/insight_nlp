@@ -15,17 +15,29 @@ from tensorflow.contrib import learn
 
 class CNNTextClassifier(object):
   def __init__(self,
+               #code review: do not use this default value.
                train_file='Insight_NLP/Classifier/CNN/Sample.Train.data',
+               #code review: do not use this default value.
+               #the name should be "validataion_file"
                test_file='Insight_NLP/Classifier/CNN/Sample.Test.data',
-               num_classes=44, embedding_dim=128,
-               kernel_sizes='1,1,1,2,3', num_kernels=128, dropout_keep_prob=0.5,
-               l2_reg_lambda=0.0, max_words_len=64, batch_size=1024,
-               num_epochs=2, evaluate_frequency=100, GPU=3):
+               #code review: do not use default value for num_classes. Others
+               #are OK.
+               num_classes=44,
+               embedding_dim=128,
+               kernel_sizes='1,1,1,2,3',
+               num_kernels=128,
+               dropout_keep_prob=0.5,
+               l2_reg_lambda=0.0,
+               max_words_len=64,
+               batch_size=1024,
+               num_epochs=2,
+               evaluate_frequency=100,
+               GPU=3):
     #code review: all member varibles should be named with the prefix "_",
     # unless it is supposed to be accessed in public.
     self.GPU = str(GPU)
-    self.train_data = open(train_file, 'r', encoding='latin').readlines()[1:]
-    self.test_data = open(test_file, 'r', encoding='latin').readlines()[1:]
+    self.train_data = open(train_file).readlines()[1:]
+    self.test_data = open(test_file).readlines()[1:]
     self.num_classes = num_classes
     self.embedding_dim = embedding_dim
     self.kernel_sizes = kernel_sizes
@@ -119,9 +131,14 @@ class CNNTextClassifier(object):
     path = saver.save(sess, checkpoint_prefix, global_step=final_step)
     print("Saved model checkpoint to {}\n".format(path))
 
+  #code review: implement this function.
+  def load_model(self, model_path):
+    pass
+
   #code review: predict what? No extra parameters?
   #think about, in a production, how to invoke your predict function?
-  def predict(self, model_path):
+  # def predict(self, model_path):
+  def predict(self, one_sample):
     """
     :param model_path: 'models/1536034094/checkpoints/model-8.meta'
     :return:
@@ -150,6 +167,8 @@ class CNNTextClassifier(object):
     #                   '\t'.join(str(v) for v in item) + '\n')
     # print('File generated!')
 
+  #code review: should be
+  # def _load_data(data_file):
   def _pre_process(self, data):
     print('Loading Data ...')
     x_text, train_y, y = [], [], []
@@ -180,6 +199,10 @@ class CNNTextClassifier(object):
     vocab_processor = \
       learn.preprocessing.VocabularyProcessor(self.max_words_len)
     x = np.array(list(vocab_processor.fit_transform(x_text)))
+    #code review: I tested my code, and found nothing. Please debug these wrong
+    #code later. Maybe it is not in the first priority, but you should resolve
+    #it.
+    #Did you really read my exmple of using Vocabulary class?
     # summer's
     # vocab_builder = Vocabulary()
     # vocab_builder.create_vob_from_data(x_text)

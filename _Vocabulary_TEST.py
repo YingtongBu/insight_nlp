@@ -30,3 +30,5 @@ if __name__ == "__main__":
         vob.convert_to_word_ids(tokens,
                                 remove_OOV=False, mark_OOV="<oov>",
                                 output_length=10, mark_empty="<empty>"))
+  
+  print(f"#vob: {vob.size()}")
