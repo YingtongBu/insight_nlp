@@ -64,7 +64,10 @@ class FormatChecker:
         self.error += 1
         return
       
-      name = name[1:].replace("_TEST.py", ".py")
+      name = name.replace("_TEST.py", ".py")
+      
+    if name.startswith("_"):
+      name = name[1:]
       
     if name[0].islower() or name.isupper() or '_' in name:
       print("Error! 文件名称采用类命名形式，例如FileName.py")
