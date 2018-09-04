@@ -182,6 +182,9 @@ class CNNTextClassifier(object):
     vocab_processor = \
       learn.preprocessing.VocabularyProcessor(self.max_words_len)
     x = np.array(list(vocab_processor.fit_transform(x_text)))
+    #code review: I tested my code, and found nothing. Please debug these wrong
+    #code later. Maybe it is not in the first priority, but you should resolve
+    #it.
     # summer's
     # vocab_builder = Vocabulary()
     # vocab_builder.create_vob_from_data(x_text)
