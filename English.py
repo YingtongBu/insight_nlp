@@ -4,7 +4,7 @@
 
 import re
 
-def tokenize_string(string):
+def tokenize_string_english(string):
   """
   Tokenization/string cleaning for all ENGLISH datasets
   """

@@ -4,7 +4,10 @@
 from Insight_NLP.Classifier.CNN.CNNTextClassifier import CNNTextClassifier
 
 if __name__ == '__main__':
-  #code review: put it in /tmp/, then test again!
-  cnn_project = CNNTextClassifier(num_classes=44, GPU=3)
+  cnn_project = \
+    CNNTextClassifier(
+                  train_file='Insight_NLP/Classifier/CNN/Sample.Train.data',
+                  validation_file='Insight_NLP/Classifier/CNN/Sample.Test.data',
+                  num_classes=44, GPU=3)
   cnn_project.train()
-  #code review: how to use cnn_project.predict()?
+  cnn_project.predict('Insight_NLP/Classifier/CNN/Sample.Test.data')

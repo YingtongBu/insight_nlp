@@ -30,4 +30,3 @@ def segment_sentence(text, pos_tagging=False):
     return words, tags
   else:
     return list(jieba.cut(text, cut_all=False))
-
