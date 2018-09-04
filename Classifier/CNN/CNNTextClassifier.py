@@ -9,7 +9,7 @@ import datetime
 import re
 from sklearn import preprocessing
 from Insight_NLP.Classifier.CNN.ModelCNN import _CNNModel
-from Insight_NLP.Common import batch_iter, token_str
+from Insight_NLP.Common import *
 from Insight_NLP.Vocabulary import Vocabulary
 from tensorflow.contrib import learn
 
