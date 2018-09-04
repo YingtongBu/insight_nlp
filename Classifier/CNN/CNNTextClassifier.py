@@ -74,7 +74,7 @@ class CNNTextClassifier(object):
     train_optimizer = optimizer.apply_gradients(grads_and_vars,
                                          global_step=global_step)
 
-    # Output directory for models
+    # Output directory for saving models
     timestamp = str(int(time.time()))
     out_dir = os.path.abspath(
       os.path.join(os.path.curdir, "models", timestamp))
@@ -104,37 +104,6 @@ class CNNTextClassifier(object):
       time_str = datetime.datetime.now().isoformat()
       # print("{}: step {}, loss {:g}, acc {:g}".format(time_str,
       # step, loss, accuracy))
-
-    def dev_step(x_batch, y_batch):
-      """
-      Evaluates model on a dev set
-      """
-      feed_dict = {
-        self.model.input_x          : x_batch,
-        self.model.input_y          : y_batch,
-        self.model.dropout_keep_prob: 1.0
-      }
-      step, loss, accuracy = sess.run(
-        [global_step, self.model.loss, self.model.accuracy], feed_dict)
-      time_str = datetime.datetime.now().isoformat()
-      print("{}: step {}, loss {:g}, acc {:g}".format(time_str,
-                                                      step, loss, accuracy))
-
-    def final_dev_step(x_batch, y_batch):
-      """
-      Evaluates model on a dev set, generate the output
-      """
-      feed_dict = {
-        self.model.input_x          : x_batch,
-        self.model.input_y          : y_batch,
-        self.model.dropout_keep_prob: 1.0
-      }
-      step, loss, accuracy, predictions = sess.run(
-        [global_step, self.model.loss, self.model.accuracy,
-         self.model.predictions], feed_dict)
-      time_str = datetime.datetime.now().isoformat()
-      print("{}: step {}, loss {:g}, acc {:g}".format(time_str,
-                                                      step, loss, accuracy))
 
     # Training loops
     for batch in batches:
