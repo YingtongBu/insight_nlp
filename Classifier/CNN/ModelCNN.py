@@ -3,6 +3,8 @@
 
 import tensorflow as tf
 
+#code review: file name. Is this an interface file? If NO, see the "coding
+# rule".
 class _CNNModel(object):
   """
   A CNN for text classification.

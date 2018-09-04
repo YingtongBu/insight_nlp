@@ -21,6 +21,8 @@ class CNNTextClassifier(object):
                kernel_sizes='1,1,1,2,3', num_kernels=128, dropout_keep_prob=0.5,
                l2_reg_lambda=0.0, max_words_len=64, batch_size=1024,
                num_epochs=2,evaluate_frequency=100, GPU=3):
+    #code review: all member varibles should be named with the prefix "_",
+    # unless it is supposed to be accessed in public.
     self.GPU = str(GPU)
     self.train_data = open(train_file, 'r', encoding='latin').readlines()[1:]
     self.test_data = open(test_file, 'r', encoding='latin').readlines()[1:]
@@ -86,6 +88,8 @@ class CNNTextClassifier(object):
       os.makedirs(checkpoint_dir)
     saver = tf.train.Saver(tf.global_variables(), max_to_keep=5)
 
+    #code review: do not use as local function. Should use CNNTextClassifier's
+    #member function.
     def train_step(x_batch, y_batch):
       """
       A single training step
@@ -116,6 +120,8 @@ class CNNTextClassifier(object):
     path = saver.save(sess, checkpoint_prefix, global_step=final_step)
     print("Saved model checkpoint to {}\n".format(path))
 
+  #code review: predict what? No extra parameters?
+  #think about, in a production, how to invoke your predict function?
   def predict(self, model_path):
     """
     :param model_path: 'models/1536034094/checkpoints/model-8.meta'

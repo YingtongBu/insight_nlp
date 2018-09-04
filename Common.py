@@ -243,6 +243,8 @@ def batch_iter(data, batch_size: int, num_epochs: int, shuffle=True):
       end_index = min((batch_num + 1) * batch_size, data_size)
       yield shuffled_data[start_index:end_index]
 
+#code review: should NOT mix Chinese and English.
+#put into Chinese.py and English.py respectively.
 def token_str(string: str):
   """
   Tokenization/string cleaning for Chinese and English data
