@@ -17,7 +17,6 @@ class CNNTextClassifier(object):
   def __init__(self,
                train_file='Insight_NLP/Classifier/CNN/Sample.Train.data',
                test_file='Insight_NLP/Classifier/CNN/Sample.Test.data',
-               model_path = '',
                num_classes=44, embedding_dim=128,
                kernel_sizes='1,1,1,2,3', num_kernels=128, dropout_keep_prob=0.5,
                l2_reg_lambda=0.0, max_words_len=64, batch_size=1024,
@@ -47,8 +46,6 @@ class CNNTextClassifier(object):
     '''
     x_train, y_train, vocab_size = \
       self._pre_process(self.train_data, self.num_classes, self.max_words_len)
-    x_dev, y_dev, vocab_size = \
-      self._pre_process(self.test_data, self.num_classes, self.max_words_len)
 
     # Generate batches
     batches = batch_iter(
@@ -113,13 +110,15 @@ class CNNTextClassifier(object):
       if current_step % self.evaluate_frequency == 0:
         print(f"\nstep number till now: {current_step}")
 
+    # save model
+    print("training finished, saving the model ...")
     final_step = tf.train.global_step(sess, global_step)
     path = saver.save(sess, checkpoint_prefix, global_step=final_step)
     print("Saved model checkpoint to {}\n".format(path))
 
   def predict(self, model_path):
     """
-    :param model_path: './checkpoint_dir/MyModel-1000.meta'
+    :param model_path: 'models/1536034094/checkpoints/model-8.meta'
     :return:
     """
     x_dev, y_dev, vocab_size = \
