@@ -1,19 +1,13 @@
 #coding: utf8
-#author: Yu Liu (yu.liu55@pactera.com)
+#author: Tian Xia (summer.xia1@pactera.com)
 
-import tensorflow as tf
-import numpy as np
-import os
-import time
-import datetime
-import re
-from sklearn import preprocessing
-from Insight_NLP.Classifier.CNN._ModelCNN import _CNNModel
+from Insight_NLP.Tensorflow import *
 from Insight_NLP.Common import *
+from sklearn import preprocessing
+from Insight_NLP.Classifiers.TextCNN._ModelCNN import _CNNModel
 from Insight_NLP.Vocabulary import Vocabulary
-from tensorflow.contrib import learn
 
-class CNNTextClassifier(object):
+class Classifier(object):
   def __init__(self,
                train_file,
                validation_file,
@@ -23,12 +17,10 @@ class CNNTextClassifier(object):
                num_kernels=128,
                dropout_keep_prob=0.5,
                l2_reg_lambda=0.0,
-               max_words_len=64,
+               max_sequence_length=64,
                batch_size=1024,
-               num_epochs=2,
-               evaluate_frequency=100,
-               GPU=3):
-    self._GPU = str(GPU)
+               num_epochs=1,
+               evaluate_frequency=100):
     self._train_data = train_file
     self._validation_data = validation_file
     self._num_classes = num_classes
@@ -37,14 +29,16 @@ class CNNTextClassifier(object):
     self._num_kernels = num_kernels
     self._dropout_keep_prob = dropout_keep_prob
     self._l2_reg_lambda = l2_reg_lambda
-    self._max_words_len = max_words_len
+    self._max_words_len = max_sequence_length
     self._batch_size = batch_size
     self._num_epochs = num_epochs
     self._evaluate_frequency = evaluate_frequency
-    # select the GPU
-    os.environ["CUDA_VISIBLE_DEVICES"] = self._GPU
 
-  def train(self):
+  def train(self, which_GPU_to_run=-1):
+    '''
+    which_GPU_to_run: [0, 4), and -1 denote CPU.
+    '''
+    os.environ["CUDA_VISIBLE_DEVICES"] = str(which_GPU_to_run)
 
     x_train, y_train, vocab_size = self._load_data(self._train_data)
 
@@ -72,15 +66,12 @@ class CNNTextClassifier(object):
     self._train_optimizer = optimizer.apply_gradients(
       grads_and_vars, global_step=self._global_step)
 
-    # Output directory for saving models
     timestamp = str(int(time.time()))
     out_dir = os.path.abspath(
       os.path.join(os.path.curdir, "models", timestamp))
 
-    # Initialize all variables
     self._sess.run(tf.global_variables_initializer())
 
-    # Checkpoint directory for model saving
     checkpoint_dir = os.path.abspath(os.path.join(out_dir, "checkpoints"))
     checkpoint_prefix = os.path.join(checkpoint_dir, "model")
     if not os.path.exists(checkpoint_dir):
@@ -125,8 +116,11 @@ class CNNTextClassifier(object):
     saver = tf.train.import_meta_graph(model_path)
     saver.restore(sess, tf.train.latest_checkpoint(os.path.pardir(model_path)))
     self._sess = sess
+    
+  def _validata(self, data):
+    pass
 
-  def predict(self, sample_file):
+  def predict(self, sample):
     x_dev, y_dev, vocab_size = self._load_data(sample_file)
     # start tf session
     feed_dict = {
@@ -153,10 +147,6 @@ class CNNTextClassifier(object):
     # print('File generated!')
 
   def _load_data(self, data_file):
-    """
-    :param data_file: the path to the data_file
-    :return: x_shuffled, y_shuffled, vocab_size
-    """
     print('Loading Data ...')
     data = open(data_file, encoding='latin').readlines()[1:]
     x_text, train_y, y = [], [], []
