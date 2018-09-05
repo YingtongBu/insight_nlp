@@ -31,6 +31,7 @@ META-INF
 upload.to.servers.sh
 
 !*.readme
+!*.pydict
 !*.data
 !*.java
 !*.py

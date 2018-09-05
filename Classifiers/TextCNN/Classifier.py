@@ -4,7 +4,7 @@
 from Insight_NLP.Tensorflow import *
 from Insight_NLP.Common import *
 from sklearn import preprocessing
-from Insight_NLP.Classifiers.TextCNN._ModelCNN import _CNNModel
+from Insight_NLP.Classifiers.TextCNN._Model import _Model
 from Insight_NLP.Vocabulary import Vocabulary
 
 class Classifier(object):
@@ -19,7 +19,7 @@ class Classifier(object):
                l2_reg_lambda=0.0,
                max_sequence_length=64,
                batch_size=1024,
-               num_epochs=1,
+               epoch_num=1,
                evaluate_frequency=100):
     self._train_data = train_file
     self._validation_data = validation_file
@@ -31,7 +31,7 @@ class Classifier(object):
     self._l2_reg_lambda = l2_reg_lambda
     self._max_words_len = max_sequence_length
     self._batch_size = batch_size
-    self._num_epochs = num_epochs
+    self._num_epochs = epoch_num
     self._evaluate_frequency = evaluate_frequency
 
   def train(self, which_GPU_to_run=-1):
@@ -50,7 +50,7 @@ class Classifier(object):
     self._sess = tf.Session()
 
     # create the model
-    self._model = _CNNModel(
+    self._model = _Model(
       sequence_length=x_train.shape[1],
       num_classes=y_train.shape[1],
       vocab_size=vocab_size,
@@ -131,7 +131,7 @@ class Classifier(object):
     loss, accuracy, predictions = self._sess.run(
       [self._model.loss,
        self._model.accuracy,
-       self._model.predictions],
+       self._model.predicted_class],
       feed_dict
     )
     time_str = datetime.datetime.now().isoformat()

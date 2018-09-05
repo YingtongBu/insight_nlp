@@ -63,6 +63,23 @@ def norm_regex(regexExpr):
     .replace("{", "\{").replace("}", "\}")\
     .replace(".", "\.")
 
+def read_pydict_file(file_name):
+  data = []
+  for idx, ln in enumerate(open(file_name)):
+    try:
+      obj = eval(ln)
+      data.append(obj)
+    except:
+      print(f"ERR in reading {file_name}:{idx + 1}: '{ln}'")
+      
+  return data
+
+def write_pydict_file(data: list, file_name):
+  with open(file_name, "w") as fou:
+    for obj in data:
+      print(obj, file=fou)
+
+#depreciated!
 def read_CSV(fname, splitter="\t", col_num=None):
   ''' All column name would be removed.
   '''
@@ -90,6 +107,7 @@ def read_CSV(fname, splitter="\t", col_num=None):
   
   return table
 
+#depreciated!
 def write_CSV(fname, data, col_names=None, splitter="\t", col_num=None):
   '''We could save name for each column, which is more human-readable.
    data: 2D array
@@ -222,23 +240,25 @@ def log_f_prime(fss, weight):
     pdw += math.exp(weight.dot(fs) - dn) * fs
   return pdw
 
-def batch_iter(data, batch_size: int, num_epochs: int, shuffle=True):
-  """
-  Generates a batch iterator for a dataset.
-  :param data: [[a,b,c], [c,d,e]]
-  :return: [[c,d,e], [a,b,c]]
-  """
-  data = numpy.array(data)
-  data_size = len(data)
-  num_batches_per_epoch = int((len(data) - 1) / batch_size) + 1
-  for epoch in range(num_epochs):
-    # Shuffle the data at each epoch
+def create_batch_iter_helper(data, batch_size, epoch_num, shuffle=True):
+  '''
+  :param data: [[word-ids, label], ...]
+  :return: iterator of batch of [words-ids, label]
+  '''
+  for epoch_id in range(epoch_num):
     if shuffle:
-      shuffle_indices = numpy.random.permutation(numpy.arange(data_size))
-      shuffled_data = data[shuffle_indices]
-    else:
-      shuffled_data = data
-    for batch_num in range(num_batches_per_epoch):
-      start_index = batch_num * batch_size
-      end_index = min((batch_num + 1) * batch_size, data_size)
-      yield shuffled_data[start_index:end_index]
+      random.shuffle(data)
+      
+    next = iter(data)
+    _ = range(batch_size)
+    while True:
+      batch = list(map(itemgetter(1), zip(_, next)))
+      if batch == []:
+        break
+        
+      samples = list(map(itemgetter(0), batch))
+      labels = list(map(itemgetter(1), batch))
+      yield samples, labels
+     
+    print(f"The {epoch_id + 1}th/{epoch_num} epoch has finished!")
+
