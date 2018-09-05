@@ -5,7 +5,7 @@
 #install python-crfsuite
 
 import pycrfsuite
-from Insight_NLP.CRF.BasicCRF.DataPreprocessing import DataPreprocessing
+from Insight_NLP.CRF.BasicCRF.DataProcessing import DataPreprocessing
 
 class CRFTrainer(object):
 
