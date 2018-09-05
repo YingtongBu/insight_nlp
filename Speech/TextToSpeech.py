@@ -50,9 +50,9 @@ def text_to_speech(content, prefix, app_id='5b7f49bd',
   if contentType == 'audio/mpeg':
     sid = r.headers['sid']
     if AUE == "raw":
-      _write_file(prefix + '.' + sid + '.wav', r.content)
+      _write_file(prefix + '.wav', r.content)
     else:
-      _write_file(prefix + '.' + sid + '.mp3', r.content)
+      _write_file(prefix + '.mp3', r.content)
     print('success, sid: ' + sid)
   else:
     print(r.text)

@@ -3,8 +3,15 @@
 #author: Xin Jin (xin.jin12@pactera.com)
 
 # pip install SpeechRecognition
-import speech_recognition as sr 
-import optparse
+import speech_recognition as sr
+
+def audio_file_recognize(audio_file,
+                         language_selection):
+  r = sr.Recognizer()
+  stock_audio = sr.AudioFile(audio_file)
+  with stock_audio as source:
+    audio = r.record(source)
+    print(r.recognize_google(audio, language=language_selection))
 
 def listen_and_recognize(input_device_index, time_limit, 
                          time_out, language_selection):
@@ -17,18 +24,3 @@ def listen_and_recognize(input_device_index, time_limit,
     print(r.recognize_google(audio, show_all=True, language=language_selection))
   except:
     print("Sorry, I cannot understand your questions.")
-
-if __name__ == '__main__':
-  usage = "usage: %prog [options]"
-  parser = optparse.OptionParser(usage=usage)
-  parser.add_option('-d', '--device_index', 
-                    default=1)
-  parser.add_option('-p', '--phrase_time_limit', 
-                    default=10)
-  parser.add_option('-t', '--timeout', 
-                    default=5)
-  parser.add_option('-l', '--language', 
-                    default='cmn-Hans-CN')                 
-  (options, args) = parser.parse_args()
-  listen_and_recognize(options.device_index, options.phrase_time_limit, 
-                       options.timeout, options.language)
