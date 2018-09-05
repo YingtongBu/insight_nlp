@@ -24,5 +24,5 @@ if __name__ == '__main__':
                                          options.timeout,
                                          options.language)
   # for i in range(100):
-  #   SpeechRecognition.audio_file_recognize(options.audio_file + str(i) + '.wav',
-  #                                        options.language)
+  #   SpeechRecognition.audio_file_recognize(options.audio_file + str(i) +
+  #                                          '.wav', options.language)
