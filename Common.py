@@ -64,6 +64,7 @@ def norm_regex(regexExpr):
     .replace(".", "\.")
 
 def read_pydict_file(file_name):
+  assert file_name.endswith(".pydict")
   data = []
   for idx, ln in enumerate(open(file_name)):
     try:
@@ -260,5 +261,5 @@ def create_batch_iter_helper(data, batch_size, epoch_num, shuffle=True):
       labels = list(map(itemgetter(1), batch))
       yield samples, labels
      
-    print(f"The {epoch_id + 1}th/{epoch_num} epoch has finished!")
+    print(f"The {epoch_id + 1}/{epoch_num} epoch has finished!")
 

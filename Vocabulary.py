@@ -12,7 +12,7 @@ class Vocabulary:
     self._word2Id = {}
     self._words = []
     
-  def create_vob_from_data(self, data_list: list[list], min_freq=None):
+  def create_vob_from_data(self, data_list: list, min_freq=None):
     '''
     data_list: a list of token list.
     For example, [["welcome", "to", "ping'an"], ["欢迎", "来到", "平安"],
