@@ -13,9 +13,9 @@ if __name__ == '__main__':
   parser.add_option('-m', '--model_name',
                     default='company')
   parser.add_option('-t', '--data_for_train',
-                    default='./Data/train.data')
+                    default='./Data/train.pydict')
   parser.add_option('-e', '--data_for_test',
-                    default='./Data/test.data')
+                    default='./Data/test.pydict')
   parser.add_option('-o', '--result_output_file',
                     default='./output.txt')
   (options, args) = parser.parse_args()

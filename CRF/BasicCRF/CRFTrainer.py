@@ -27,7 +27,7 @@ class CRFTrainer(object):
     trainer.train(self.model_name)
 
   def train(self):
-    data_preprocessing = DataPreprocessing(self. data)
+    data_preprocessing = DataPreprocessing(self.data)
     sample = data_preprocessing.process_train_data()
     X = [self.feature_extractor.extract_features(sample) for sample in sample]
     y = [data_preprocessing.get_labels(sample) for sample in sample]
