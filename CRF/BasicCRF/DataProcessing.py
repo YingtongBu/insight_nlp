@@ -2,6 +2,7 @@
 #coding: utf8
 #author: Xin Jin (xin.jin12@pactera.com)
 
+from Insight_NLP.Chinese import *
 class DataPreprocessing(object):
 
   def __init__(self, data):
