@@ -40,6 +40,5 @@ if __name__ == '__main__':
                     min_freq=2,
                     out_file=param["vob_file"])
   
-  trainer = Trainer(param)
-  trainer.train()
+  Trainer().train(param)
   print("Training is Done")

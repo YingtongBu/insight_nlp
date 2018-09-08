@@ -47,7 +47,7 @@ class Predictor(object):
         pred = {
           "label": y,
           "predicted_label": preds[idx],
-          "class_probilities": class_probs[idx],
+          "class_probilities": list(class_probs[idx]),
         }
         print(pred, file=fou)
     fou.close()

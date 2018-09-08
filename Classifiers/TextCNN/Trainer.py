@@ -6,7 +6,7 @@ from Insight_NLP.Classifiers.TextCNN._Model import _Model
 from Insight_NLP.Classifiers.TextCNN.Data import *
 
 class Trainer(object):
-  def __init__(self, param):
+  def train(self, param):
     self.param = param
     assert param["evaluate_frequency"] % 100 == 0
     
@@ -18,8 +18,8 @@ class Trainer(object):
     self._create_model()
     self._sess = tf.Session()
     self._sess.run(tf.global_variables_initializer())
+    self._sess.run(tf.local_variables_initializer())
     
-  def train(self):
     param = self.param
     train_data = DataSet(data_file=param["train_file"],
                          num_class=param["num_classes"],
@@ -147,32 +147,6 @@ class Trainer(object):
       filter_num=self.param["filter_num"],
       l2_reg_lambda=self.param["l2_reg_lambda"])
       
-    self._global_step = tf.Variable(0, name="global_step", trainable=False)
     optimizer = tf.train.AdamOptimizer(self.param["learning_rate"])
     grads_and_vars = optimizer.compute_gradients(self._model.loss)
-    self._train_optimizer = optimizer.apply_gradients(
-      grads_and_vars, global_step=self._global_step)
-
-  def load_model(self, model_path):
-    ''' We only load the best model in {model_path}
-    '''
-    def extract_id(model_file):
-      return int(re.findall(r"iter-(.*?).index", model_file)[0])
-
-    names = [extract_id(name) for name in os.listdir(model_path)
-             if name.endswith(".index")]
-    best_iter = max(names)
-    
-    param_file = os.path.join(model_path, "param.pydict")
-    self.param = read_pydict_file(param_file)[0]
-    
-    self.vob = Vocabulary()
-    self.vob.load_from_file(self.param["vob_file"])
-
-    self._create_model()
-    
-    self._sess = tf.Session()
-    model_prefix = f"{model_path}/iter-{best_iter}"
-    saver = tf.train.import_meta_graph(f"{model_prefix}.meta")
-    saver.restore(self._sess, f"{model_prefix}")
-    
+    self._train_optimizer = optimizer.apply_gradients( grads_and_vars)
