@@ -13,10 +13,11 @@ EMPTY_TOKEN = "<empty>"
 OOV_TOKEN   = "<oov>"
 
 class DataSet:
-  def __init__(self, data_file, num_class, max_length, vob: Vocabulary,
+  def __init__(self, data_file, num_class, max_seq_length, vob: Vocabulary,
                remove_OOV: bool):
     self._data = []
     samples = read_pydict_file(data_file)
+    self._data_name = os.path.basename(data_file)
     for sample in samples:
       if not 0 <= sample["label"] < num_class:
         print(f"ERROR: {data_file}: label={sample['label']}")
@@ -25,7 +26,7 @@ class DataSet:
       word_ids = vob.convert_to_word_ids(sample["word_list"],
                                          remove_OOV=remove_OOV,
                                          mark_OOV=OOV_TOKEN,
-                                         output_length=max_length,
+                                         output_length=max_seq_length,
                                          mark_empty=EMPTY_TOKEN)
       self._data.append([word_ids, sample["label"]])
       
@@ -33,7 +34,8 @@ class DataSet:
     return len(self._data)
       
   def create_batch_iter(self, batch_size, epoch_num, shuffle: bool):
-    return create_batch_iter_helper(self._data, batch_size, epoch_num, shuffle)
+    return create_batch_iter_helper(self._data_name, self._data, batch_size,
+                                    epoch_num, shuffle)
 
 def normalize_data_file(file_name, out_file_name):
   data = read_pydict_file(file_name)

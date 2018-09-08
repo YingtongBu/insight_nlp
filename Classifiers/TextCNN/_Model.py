@@ -63,13 +63,14 @@ class _Model(object):
       b = tf.Variable(tf.constant(0.1, shape=[num_classes]), name="b")
       l2_loss += tf.nn.l2_loss(W)
       l2_loss += tf.nn.l2_loss(b)
-      self.class_scores = tf.nn.xw_plus_b(h_drop, W, b, name="scores")
-      self.predicted_class = tf.argmax(self.class_scores, 1, name="predictions",
+      class_scores = tf.nn.xw_plus_b(h_drop, W, b, name="scores")
+      self.class_probs = tf.keras.activations.softmax(class_scores)
+      self.predicted_class = tf.argmax(class_scores, 1, name="predictions",
                                        output_type=tf.int32)
 
     loss_fun = tf.nn.softmax_cross_entropy_with_logits
     input_y = tf.one_hot(self.input_y, num_classes)
-    losses = loss_fun(logits=self.class_scores, labels=input_y)
+    losses = loss_fun(logits=class_scores, labels=input_y)
     self.loss = tf.reduce_mean(losses) + l2_reg_lambda * l2_loss
 
     correct = tf.equal(self.predicted_class, self.input_y)

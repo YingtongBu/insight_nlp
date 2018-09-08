@@ -241,7 +241,8 @@ def log_f_prime(fss, weight):
     pdw += math.exp(weight.dot(fs) - dn) * fs
   return pdw
 
-def create_batch_iter_helper(data, batch_size, epoch_num, shuffle=True):
+def create_batch_iter_helper(title: str, data, batch_size, epoch_num,
+                             shuffle=True):
   '''
   :param data: [[word-ids, label], ...]
   :return: iterator of batch of [words-ids, label]
@@ -261,5 +262,5 @@ def create_batch_iter_helper(data, batch_size, epoch_num, shuffle=True):
       labels = list(map(itemgetter(1), batch))
       yield samples, labels
      
-    print(f"The {epoch_id + 1}/{epoch_num} epoch has finished!")
+    print(f"The '{title}' {epoch_id + 1}/{epoch_num} epoch has finished!")
 
