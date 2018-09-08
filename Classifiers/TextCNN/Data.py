@@ -12,6 +12,49 @@ which would be fed in a DL model.
 EMPTY_TOKEN = "<empty>"
 OOV_TOKEN   = "<oov>"
 
+def create_classifier_parameter(
+  train_file,
+  vali_file,  # can be None
+  vob_file,
+  num_classes,
+  max_seq_length=64,
+  epoch_num=1,
+  batch_size=1024,
+  embedding_size=128,
+  kernels="1,1,1,2,3",
+  filter_num=128,
+  dropout_keep_prob=0.5,
+  learning_rate=0.001,
+  l2_reg_lambda=0.0,
+  evaluate_frequency=100,  # must divided by 100.
+  remove_OOV=True,
+  GPU: int=-1,  # which_GPU_to_run: [0, 4), and -1 denote CPU.
+  model_dir: str= "model"):
+  
+  assert os.path.isfile(train_file)
+  assert os.path.isfile(vali_file)
+  assert os.path.isfile(vob_file)
+  
+  return {
+    "train_file": os.path.realpath(train_file),
+    "vali_file": os.path.realpath(vali_file),
+    "vob_file": os.path.realpath(vob_file),
+    "num_classes": num_classes,
+    "max_seq_length": max_seq_length,
+    "epoch_num": epoch_num,
+    "batch_size": batch_size,
+    "embedding_size": embedding_size,
+    "kernels": list(map(int, kernels.split(","))),
+    "filter_num": filter_num,
+    "learning_rate": learning_rate,
+    "dropout_keep_prob": dropout_keep_prob,
+    "l2_reg_lambda": l2_reg_lambda,
+    "evaluate_frequency":  evaluate_frequency,
+    "remove_OOV": remove_OOV,
+    "GPU":  GPU,
+    "model_dir": os.path.realpath(model_dir),
+  }
+
 class DataSet:
   def __init__(self, data_file, num_class, max_seq_length, vob: Vocabulary,
                remove_OOV: bool):
@@ -37,13 +80,18 @@ class DataSet:
     return create_batch_iter_helper(self._data_name, self._data, batch_size,
                                     epoch_num, shuffle)
 
-def normalize_data_file(file_name, out_file_name):
+def normalize_data_file(file_name, norm_text_func):
+  '''
+  :return: normalized file name
+  '''
   data = read_pydict_file(file_name)
   for sample in data:
     text  = sample["text"]
-    sample["word_list"] = normalize_text(text).split()
+    sample["word_list"] = norm_text_func(text).split()
   
+  out_file_name = file_name.replace(".pydict", ".norm.pydict")
   write_pydict_file(data, out_file_name)
+  return out_file_name
   
 def create_vocabulary(file_name, min_freq, out_file):
   data = read_pydict_file(file_name)

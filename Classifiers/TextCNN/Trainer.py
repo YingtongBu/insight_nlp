@@ -5,51 +5,8 @@ from Insight_NLP.Tensorflow import *
 from Insight_NLP.Classifiers.TextCNN._Model import _Model
 from Insight_NLP.Classifiers.TextCNN.Data import *
 
-def create_classifier_parameter(
-  train_file,
-  vali_file,  # can be None
-  vob_file,
-  num_classes,
-  max_seq_length=64,
-  epoch_num=1,
-  batch_size=1024,
-  embedding_size=128,
-  kernels="1,1,1,2,3",
-  filter_num=128,
-  dropout_keep_prob=0.5,
-  learning_rate=0.001,
-  l2_reg_lambda=0.0,
-  evaluate_frequency=100,  # must divided by 100.
-  remove_OOV=True,
-  GPU: int=-1,  # which_GPU_to_run: [0, 4), and -1 denote CPU.
-  model_dir: str= "model"):
-  
-  assert os.path.isfile(train_file)
-  assert os.path.isfile(vali_file)
-  assert os.path.isfile(vob_file)
-  
-  return {
-    "train_file": os.path.realpath(train_file),
-    "vali_file": os.path.realpath(vali_file),
-    "vob_file": os.path.realpath(vob_file),
-    "num_classes": num_classes,
-    "max_seq_length": max_seq_length,
-    "epoch_num": epoch_num,
-    "batch_size": batch_size,
-    "embedding_size": embedding_size,
-    "kernels": list(map(int, kernels.split(","))),
-    "filter_num": filter_num,
-    "learning_rate": learning_rate,
-    "dropout_keep_prob": dropout_keep_prob,
-    "l2_reg_lambda": l2_reg_lambda,
-    "evaluate_frequency":  evaluate_frequency,
-    "remove_OOV": remove_OOV,
-    "GPU":  GPU,
-    "model_dir": os.path.realpath(model_dir),
-  }
-
-class Classifier(object):
-  def train(self, param):
+class Trainer(object):
+  def __init__(self, param):
     self.param = param
     assert param["evaluate_frequency"] % 100 == 0
     
@@ -62,6 +19,8 @@ class Classifier(object):
     self._sess = tf.Session()
     self._sess.run(tf.global_variables_initializer())
     
+  def train(self):
+    param = self.param
     train_data = DataSet(data_file=param["train_file"],
                          num_class=param["num_classes"],
                          max_seq_length=param["max_seq_length"],
@@ -85,7 +44,7 @@ class Classifier(object):
     model_dir = param["model_dir"]
     execute_cmd(f"rm -rf {model_dir}; mkdir {model_dir}")
     self._model_prefix = os.path.join(model_dir, "iter")
-    self._saver = tf.train.Saver(tf.global_variables(), max_to_keep=5)
+    self._saver = tf.train.Saver(max_to_keep=5)
     param_file = os.path.join(model_dir, "param.pydict")
     write_pydict_file([param], param_file)
    
@@ -130,7 +89,7 @@ class Classifier(object):
     vali_iter = vali_data.create_batch_iter(128, 1, False)
     correct = 0
     for batch_x, batch_y in vali_iter:
-      _, accuracy, _ = self.predict(batch_x, batch_y)
+      _, accuracy, _ = Trainer.predict(self._sess, batch_x, batch_y)
       correct += accuracy * len(batch_x)
       
     accuracy = correct / vali_data.size()
@@ -139,54 +98,29 @@ class Classifier(object):
       self._save_model(step)
       
     print(f"evaluation: accuracy: {accuracy:.4f} "
-          f"best: {self._best_vali_accuracy:.4f}")
-    
-  def predict_dataset(self, file_name, out_file):
-    data = DataSet(data_file=file_name,
-                        num_class=self.param["num_classes"],
-                        max_seq_length=self.param["max_seq_length"],
-                        vob=self.vob,
-                        remove_OOV=self.param["remove_OOV"])
-    data_iter = data.create_batch_iter(batch_size=self.param["batch_size"],
-                                       epoch_num=1,
-                                       shuffle=False)
-    fou = open(out_file, "w")
-    correct = 0.
-    for batch_x, batch_y in data_iter:
-      preds, accuracy, class_probs = self.predict(batch_x, batch_y)
-      correct += accuracy * len(batch_x)
-      
-      for idx, y in enumerate(batch_y):
-        pred = {
-          "label": y,
-          "predicted_label": preds[idx],
-          "class_probilities": class_probs[idx],
-        }
-        print(pred, file=fou)
-    fou.close()
-    
-    accuracy = correct / data.size()
-    print(f"Test: '{file_name}': {accuracy:.4f}")
+          f"best: {self._best_vali_accuracy:.4f}\n")
 
-  def predict(self, batch_x, batch_y=None):
+  @staticmethod
+  def predict(sess, batch_x, batch_y=None):
     if batch_y is None:
       batch_y = [-1] * len(batch_x)
   
-    preds, accuracy, class_probs = self._sess.run(
+    graph = sess.graph
+    preds, accuracy, class_probs = sess.run(
       [
-        self._model.predicted_class,
-        self._model.accuracy,
-        self._model.class_probs,
+        graph.get_tensor_by_name("output/predictions:0"),
+        graph.get_tensor_by_name("output/accuracy:0"),
+        graph.get_tensor_by_name("output/Softmax:0")
       ],
       feed_dict={
-        self._model.input_x          : batch_x,
-        self._model.input_y          : batch_y,
-        self._model.dropout_keep_prob: 1.
+        graph.get_tensor_by_name("input_x:0"): batch_x,
+        graph.get_tensor_by_name("input_y:0"): batch_y,
+        graph.get_tensor_by_name("dropout:0"): 1
       }
     )
     
     return preds, accuracy, class_probs
-
+  
   def _go_a_step(self, x_batch, y_batch, dropout_keep_prob):
     _, loss, accuracy = self._sess.run(
       [

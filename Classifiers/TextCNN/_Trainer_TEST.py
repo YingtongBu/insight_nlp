@@ -2,26 +2,9 @@
 #author: Yu Liu (yu.liu55@pactera.com)
 
 from Insight_NLP.Classifiers.TextCNN.Trainer import *
+from Insight_NLP.Classifiers.TextCNN.Data import normalize_text
 from Insight_NLP.Common import *
 
-def train_model(param):
-  trainer = Trainer()
-  trainer.train(param)
-  print("Training is Done")
-  
-def apply_to_test(model_path, test_file):
-  predictor = Trainer()
-  predictor.load_model(model_path)
-  output_file = test_file.replace(".pydict", ".prediction.pydict")
-  predictor.predict_dataset(test_file, output_file)
-  
-def preprocess(data_file):
-  assert data_file.endswith(".pydict")
-  norm_file = data_file.replace(".pydict", ".norm.pydict")
-  normalize_data_file(data_file, norm_file)
-  
-  return norm_file
-  
 if __name__ == '__main__':
   data_path = os.path.join(
     get_module_path("Insight_NLP.Common"),
@@ -30,11 +13,9 @@ if __name__ == '__main__':
 
   train_file = os.path.join(data_path, "data.1.train.pydict")
   vali_file = os.path.join(data_path, "data.1.train.pydict")
-  test_file = os.path.join(data_path, "data.1.test.pydict")
   
-  train_norm_file = preprocess(train_file)
-  vali_norm_file = preprocess(vali_file)
-  test_norm_file = preprocess(test_file)
+  train_norm_file = normalize_data_file(train_file, normalize_text)
+  vali_norm_file = normalize_data_file(vali_file, normalize_text)
 
   param = create_classifier_parameter(
     train_file=train_norm_file,
@@ -55,9 +36,10 @@ if __name__ == '__main__':
     GPU=-1,
     model_dir="model")
  
-  '''create_vocabulary(param["train_file"],
+  create_vocabulary(param["train_file"],
                     min_freq=2,
-                    out_file=param["vob_file"])'''
+                    out_file=param["vob_file"])
   
-  # train_model(param)
-  apply_to_test(param["model_dir"], test_norm_file)
+  trainer = Trainer(param)
+  trainer.train()
+  print("Training is Done")
