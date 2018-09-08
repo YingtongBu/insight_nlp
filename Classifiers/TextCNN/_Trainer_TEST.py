@@ -1,5 +1,5 @@
 #coding: utf8
-#author: Yu Liu (yu.liu55@pactera.com)
+#author: Tian Xia (summer.xia1@pactera.com)
 
 from Insight_NLP.Classifiers.TextCNN.Trainer import *
 from Insight_NLP.Classifiers.TextCNN.Data import normalize_text
