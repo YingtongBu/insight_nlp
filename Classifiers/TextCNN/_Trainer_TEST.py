@@ -22,7 +22,7 @@ if __name__ == '__main__':
     vali_file=vali_norm_file,
     vob_file="vob.txt",
     num_classes=45,
-    max_seq_length=64,
+    max_seq_length=32,
     epoch_num=5,
     batch_size=32,
     embedding_size=128,
@@ -37,7 +37,7 @@ if __name__ == '__main__':
     model_dir="model")
  
   create_vocabulary(param["train_file"],
-                    min_freq=2,
+                    min_freq=3,
                     out_file=param["vob_file"])
   
   Trainer().train(param)

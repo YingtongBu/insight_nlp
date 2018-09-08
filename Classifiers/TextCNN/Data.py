@@ -33,7 +33,6 @@ def create_classifier_parameter(
   
   assert os.path.isfile(train_file)
   assert os.path.isfile(vali_file)
-  assert os.path.isfile(vob_file)
   
   return {
     "train_file": os.path.realpath(train_file),
