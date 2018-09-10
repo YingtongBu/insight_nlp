@@ -12,9 +12,6 @@ from Insight_NLP.Vocabulary import *
 which would be fed in a DL model.
 '''
 
-EMPTY_TOKEN = "<empty>"
-OOV_TOKEN   = "<oov>"
-
 def create_classifier_parameter(
   train_file,
   vali_file,  # can be None
