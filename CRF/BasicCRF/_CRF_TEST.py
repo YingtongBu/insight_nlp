@@ -15,9 +15,13 @@ if __name__ == '__main__':
   parser.add_option('-t', '--data_for_train',
                     default='./Data/train.pydict')
   parser.add_option('-e', '--data_for_test',
-                    default='./Data/test.pydict')
+                    default='./Data/test.data')
   parser.add_option('-o', '--result_output_file',
                     default='./output.txt')
+  parser.add_option('-i', '--input_data',
+                    default='1.当事人:尉氏县第三人民医院')
+  parser.add_option('-c', '--is_batch_process',
+                    default=False)
   (options, args) = parser.parse_args()
   #train
   crf_trainer = CRFTrainer(options.model_name,
@@ -27,7 +31,8 @@ if __name__ == '__main__':
 
   #predict
   crf_predictor = CRFPredictor(options.model_name,
-                               options.data_for_test,
+                               options.input_data,
                                FeatureExtraction(options.data_for_test),
-                               options.result_output_file)
+                               options.result_output_file,
+                               options.is_batch_process)
   crf_predictor.predict()
