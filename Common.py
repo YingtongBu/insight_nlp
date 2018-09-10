@@ -78,6 +78,9 @@ def read_pydict_file(file_name):
 def write_pydict_file(data: list, file_name):
   with open(file_name, "w") as fou:
     for obj in data:
+      obj_str = str(obj)
+      if "\n" in obj_str:
+        print(f"ERR: in write_pydict_file: not '\\n' is allowed: '{obj_str}'")
       print(obj, file=fou)
 
 #depreciated!
