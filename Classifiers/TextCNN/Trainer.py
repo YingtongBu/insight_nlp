@@ -73,9 +73,11 @@ class Trainer(object):
         last_display_time = time.time()
         accum_run_time = 0
 
-      if ((step + 1) % param["evaluate_frequency"] == 0 and
-        vali_data is not None):
-        self._validate(vali_data, step)
+      if (step + 1) % param["evaluate_frequency"] == 0:
+        if vali_data is not None:
+          self._validate(vali_data, step)
+        else:
+          self._save_model(step)
 
     if vali_data is None:
       self._save_model(step)

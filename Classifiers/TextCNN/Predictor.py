@@ -13,27 +13,28 @@ class Predictor(object):
     def extract_id(model_file):
       return int(re.findall(r"iter-(.*?).index", model_file)[0])
 
-    names = [extract_id(name) for name in os.listdir(model_path)
-             if name.endswith(".index")]
-    best_iter = max(names)
-    
     param_file = os.path.join(model_path, "param.pydict")
     self.param = read_pydict_file(param_file)[0]
     
     self.vob = Vocabulary()
     self.vob.load_from_file(self.param["vob_file"])
 
+    names = [extract_id(name) for name in os.listdir(model_path)
+             if name.endswith(".index")]
+    best_iter = max(names)
+
     self._sess = tf.Session()
     model_prefix = f"{model_path}/iter-{best_iter}"
+    print(f"loading model: '{model_prefix}'")
     saver = tf.train.import_meta_graph(f"{model_prefix}.meta")
     saver.restore(self._sess, f"{model_prefix}")
-  
+
   def predict_dataset(self, file_name):
     data = DataSet(data_file=file_name,
-                        num_class=self.param["num_classes"],
-                        max_seq_length=self.param["max_seq_length"],
-                        vob=self.vob,
-                        remove_OOV=self.param["remove_OOV"])
+                   num_class=self.param["num_classes"],
+                   max_seq_length=self.param["max_seq_length"],
+                   vob=self.vob,
+                   remove_OOV=self.param["remove_OOV"])
     data_iter = data.create_batch_iter(batch_size=self.param["batch_size"],
                                        epoch_num=1,
                                        shuffle=False)
@@ -68,11 +69,6 @@ class Predictor(object):
       filter_num=self.param["filter_num"],
       l2_reg_lambda=self.param["l2_reg_lambda"])
       
-    self._global_step = tf.Variable(0, name="global_step", trainable=False)
     optimizer = tf.train.AdamOptimizer(self.param["learning_rate"])
     grads_and_vars = optimizer.compute_gradients(self._model.loss)
-    self._train_optimizer = optimizer.apply_gradients(
-      grads_and_vars, global_step=self._global_step)
-
- 
-    
+    self._train_optimizer = optimizer.apply_gradients(grads_and_vars)

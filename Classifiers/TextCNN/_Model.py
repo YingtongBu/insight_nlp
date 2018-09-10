@@ -62,15 +62,14 @@ class _Model(object):
       print(f"name(class_probs):{self.class_probs.name}")
       #output
       self.predicted_class = tf.argmax(class_scores, 1,
-                                  name="predictions",
-                                  output_type=tf.int32)
+                                       name="predictions",
+                                       output_type=tf.int32)
       print(f"name(predicted_class):{self.predicted_class.name}")
 
-      loss_fun = tf.nn.softmax_cross_entropy_with_logits
       input_y = tf.one_hot(self.input_y, num_classes)
-      losses = loss_fun(logits=class_scores, labels=input_y)
       #output
-      self.loss = tf.reduce_mean(losses) + l2_reg_lambda * l2_loss
+      losses = tf.losses.softmax_cross_entropy(input_y, class_scores)
+      self.loss = losses + l2_reg_lambda * l2_loss
       print(f"name(loss):{self.loss.name}")
 
       correct = tf.equal(self.predicted_class, self.input_y)
