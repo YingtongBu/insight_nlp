@@ -14,8 +14,8 @@ if __name__ == "__main__":
 
   vob = Vocabulary(False, 10)
   vob.create_vob_from_data(data)
-  vob.save_to_file("vob.data")
-  vob.load_from_file("vob.data")
+  vob.save_model("vob.data")
+  vob.load_model("vob.data")
  
   for tokens in data:
     print(f"{tokens}:",

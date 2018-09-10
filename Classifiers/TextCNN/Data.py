@@ -15,7 +15,6 @@ which would be fed in a DL model.
 def create_classifier_parameter(
   train_file,
   vali_file,  # can be None
-  vob_file,
   num_classes,
   max_seq_length=64,
   epoch_num=1,
@@ -37,7 +36,6 @@ def create_classifier_parameter(
   return {
     "train_file": os.path.realpath(train_file),
     "vali_file": os.path.realpath(vali_file),
-    "vob_file": os.path.realpath(vob_file),
     "num_classes": num_classes,
     "max_seq_length": max_seq_length,
     "epoch_num": epoch_num,
@@ -55,8 +53,7 @@ def create_classifier_parameter(
   }
 
 class DataSet:
-  def __init__(self, data_file, num_class, max_seq_length, vob: Vocabulary,
-               remove_OOV: bool):
+  def __init__(self, data_file, num_class, vob: Vocabulary):
     self._data = []
     samples = read_pydict_file(data_file)
     self._data_name = os.path.basename(data_file)
@@ -65,11 +62,7 @@ class DataSet:
         print(f"ERROR: {data_file}: label={sample['label']}")
         continue
       
-      word_ids = vob.convert_to_word_ids(sample["word_list"],
-                                         remove_OOV=remove_OOV,
-                                         mark_OOV=OOV_TOKEN,
-                                         output_length=max_seq_length,
-                                         mark_empty=EMPTY_TOKEN)
+      word_ids = vob.convert_to_word_ids(sample["word_list"])
       self._data.append([word_ids, sample["label"]])
       
   def size(self):
@@ -92,14 +85,14 @@ def normalize_data_file(file_name, norm_text_func):
   write_pydict_file(data, out_file_name)
   return out_file_name
   
-def create_vocabulary(file_name, min_freq, out_file):
+def create_vocabulary(file_name, min_freq):
   data = read_pydict_file(file_name)
   data = [sample["word_list"] for sample in data]
-  vob = Vocabulary()
+  vob = Vocabulary(None, None)
   vob.create_vob_from_data(data, min_freq)
   vob.add_word(EMPTY_TOKEN)
   vob.add_word(OOV_TOKEN)
-  vob.save_to_file(out_file)
+  vob.save_model()
 
 def normalize_text(string: str):
   '''

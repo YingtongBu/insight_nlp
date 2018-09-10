@@ -15,9 +15,10 @@ class Predictor(object):
 
     param_file = os.path.join(model_path, "param.pydict")
     self.param = read_pydict_file(param_file)[0]
-    
-    self.vob = Vocabulary()
-    self.vob.load_from_file(self.param["vob_file"])
+
+    self.vob = Vocabulary(self.param["remove_OOV"],
+                          self.param["max_seq_length"])
+    self.vob.load_model()
 
     names = [extract_id(name) for name in os.listdir(model_path)
              if name.endswith(".index")]
@@ -32,9 +33,7 @@ class Predictor(object):
   def predict_dataset(self, file_name):
     data = DataSet(data_file=file_name,
                    num_class=self.param["num_classes"],
-                   max_seq_length=self.param["max_seq_length"],
-                   vob=self.vob,
-                   remove_OOV=self.param["remove_OOV"])
+                   vob=self.vob)
     data_iter = data.create_batch_iter(batch_size=self.param["batch_size"],
                                        epoch_num=1,
                                        shuffle=False)

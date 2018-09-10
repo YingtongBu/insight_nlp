@@ -12,8 +12,8 @@ class Trainer(object):
     
     os.environ["CUDA_VISIBLE_DEVICES"] = str(param["GPU"])
     
-    self.vob = Vocabulary()
-    self.vob.load_from_file(param["vob_file"])
+    self.vob = Vocabulary(param["remove_OOV"], param["max_seq_length"])
+    self.vob.load_model()
    
     self._create_model()
     self._sess = tf.Session()
@@ -23,9 +23,7 @@ class Trainer(object):
     param = self.param
     train_data = DataSet(data_file=param["train_file"],
                          num_class=param["num_classes"],
-                         max_seq_length=param["max_seq_length"],
-                         vob=self.vob,
-                         remove_OOV=param["remove_OOV"])
+                         vob=self.vob)
     batch_iter = train_data.create_batch_iter(batch_size=param["batch_size"],
                                               epoch_num=param["epoch_num"],
                                               shuffle=True)
@@ -35,9 +33,7 @@ class Trainer(object):
     else:
       vali_data = DataSet(data_file=param["vali_file"],
                           num_class=param["num_classes"],
-                          max_seq_length=param["max_seq_length"],
-                          vob=self.vob,
-                          remove_OOV=param["remove_OOV"])
+                          vob=self.vob)
 
     self._best_vali_accuracy = None
 
