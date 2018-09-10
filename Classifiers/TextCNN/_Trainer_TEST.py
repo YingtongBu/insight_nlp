@@ -37,7 +37,7 @@ if __name__ == '__main__':
     model_dir="model")
  
   create_vocabulary(param["train_file"],
-                    min_freq=3,
+                    min_freq=1,
                     out_file=param["vob_file"])
   
   Trainer().train(param)
