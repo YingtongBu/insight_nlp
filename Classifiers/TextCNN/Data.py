@@ -85,15 +85,6 @@ def normalize_data_file(file_name, norm_text_func):
   write_pydict_file(data, out_file_name)
   return out_file_name
   
-def create_vocabulary(file_name, min_freq):
-  data = read_pydict_file(file_name)
-  data = [sample["word_list"] for sample in data]
-  vob = Vocabulary(None, None)
-  vob.create_vob_from_data(data, min_freq)
-  vob.add_word(EMPTY_TOKEN)
-  vob.add_word(OOV_TOKEN)
-  vob.save_model()
-
 def normalize_text(string: str):
   '''
   Tokenization/string cleaning for Chinese and English mixed data

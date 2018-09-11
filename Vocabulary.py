@@ -102,3 +102,10 @@ class Vocabulary:
       ids.extend([self.id_EMPTY_TOKEN] * (self._output_length - len(ids)))
       
     return ids
+  
+def create_vocabulary(file_name, min_freq, attr_name="word_list"):
+  data = read_pydict_file(file_name)
+  data = [sample.get(attr_name) for sample in data]
+  vob = Vocabulary(None, None)
+  vob.create_vob_from_data(data, min_freq)
+  vob.save_model()

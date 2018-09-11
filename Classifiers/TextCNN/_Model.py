@@ -12,7 +12,8 @@ class _Model(object):
                kernels: list,
                filter_num,
                l2_reg_lambda=0.0):
-    self.input_x = tf.placeholder(tf.int32, [None, max_seq_length], name="input_x")
+    self.input_x = tf.placeholder(tf.int32, [None, max_seq_length], 
+                                  name="input_x")
     self.input_y = tf.placeholder(tf.int32, [None], name="input_y")
     self.dropout_keep_prob = tf.placeholder(tf.float32, name="dropout")
     print(f"name(input_x):{self.input_x.name}")
