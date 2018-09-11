@@ -4,8 +4,11 @@
 
 from Insight_NLP.Chinese import segment_sentence
 from Insight_NLP.Common import read_pydict_file
+
+#code review: rename: _DataProcessing
 class DataProcessing(object):
 
+  #code review: data--> data_file
   def __init__(self, data):
     self.data = data
 

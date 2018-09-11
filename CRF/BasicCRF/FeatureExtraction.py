@@ -4,6 +4,7 @@
 
 class FeatureExtraction(object):
 
+  #code review: rename
   def __init__(self, data):
     self.doc_path = data
 

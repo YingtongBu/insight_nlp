@@ -10,6 +10,7 @@ from Insight_NLP.CRF.BasicCRF.DataProcessing import DataProcessing
 class CRFTrainer(object):
 
   def __init__(self, model_name, data, feature_extractor):
+    #code review: private members.
     self.model_name = model_name
     self.data = data
     self.feature_extractor = feature_extractor
@@ -19,13 +20,14 @@ class CRFTrainer(object):
     for x_seq, y_seq in zip(X_train, y_train):
       trainer.append(x_seq, y_seq)
     trainer.set_params({
-      'c1': 0.1,
+      'c1': 0.1,    #code review: rename
       'c2': 0.01,
       'max_iterations': 200,
-      'feature.possible_transitions': True
+      'feature.possible_transitions': True  #code review: add a comment here.
     })
     trainer.train(self.model_name)
 
+  #code review: pass "model parameter" to this function.
   def train(self):
     data_processing = DataProcessing(self.data)
     sample = data_processing.process_train_data()

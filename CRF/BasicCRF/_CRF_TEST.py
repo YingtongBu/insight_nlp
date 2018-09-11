@@ -30,9 +30,13 @@ if __name__ == '__main__':
   crf_trainer.train()
 
   #predict
+  #code review: load model only once.
   crf_predictor = CRFPredictor(options.model_name,
                                options.input_data,
                                FeatureExtraction(options.data_for_test),
                                options.result_output_file,
                                options.is_batch_process)
-  crf_predictor.predict()
+  #code review: put feature extraction here.
+  crf_predictor.predict(one_sample)
+  
+  crf_predictor.predict(data_file)

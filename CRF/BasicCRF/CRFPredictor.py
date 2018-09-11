@@ -23,6 +23,7 @@ class CRFPredictor(object):
       f.write(str(result[i]) + '\t' + str(probability[i]) + '\n')
     f.close()
 
+  #code review: set as public function.
   def _predict(self, X_test):
     tagger = pycrfsuite.Tagger()
     tagger.open(self.model_name)
@@ -40,6 +41,7 @@ class CRFPredictor(object):
     print(result)
     self._write_to_doc(result, probability)
 
+  #code review: predict_file(self, file_name)
   def predict(self):
     self.data_processing = DataProcessing(self.data)
     if self.is_batch_process == True:
