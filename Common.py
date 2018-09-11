@@ -83,52 +83,6 @@ def write_pydict_file(data: list, file_name):
         print(f"ERR: in write_pydict_file: not '\\n' is allowed: '{obj_str}'")
       print(obj, file=fou)
 
-#depreciated!
-def read_CSV(fname, splitter="\t", col_num=None):
-  ''' All column name would be removed.
-  '''
-  def normalize(toks):
-    result = []
-    for tok in toks:
-      p = tok.find("=")
-      result.append(tok[p + 1:].strip())
-    return result
-  
-  table = []
-  with open(fname) as fin:
-    for ln in fin:
-      toks = ln.split(splitter)
-      toks = normalize(toks)
-      if col_num is None:
-        table.append(toks)
-      else:
-        size = len(toks)
-        if size != col_num:
-          print(f"Warn: {size} != {col_num}: {toks}")
-          continue
-        else:
-          table.append(toks)
-  
-  return table
-
-#depreciated!
-def write_CSV(fname, data, col_names=None, splitter="\t", col_num=None):
-  '''We could save name for each column, which is more human-readable.
-   data: 2D array
-  '''
-  assert len(col_names) == col_num
-  with open(fname) as fou:
-    for row in data:
-      if col_num is not None:
-        assert len(row) == col_num, row
-        
-      if col_names is not None:
-        assert len(row) == len(col_names), row
-        rowStr = [name + "=" + str(e) for name, e in zip(col_names, row)]
-      else:
-        rowStr = [str(e) for e in row]
-      print(splitter.join(rowStr), file=fou)
-
 def get_files_in_folder(data_path, file_exts=None, resursive=False):
   '''
     do NOT set fileExt=html, as in some rare cases, all data files do not have
