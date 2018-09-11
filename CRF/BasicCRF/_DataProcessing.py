@@ -5,15 +5,13 @@
 from Insight_NLP.Chinese import segment_sentence
 from Insight_NLP.Common import read_pydict_file
 
-#code review: rename: _DataProcessing
-class DataProcessing(object):
+class _DataProcessing(object):
 
-  #code review: data--> data_file
-  def __init__(self, data):
-    self.data = data
+  def __init__(self, data_file):
+    self.data_file = data_file
 
-  def process_train_data(self):
-    data = read_pydict_file(self.data)
+  def _process_train_data(self):
+    data = read_pydict_file(self.data_file)
     sample = list()
 
     for line in data:
@@ -51,15 +49,15 @@ class DataProcessing(object):
       sample.append(part_pos_text)
     return sample
 
-  def process_test_data(self):
-    words, tags = segment_sentence(self.data, True)
+  def _process_test_data(self):
+    words, tags = segment_sentence(self.data_file, True)
     sample = list()
     for pos in range(len(words)):
       sample.append([words[pos], tags[pos]])
     return [sample]
 
-  def process_test_data_batch(self):
-    doc_file = open(self.data)
+  def _process_test_data_batch(self):
+    doc_file = open(self.data_file)
     sample = list()
     for line in doc_file:
       words, tags = segment_sentence(line, True)
@@ -70,10 +68,10 @@ class DataProcessing(object):
     doc_file.close()
     return sample
 
-  def get_labels(self, sample):
+  def _get_labels(self, sample):
     return [label for (token, postag, label) in sample]
 
-  def get_longest_label(self, X, Y):
+  def _get_longest_label(self, X, Y):
     n = len(Y)
     current_len = 0
     max_len = 0
