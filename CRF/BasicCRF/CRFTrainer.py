@@ -17,7 +17,6 @@ class CRFTrainer(object):
     self._c1 = c1 # coefficient for L1 penalty
     self._c2 = c2 # coefficient for L2 penalty
     self._max_iterations = max_iterations # stop earlier
-    # include transitions that are possible, but not observed
 
   def _train(self, X_train, y_train):
     trainer = pycrfsuite.Trainer(verbose=False)
@@ -27,7 +26,8 @@ class CRFTrainer(object):
       'c1': self._c1,
       'c2': self._c2,
       'max_iterations': self._max_iterations,
-      'feature.possible_transitions': True,
+      'feature.possible_transitions': True
+      # include transitions that are possible, but not observed
     })
     trainer.train(self._model_name)
 

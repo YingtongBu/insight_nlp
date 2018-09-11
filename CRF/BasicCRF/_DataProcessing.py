@@ -49,26 +49,18 @@ class _DataProcessing(object):
       sample.append(part_pos_text)
     return sample
 
-  def _process_test_data(self):
-    words, tags = segment_sentence(self.data_file, True)
+  def _process_line(self, line):
+    words, tags = segment_sentence(line, True)
     sample = list()
     for pos in range(len(words)):
       sample.append([words[pos], tags[pos]])
-    return [sample]
-  
-  #code review
-  def _process_line(self, ...):
+    return sample
 
-  #code review:
-  def _process_test_data_batch(self, file_name):
+  def _process_test_data_batch(self):
     doc_file = open(self.data_file)
     sample = list()
     for line in doc_file:
-      words, tags = segment_sentence(line, True)
-      line_sample = list()
-      for pos in range(len(words)):
-        line_sample.append([words[pos], tags[pos]])
-      sample.append(line_sample)
+      sample.append(self._process_line(line))
     doc_file.close()
     return sample
 
