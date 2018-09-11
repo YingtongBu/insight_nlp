@@ -10,14 +10,13 @@ from Insight_NLP.CRF.BasicCRF._DataProcessing import _DataProcessing
 class CRFTrainer(object):
 
   def __init__(self, model_name, data_file, feature_extractor, c1=0.1, c2=0.01,
-               max_iterations=200, feature_possible_transitions=True):
+               max_iterations=200):
     self._model_name = model_name
     self._data_file = data_file
     self._feature_extractor = feature_extractor
     self._c1 = c1 # coefficient for L1 penalty
     self._c2 = c2 # coefficient for L2 penalty
     self._max_iterations = max_iterations # stop earlier
-    self._feature_possible_transitions = feature_possible_transitions
     # include transitions that are possible, but not observed
 
   def _train(self, X_train, y_train):
@@ -28,7 +27,7 @@ class CRFTrainer(object):
       'c1': self._c1,
       'c2': self._c2,
       'max_iterations': self._max_iterations,
-      'feature.possible_transitions': self._feature_possible_transitions
+      'feature.possible_transitions': True,
     })
     trainer.train(self._model_name)
 

@@ -20,28 +20,33 @@ if __name__ == '__main__':
                     default='./output.txt')
   parser.add_option('-i', '--prediction_content',
                     default='1.当事人:尉氏县第三人民医院')
-  parser.add_option('-a', '--c1', default=0.1)
-  parser.add_option('-q', '--c2', default=0.01)
-  parser.add_option('-x', '--max_iterations', default=200)
-  parser.add_option('-f', '--feature_possible_transitions', default=True)
+  parser.add_option('--c1', default=0.1)
+  parser.add_option('--c2', default=0.01)
+  parser.add_option('--max_iterations', default=200)
+  parser.add_option('--feature_possible_transitions', default=True)
   (options, args) = parser.parse_args()
 
   #train
   crf_trainer = CRFTrainer(options.model_name,
                            options.data_for_train,
                            FeatureExtraction(), options.c1, options.c2,
-                           options.max_iterations,
-                           options.feature_possible_transitions)
+                           options.max_iterations)
   crf_trainer.train()
 
   #predictor_init
+  #code review: FeatureExtraction()
   crf_predictor = CRFPredictor(options.model_name, options.result_output_file)
 
   #override feature extraction
   feature_extraction = FeatureExtraction()
 
   #predict a sample
-  crf_predictor.predict(options.prediction_content, feature_extraction)
+  #code review
+  crf_predictor.predict(options.prediction_text, feature_extraction)
 
   #predict in batch
-  crf_predictor.predict_file(options.data_for_prediction, feature_extraction)
+  #code review: output_file
+  crf_predictor.predict_file(options.file_for_prediction,
+                             feature_extraction)
+  crf_predictor.predict_file("test1.pydict", feature_extraction)
+  crf_predictor.predict_file("test2.pydict", feature_extraction)

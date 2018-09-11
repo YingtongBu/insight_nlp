@@ -55,8 +55,12 @@ class _DataProcessing(object):
     for pos in range(len(words)):
       sample.append([words[pos], tags[pos]])
     return [sample]
+  
+  #code review
+  def _process_line(self, ...):
 
-  def _process_test_data_batch(self):
+  #code review:
+  def _process_test_data_batch(self, file_name):
     doc_file = open(self.data_file)
     sample = list()
     for line in doc_file:
