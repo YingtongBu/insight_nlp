@@ -1,8 +1,8 @@
 #coding: utf8
 #author: Tian Xia (summer.xia1@pactera.com)
 
-from Insight_NLP.Common import *
-from Insight_NLP.Chinese import *
+from Common import *
+from Chinese import *
 
 if __name__ == "__main__":
   text = "中国人民共和国今天成立了。"

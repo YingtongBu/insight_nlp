@@ -1,7 +1,7 @@
 #coding: utf8
 #author: Tian Xia (summer.xia1@pactera.com)
 
-from Insight_NLP.Common import *
+from Common import *
 
 '''This class has added two special tokens, <empty> and <oov> by default.
 '''

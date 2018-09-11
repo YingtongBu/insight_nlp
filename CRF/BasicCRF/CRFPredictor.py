@@ -5,7 +5,7 @@
 #install python-crfsuite
 
 import pycrfsuite
-from Insight_NLP.CRF.BasicCRF._DataProcessing import _DataProcessing
+from CRF.BasicCRF._DataProcessing import _DataProcessing
 
 class CRFPredictor(object):
 

@@ -1,8 +1,8 @@
 # coding: utf8
 # author: Tian Xia (summer.xia1@pactera.com)
 
-from Insight_NLP.Common import *
-from Insight_NLP.Measure import *
+from Common import *
+from Measure import *
 
 if __name__ == "__main__":
   parser = OptionParser(usage="cmd dev1@dir1 dir2")

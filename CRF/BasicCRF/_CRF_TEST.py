@@ -3,9 +3,9 @@
 #author: Xin Jin (xin.jin12@pactera.com)
 
 import optparse
-from Insight_NLP.CRF.BasicCRF.FeatureExtraction import FeatureExtraction
-from Insight_NLP.CRF.BasicCRF.CRFTrainer import CRFTrainer
-from Insight_NLP.CRF.BasicCRF.CRFPredictor import CRFPredictor
+from CRF.BasicCRF.FeatureExtraction import FeatureExtraction
+from CRF.BasicCRF.CRFTrainer import CRFTrainer
+from CRF.BasicCRF.CRFPredictor import CRFPredictor
 
 if __name__ == '__main__':
   usage = "usage: %prog [options]"

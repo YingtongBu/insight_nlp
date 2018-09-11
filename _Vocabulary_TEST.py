@@ -2,7 +2,7 @@
 #coding: utf8
 #author: Tian Xia (summer.xia1@pactera.com)
 
-from Insight_NLP.Vocabulary import *
+from Vocabulary import *
 
 if __name__ == "__main__":
   data = [

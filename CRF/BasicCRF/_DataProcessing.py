@@ -2,8 +2,8 @@
 #coding: utf8
 #author: Xin Jin (xin.jin12@pactera.com)
 
-from Insight_NLP.Chinese import segment_sentence
-from Insight_NLP.Common import read_pydict_file
+from Chinese import segment_sentence
+from Common import read_pydict_file
 
 class _DataProcessing(object):
 

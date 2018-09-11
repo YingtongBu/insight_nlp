@@ -1,7 +1,7 @@
 #coding: utf8
 #author: Tian Xia (summer.xia1@pactera.com)
 
-from Insight_NLP.Vocabulary import *
+from Vocabulary import *
 
 '''The format of data is defined as
 1. each line is a python dict string, denoting a sample dict.
