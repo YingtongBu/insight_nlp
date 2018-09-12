@@ -17,7 +17,10 @@ def lookup1(table, table_width, pos):
   :param pos:   [batch]
   :return [batch]
   '''
-  return tf.reduce_sum(tf.multiply(table, tf.one_hot(pos, table_width)), axis=1)
+  dtype = table.dtype
+  return tf.reduce_sum(tf.multiply(table,
+                                   tf.one_hot(pos, table_width, dtype=dtype)),
+                       axis=1)
   
 def lookup2(table, pos):
   '''
@@ -65,7 +68,8 @@ def log_sum(tensor_list):
   tensor = tf.concat(tensor_list, 1)
   return tf.reduce_logsumexp(tensor, 1)
 
-def create_bi_LSTM(word_ids, vob_size, embedding_size, LSTM_layer_num):
+def create_bi_LSTM(word_ids, vob_size, embedding_size, LSTM_layer_num,
+                   RNN_type="lstm"):
   '''
   :param word_ids: tensor, of shape [batch_size, length]
   :param vob_size:
@@ -76,7 +80,15 @@ def create_bi_LSTM(word_ids, vob_size, embedding_size, LSTM_layer_num):
   def encode(input, reuse):
     with tf.variable_scope(tf.get_variable_scope(), reuse=reuse):
       embeddings = tf.get_variable("embeddings", [vob_size, embedding_size])
-      cell = rnn_cell.MultiRNNCell([rnn_cell.LSTMCell(embedding_size)
+      
+      if RNN_type.lower() == "lstm":
+        cell = rnn_cell.LSTMCell
+      elif RNN_type.lower() == "gru":
+        cell = rnn_cell.GRUCell
+      else:
+        assert False
+        
+      cell = rnn_cell.MultiRNNCell([cell(embedding_size)
                                     for _ in range(LSTM_layer_num)])
       word_vec = lookup0(embeddings, input)
       word_list = tf.unstack(word_vec, axis=1)
