@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 #coding: utf8
 #author: Xin Jin (xin.jin12@pactera.com)
+
 from __future__ import print_function
 import os
 import logging
 import sys
-from Insight_NLP.CRF.DLBasedCRF.NeuralNets.BiLSTM import BiLSTM
-from Insight_NLP.CRF.DLBasedCRF.util.PreProcessing \
+from CRF.DLBasedCRF.NeuralNets.BiLSTM import BiLSTM
+from CRF.DLBasedCRF.util.PreProcessing \
   import prepare_dataset, load_dataset_pickle
 from keras import backend as K
 

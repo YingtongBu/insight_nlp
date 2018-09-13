@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 #coding: utf8
 #author: Xin Jin (xin.jin12@pactera.com)
+
 from __future__ import print_function
-from Insight_NLP.CRF.DLBasedCRF.util import BIOF1Validation
+from CRF.DLBasedCRF.util import BIOF1Validation
 import keras
 from keras.optimizers import *
 from keras.models import Model
@@ -15,7 +16,7 @@ import time
 import os
 import random
 import logging
-from Insight_NLP.CRF.DLBasedCRF.NeuralNets.KerasLayers.ChainCRF import ChainCRF
+from CRF.DLBasedCRF.NeuralNets.ChainCRF import ChainCRF
 
 class BiLSTM:
   def __init__(self, params=None):
@@ -634,7 +635,7 @@ class BiLSTM:
   def load_model(model_path):
     import h5py
     import json
-    from Insight_NLP.CRF.DLBasedCRF.NeuralNets.KerasLayers.ChainCRF import \
+    from CRF.DLBasedCRF.NeuralNets.KerasLayers.ChainCRF import \
       create_custom_objects
 
     model = keras.models.load_model(model_path,

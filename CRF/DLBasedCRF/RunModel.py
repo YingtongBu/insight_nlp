@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 #coding: utf8
 #author: Xin Jin (xin.jin12@pactera.com)
+
 from __future__ import print_function
 import nltk
-from Insight_NLP.CRF.DLBasedCRF.util.PreProcessing \
+from CRF.DLBasedCRF.util.PreProcessing \
   import (add_char_information, create_matrices, add_casing_information)
-from Insight_NLP.CRF.DLBasedCRF.NeuralNets.BiLSTM import BiLSTM
+from CRF.DLBasedCRF.NeuralNets.BiLSTM import BiLSTM
 import sys
 import os
 

@@ -10,8 +10,8 @@ import os.path
 import nltk
 import logging
 from nltk import FreqDist
-from Insight_NLP.CRF.DLBasedCRF.util.WordEmbeddings import word_normalize
-from Insight_NLP.CRF.DLBasedCRF.util.CoNLL import read_co_nll
+from CRF.DLBasedCRF.util.WordEmbeddings import word_normalize
+from CRF.DLBasedCRF.util.CoNLL import read_co_nll
 import sys
 
 if (sys.version_info > (3, 0)):
