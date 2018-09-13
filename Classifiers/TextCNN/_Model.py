@@ -2,6 +2,7 @@
 #author: Tian Xia (summer.xia1@pactera.com)
 
 import tensorflow as tf
+import Tensorflow as TF
 
 class _Model(object):
   def __init__(self,
@@ -72,10 +73,8 @@ class _Model(object):
       losses = tf.losses.softmax_cross_entropy(input_y, class_scores)
       self.loss = losses + l2_reg_lambda * l2_loss
       print(f"name(loss):{self.loss.name}")
-
-      correct = tf.equal(self.predicted_class, self.input_y)
-      #output
-      self.accuracy = tf.reduce_mean(tf.cast(correct, "float"),
-                                     name="accuracy")
+      
+      self.accuracy = TF.accuracy(self.predicted_class, self.input_y,
+                                  "accuracy")
       print(f"name(accuracy):{self.accuracy.name}")
     

@@ -14,8 +14,8 @@ class Vocabulary:
     :param remove_OOV:
     :param output_length: int, or None
     '''
-    self._remove_OOV = remove_OOV
-    self._output_length = output_length
+    self.remove_OOV = remove_OOV
+    self.output_length = output_length
     self._clear()
     
   def _update_special_tokens(self):
@@ -92,14 +92,14 @@ class Vocabulary:
   
   def convert_to_word_ids(self, words: list):
     ids = [self.get_word_id(word) for word in words]
-    if self._remove_OOV:
+    if self.remove_OOV:
       ids = [id for id in ids if id is not None]
     else:
       ids = [id if id is not None else self.id_OOV_TOKEN for id in ids]
       
-    if self._output_length is not None:
-      ids = ids[: self._output_length]
-      ids.extend([self.id_EMPTY_TOKEN] * (self._output_length - len(ids)))
+    if self.output_length is not None:
+      ids = ids[: self.output_length]
+      ids.extend([self.id_EMPTY_TOKEN] * (self.output_length - len(ids)))
       
     return ids
   

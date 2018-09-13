@@ -3,6 +3,10 @@
 
 import tensorflow as tf
 
+def accuracy(prediction, label, name):
+  correct = tf.equal(prediction, label)
+  return tf.reduce_mean(tf.cast(correct, "float"), name=name)
+
 def lookup0(table, pos):
   '''
   :param table: [width1, width2]
