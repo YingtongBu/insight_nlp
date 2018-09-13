@@ -21,6 +21,7 @@ class NewsScraper(object):
     news_content = news_content.text
     soup = BeautifulSoup(news_content, 'html.parser')
     news_time = soup.find(class_="time").text
+    #todo: convert the date string to python DateTime object.
     return news_time
 
   def get_result(self):
