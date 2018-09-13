@@ -10,7 +10,7 @@ from bs4 import BeautifulSoup
 class Scraper(object):
   def __init__(self, url, language='zh'):
     self.url = url
-    self._news_article = Article(self.url, language = language)
+    self._news_article = Article(self.url, language=language)
     self._news_article.download()
     self._news_article.parse()
     self._news_article.nlp()
