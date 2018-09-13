@@ -81,10 +81,11 @@ def create_bi_LSTM(word_ids, vob_size, embedding_size, LSTM_layer_num,
   :param LSTM_layer_num:
   :return:
   '''
-  def encode(input, reuse):
+  def encode(input, score_name, reuse):
     with tf.variable_scope(tf.get_variable_scope(), reuse=reuse):
       embeddings = tf.get_variable("embeddings", [vob_size, embedding_size])
-      
+     
+    with tf.variable_scope(score_name, reuse=False):
       if RNN_type.lower() == "lstm":
         cell = rnn_cell.LSTMCell
       elif RNN_type.lower() == "gru":
@@ -100,8 +101,8 @@ def create_bi_LSTM(word_ids, vob_size, embedding_size, LSTM_layer_num,
       return outputs
   
   rnn_cell = tf.nn.rnn_cell
-  outputs1 = encode(word_ids, reuse=False)
-  outputs2 = encode(tf.reverse(word_ids, [1]), reuse=True)
+  outputs1 = encode(word_ids, "directed", reuse=False)
+  outputs2 = encode(tf.reverse(word_ids, [1]), "reversed", reuse=True)
   outputs2 = list(reversed(outputs2))
   
   outputs = [tf.concat(o, axis=1) for o in zip(outputs1, outputs2)]
