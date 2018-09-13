@@ -4,10 +4,7 @@
 
 class FeatureExtraction(object):
 
-  def __init__(self, data):
-    self.doc_path = data
-
-  def extract_features(self, data):
+  def _extract_features(self, data):
     return [self.word_to_features(data, i)
             for i in range(len(data))]
 

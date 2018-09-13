@@ -2,8 +2,8 @@
 #coding: utf8
 #author: Tian Xia (summer.xia1@pactera.com)
 
-from Insight_NLP.Common import *
-from Insight_NLP.GitCheck.FormatChecker import *
+from Common import *
+from GitCheck.FormatChecker import *
 
 USER_WHITE_LIST = set(["summer"])
 

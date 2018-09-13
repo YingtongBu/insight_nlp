@@ -1,13 +1,30 @@
 #coding: utf8
 #author: Tian Xia (summer.xia1@pactera.com)
 
-from Insight_NLP.Common import *
+from Common import *
+
+'''This class has added two special tokens, <empty> and <oov> by default.
+'''
+EMPTY_TOKEN = "<empty>"
+OOV_TOKEN   = "<oov>"
 
 class Vocabulary:
-  def __init__(self):
-    self._clean()
+  def __init__(self, remove_OOV: bool, output_length: int):
+    '''
+    :param remove_OOV:
+    :param output_length: int, or None
+    '''
+    self._remove_OOV = remove_OOV
+    self._output_length = output_length
+    self._clear()
     
-  def _clean(self):
+  def _update_special_tokens(self):
+    self.add_word(EMPTY_TOKEN)
+    self.add_word(OOV_TOKEN)
+    self.id_EMPTY_TOKEN = self.get_word_id(EMPTY_TOKEN)
+    self.id_OOV_TOKEN = self.get_word_id(OOV_TOKEN)
+    
+  def _clear(self):
     self._word2freq = defaultdict(int)
     self._word2Id = {}
     self._words = []
@@ -18,7 +35,8 @@ class Vocabulary:
     For example, [["welcome", "to", "ping'an"], ["欢迎", "来到", "平安"],
                   ["欢", "迎", "来", "到", "平安"]]
     '''
-    self._clean()
+    self._clear()
+    
     counter = Counter()
     for tokens in data_list:
       counter.update(tokens)
@@ -28,25 +46,29 @@ class Vocabulary:
         break
       self.add_word(word)
       self._word2freq[word] = freq
+      
+    self._update_special_tokens()
     
-  def save_to_file(self, file_name):
+  def save_model(self):
     '''
     each line: word idx freq
     '''
-    with open(file_name, "w") as fou:
+    with open("vob.data", "w") as fou:
       for word in self._words:
         idx = self.get_word_id(word)
         freq = self._word2freq[word]
         print(f"{word} {idx} {freq}", file=fou)
         
-  def load_from_file(self, file_name):
+  def load_model(self):
     ''' The first word each line would be read.
     '''
-    self._clean()
-    for ln in open(file_name):
+    self._clear()
+    for ln in open("vob.data"):
       self.add_word(ln.split()[0])
-      
-    print(f"loaded {self.size()} words from '{file_name}'.")
+
+    self._update_special_tokens()
+    
+    print(f"loaded {self.size()} words from vob.data.")
 
   def add_word(self, word):
     ''' add word if it does not exist, and then return its id.
@@ -68,27 +90,22 @@ class Vocabulary:
   def size(self):
     return len(self._words)
   
-  def convert_to_word_ids(self, words: list,
-                          remove_OOV=True, mark_OOV=None,
-                          output_length=None, mark_empty=None):
-    if not remove_OOV:
-      assert mark_OOV is not None, "you must set 'mark_OOV'"
-      id_OOV = self.get_word_id(mark_OOV)
-      assert id_OOV is not None, "you must set 'mark_OOV' in vob."
-    
-    if output_length is not None:
-      assert mark_empty is not None, "You must set 'mark_empty'."
-      id_empty = self.get_word_id(mark_empty)
-      assert id_empty is not None, "You must set 'mark_empty' in vob."
-      
+  def convert_to_word_ids(self, words: list):
     ids = [self.get_word_id(word) for word in words]
-    if remove_OOV:
+    if self._remove_OOV:
       ids = [id for id in ids if id is not None]
     else:
-      ids = [id if id is not None else id_OOV for id in ids]
+      ids = [id if id is not None else self.id_OOV_TOKEN for id in ids]
       
-    if output_length is not None:
-      ids = ids[: output_length]
-      ids.extend([id_empty] * (output_length - len(ids)))
+    if self._output_length is not None:
+      ids = ids[: self._output_length]
+      ids.extend([self.id_EMPTY_TOKEN] * (self._output_length - len(ids)))
       
     return ids
+  
+def create_vocabulary(file_name, min_freq, attr_name="word_list"):
+  data = read_pydict_file(file_name)
+  data = [sample.get(attr_name) for sample in data]
+  vob = Vocabulary(None, None)
+  vob.create_vob_from_data(data, min_freq)
+  vob.save_model()

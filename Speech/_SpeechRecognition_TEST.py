@@ -2,7 +2,7 @@
 #coding: utf8
 #author: Xin Jin (xin.jin12@pactera.com)
 
-import Insight_NLP.Speech.SpeechRecognition as SpeechRecognition
+import Speech.SpeechRecognition as SpeechRecognition
 import optparse
 
 if __name__ == '__main__':

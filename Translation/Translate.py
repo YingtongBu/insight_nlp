@@ -6,7 +6,7 @@
 
 from google.cloud import translate
 import os
-import Insight_NLP.Common as common
+import Common as common
 
 os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = \
   common.get_module_path("Insight_NLP.Translation.Translate") + \

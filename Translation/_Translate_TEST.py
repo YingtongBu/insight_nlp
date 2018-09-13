@@ -3,7 +3,7 @@
 
 #Author: hong xu(hong.xu55@pactera.com)
 
-import Insight_NLP.Translation.Translate as Trans
+import Translation.Translate as Trans
 
 if __name__ == '__main__':
   src = "Beijing"

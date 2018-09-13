@@ -3,7 +3,7 @@
 
 from optparse import OptionParser
 import re, os
-import Insight_NLP.Common as Common
+import Common as Common
 
 debug = None
 

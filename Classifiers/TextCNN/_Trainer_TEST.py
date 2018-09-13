@@ -1,14 +1,14 @@
 #coding: utf8
 #author: Tian Xia (summer.xia1@pactera.com)
 
-from Insight_NLP.Classifiers.TextCNN.Trainer import *
-from Insight_NLP.Classifiers.TextCNN.Data import normalize_text
-from Insight_NLP.Common import *
+from Classifiers.TextCNN.Trainer import *
+from Classifiers.TextCNN.Data import normalize_text
+from Common import *
 
 if __name__ == '__main__':
   data_path = os.path.join(
-    get_module_path("Insight_NLP.Common"),
-    "Insight_NLP/Classifiers/TextCNN/SampleData"
+    get_module_path("Common"),
+    "Classifiers/TextCNN/SampleData"
   )
 
   train_file = os.path.join(data_path, "data.1.train.pydict")
@@ -20,7 +20,6 @@ if __name__ == '__main__':
   param = create_classifier_parameter(
     train_file=train_norm_file,
     vali_file=vali_norm_file,
-    vob_file="vob.txt",
     num_classes=45,
     max_seq_length=32,
     epoch_num=5,
@@ -36,9 +35,7 @@ if __name__ == '__main__':
     GPU=-1,
     model_dir="model")
  
-  create_vocabulary(param["train_file"],
-                    min_freq=1,
-                    out_file=param["vob_file"])
+  create_vocabulary(param["train_file"], min_freq=1)
   
   Trainer().train(param)
   print("Training is Done")
