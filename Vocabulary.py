@@ -49,26 +49,26 @@ class Vocabulary:
       
     self._update_special_tokens()
     
-  def save_model(self):
+  def save_model(self, vob_file="vob.data"):
     '''
     each line: word idx freq
     '''
-    with open("vob.data", "w") as fou:
+    with open(vob_file, "w") as fou:
       for word in self._words:
         idx = self.get_word_id(word)
         freq = self._word2freq[word]
         print(f"{word} {idx} {freq}", file=fou)
         
-  def load_model(self):
+  def load_model(self, vob_file="vob.data"):
     ''' The first word each line would be read.
     '''
     self._clear()
-    for ln in open("vob.data"):
+    for ln in open(vob_file):
       self.add_word(ln.split()[0])
 
     self._update_special_tokens()
     
-    print(f"loaded {self.size()} words from vob.data.")
+    print(f"loaded {self.size()} words from {vob_file}.")
 
   def add_word(self, word):
     ''' add word if it does not exist, and then return its id.
