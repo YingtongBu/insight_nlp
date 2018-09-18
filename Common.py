@@ -37,6 +37,22 @@ try:
 except ImportError:
   print("Does not find package 'scipy'")
   
+def split_to_sublist(data):
+  '''
+  :param data: [[a1, b1, ...], [a2, b2, ...], ...]
+  :return: [a1, a2, ...], [b1, b2, ...]
+  '''
+  if data == []:
+    return []
+  
+  size = len(data[0])
+  result = [[] for _ in range(size)]
+  for tuple in data:
+    for pos in range(size):
+      result[pos].append(tuple[pos])
+  
+  return result
+  
 def get_module_path(module_name):
   '''
   e.g., get_module_path("NLP.Translation.Translate")
