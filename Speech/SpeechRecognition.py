@@ -7,6 +7,11 @@ import speech_recognition as sr
 
 def audio_file_recognize(audio_file,
                          language_selection):
+  '''
+  :param audio_file: audio file to be recognized
+  :param language_selection: selected language code
+  :return: print recognized audio content
+  '''
   r = sr.Recognizer()
   stock_audio = sr.AudioFile(audio_file)
   with stock_audio as source:
@@ -15,6 +20,13 @@ def audio_file_recognize(audio_file,
 
 def listen_and_recognize(input_device_index, time_limit, 
                          time_out, language_selection):
+  '''
+  :param input_device_index: assigned index for the specific input device
+  :param time_limit: set min time for the listening time
+  :param time_out: set max time for the listening time
+  :param language_selection: selected language code
+  :return: print recognized audio content
+  '''
   r = sr.Recognizer()
   mic = sr.Microphone(device_index=input_device_index)
   with mic as source:

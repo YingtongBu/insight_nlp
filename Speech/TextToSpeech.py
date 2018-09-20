@@ -44,6 +44,13 @@ def _write_file(file, content):
 
 def text_to_speech(content, prefix, app_id='5b7f49bd',
                    api_key='95855982aa95346883233f1059d18855'):
+  '''
+  :param content: content to be processed
+  :param prefix: prefix assigned to the audio
+  :param app_id: app_id in iFlyTek service
+  :param api_key: api_key in iFlyTek service
+  :return: None but get the output audio
+  '''
   r = requests.post(URL, headers=_get_header(app_id, api_key),
                     data=_get_body(content))
   contentType = r.headers['Content-Type']
