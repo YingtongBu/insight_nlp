@@ -9,7 +9,7 @@ from CRF.BasicCRF._DataProcessing import _DataProcessing
 
 class CRFTrainer(object):
   '''
-  developers can call 'train' function to train a CRF model
+  call 'train' function to train a CRF model
   '''
   def __init__(self, model_name, data_file, feature_extractor, c1=0.1, c2=0.01,
                max_iterations=200):
@@ -34,6 +34,9 @@ class CRFTrainer(object):
     trainer.train(self._model_name)
 
   def train(self):
+    '''
+    :return: return None but generate a specific CRF model
+    '''
     data_processing = _DataProcessing(self._data_file)
     data = data_processing._process_train_data()
     X = [self._feature_extractor._extract_features(sample) for sample in data]

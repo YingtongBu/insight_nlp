@@ -11,6 +11,9 @@ class _DataProcessing(object):
     self.data_file = data_file
 
   def _process_train_data(self):
+    '''
+    preprocess training dataset
+    '''
     data = read_pydict_file(self.data_file)
     sample = list()
 
@@ -50,6 +53,9 @@ class _DataProcessing(object):
     return sample
 
   def _process_line(self, line):
+    '''
+    preprocess a single test item
+    '''
     words, tags = segment_sentence(line, True)
     sample = list()
     for pos in range(len(words)):
@@ -57,6 +63,9 @@ class _DataProcessing(object):
     return sample
 
   def _process_test_data_batch(self):
+    '''
+    preprocess test data in batch
+    '''
     doc_file = open(self.data_file)
     sample = list()
     for line in doc_file:
@@ -65,9 +74,16 @@ class _DataProcessing(object):
     return sample
 
   def _get_labels(self, sample):
+    '''
+    get labels of the input dataset
+    '''
     return [label for (token, postag, label) in sample]
 
   def _get_longest_label(self, X, Y):
+    '''
+    call this function to get the longest label if there are multiple results
+    for a single item
+    '''
     n = len(Y)
     current_len = 0
     max_len = 0
