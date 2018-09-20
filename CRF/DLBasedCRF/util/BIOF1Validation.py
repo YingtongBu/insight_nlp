@@ -4,7 +4,6 @@
 
 from __future__ import print_function
 import logging
-
 def compute_f1_token_basis(predictions, correct, o_label):
   prec = compute_precision_token_basis(predictions, correct, o_label)
   rec = compute_precision_token_basis(correct, predictions, o_label)

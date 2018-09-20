@@ -10,7 +10,9 @@ from keras import constraints
 from keras import initializers
 from keras.engine import Layer, InputSpec
 import tensorflow as tf
-
+'''
+ChainCRF layer to do sequence labeling
+'''
 def path_energy(y, x, u, b_start=None, b_end=None, mask=None):
   x = add_boundary_energy(x, b_start, b_end, mask)
   return path_energy0(y, x, u, mask)

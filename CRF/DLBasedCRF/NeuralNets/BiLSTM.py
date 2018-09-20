@@ -19,6 +19,9 @@ import logging
 from CRF.DLBasedCRF.NeuralNets.ChainCRF import ChainCRF
 
 class BiLSTM:
+  '''
+  BiLSTM class to accomplish the BiLSTM model
+  '''
   def __init__(self, params=None):
     self.models = None
     self.model_save_path = None
