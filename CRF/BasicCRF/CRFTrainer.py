@@ -8,7 +8,9 @@ import pycrfsuite
 from CRF.BasicCRF._DataProcessing import _DataProcessing
 
 class CRFTrainer(object):
-
+  '''
+  developers can call 'train' function to train a CRF model
+  '''
   def __init__(self, model_name, data_file, feature_extractor, c1=0.1, c2=0.01,
                max_iterations=200):
     self._model_name = model_name

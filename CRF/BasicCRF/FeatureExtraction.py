@@ -10,6 +10,11 @@ class FeatureExtraction(object):
 
   # @override
   def word_to_features(self, sample, pos):
+    '''
+    :param sample: a data sample
+    :param pos: the position where we need to do word2feature process
+    :return: features extracted from input data
+    '''
     word = sample[pos][0]
     postag = sample[pos][1]
 
