@@ -5,7 +5,11 @@ from CRF.LSTMCRF.Predictor import *
 from Common import *
 
 if __name__ == '__main__':
-  data_path = "SampleData"
+  data_path = os.path.join(
+    get_module_path("Common"),
+    "CRF/LSTMCRF/SampleData"
+  )
+  
   test_file = os.path.join(data_path, "test.pydict")
 
   model_path = os.path.join(data_path, "../model")

@@ -2,11 +2,14 @@
 #author: Tian Xia (summer.xia1@pactera.com)
 
 from CRF.LSTMCRF.Trainer import *
-from Common import *
 from CRF.LSTMCRF.Data import *
 
 if __name__ == '__main__':
-  data_path = "SampleData"
+  data_path = os.path.join(
+    get_module_path("Common"),
+    "CRF/LSTMCRF/SampleData"
+  )
+  
   train_file = os.path.join(data_path, "train.pydict")
   vali_file = os.path.join(data_path, "test.pydict")
   

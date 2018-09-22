@@ -2,7 +2,6 @@
 #author: Tian Xia (summer.xia1@pactera.com)
 
 from Tensorflow import *
-# from CRF.LSTMCRF._Model import _Model
 from CRF.LSTMCRF.Data import *
 from CRF.LSTMCRF.Trainer import Trainer
 

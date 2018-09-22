@@ -9,8 +9,8 @@
 '''
 
 from Tensorflow import *
-from _Model import _Model
-from Data import *
+from CRF.LSTMCRF._Model import _Model
+from CRF.LSTMCRF.Data import *
 
 class Trainer(object):
   def train(self, param):
