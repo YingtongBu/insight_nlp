@@ -1,8 +1,9 @@
 #coding: utf8
 #author: Tian Xia (summer.xia1@pactera.com)
 
-from Trainer import *
+from CRF.LSTMCRF.Trainer import *
 from Common import *
+from CRF.LSTMCRF.Data import *
 
 if __name__ == '__main__':
   data_path = "SampleData"
