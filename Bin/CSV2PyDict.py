@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #coding: utf8
-
+#author: Xinlu Yu (xinlu.yu1@pactera.com)
 '''
 1. Suppose the first line of a csv is its titles.
 '''
@@ -21,9 +21,7 @@ def process(csv_file, pydict_file):
 
 if __name__ == "__main__":
   os.system("clear")
-
   parser = optparse.OptionParser(usage="cmd [optons] ..]")
-  #parser.add_option("-q", "--quiet", action="store_true", dest="verbose", #default=False, help="")
   parser.add_option("--splitter", dest="splitter", default="\t", help="")
   (options, args) = parser.parse_args()
 
