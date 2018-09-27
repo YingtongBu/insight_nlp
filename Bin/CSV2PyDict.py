@@ -14,8 +14,8 @@ def process(csv_file, pydict_file):
     data = csv.DictReader(f)
     titles = data.fieldnames
     for row in data:
-      data_list.extend([{titles[i]: row[titles[i]] for i in range(len(titles))}])
-
+      data_list.extend([{titles[i]: row[titles[i]]
+                         for i in range(len(titles))}])
   with open(pydict_file, "w") as output:
     for obj in data_list:
       print(obj, file=output)
