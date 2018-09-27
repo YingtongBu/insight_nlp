@@ -4,17 +4,19 @@
 from collections import defaultdict, namedtuple, Counter
 from operator import methodcaller, attrgetter, itemgetter, add
 from optparse import OptionParser
+from scipy import array
 
 import bisect
 import collections
 import copy
 import datetime
+import functools
 import heapq
 import itertools
 import logging
-import functools
 import math
-import multiprocessing
+import multiprocessing as mp
+import numpy as np
 import operator
 import optparse
 import os
@@ -23,7 +25,7 @@ import pprint
 import queue
 import random
 import re
-import numpy
+import scipy
 import struct
 import sys
 import time
@@ -31,12 +33,6 @@ import time
 INF         = float("inf")
 EPSILON     = 1e-6
 
-try:
-  import scipy
-  from scipy import array
-except ImportError:
-  print("Does not find package 'scipy'")
-  
 def split_to_sublist(data):
   '''
   :param data: [[a1, b1, ...], [a2, b2, ...], ...]
