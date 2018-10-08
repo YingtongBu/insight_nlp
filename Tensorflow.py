@@ -3,6 +3,44 @@
 
 import tensorflow as tf
 
+def linear_layer(input, output_size, scope=None):
+    '''
+    Linear map: output[k] = sum_i(Matrix[k, i] * input_[i] ) + Bias[k]
+    Args:
+    ValueError: if some of the arguments has unspecified or wrong shape.
+    '''
+    
+    shape = input.get_shape().as_list()
+    input_size = shape[1]
+
+    with tf.variable_scope(scope or "SimpleLinear", reuse=tf.AUTO_REUSE):
+      matrix = tf.get_variable("Matrix", [input_size, output_size],
+                               dtype=input.dtype)
+      bias_term = tf.get_variable("Bias", [output_size], dtype=input.dtype)
+
+    return tf.matmul(input, matrix) + bias_term
+
+def high_way_layer(input, size, num_layers=1, bias=-2.0, activation=tf.nn.relu,
+                   scope='highway'):
+  '''
+   t = sigmoid(Wy + b)
+   z = t * g(Wy + b) + (1 - t) * y
+   where g is nonlinearity, t is transform gate, and (1 - t) is carry gate.
+ '''
+  
+  
+  
+  with tf.variable_scope(scope, reuse=tf.AUTO_REUSE):
+    for idx in range(num_layers):
+      g = activation(linear_layer(input, size, scope=f'highway_lin_{idx}'))
+      prob = tf.sigmoid(linear_layer(input, size, scope=f'highway_gate_{idx}') +
+                        bias)
+      
+      output = prob * g + (1. - prob) * input
+      input = output
+  
+  return output
+
 def accuracy(prediction, label, name):
   correct = tf.equal(prediction, label)
   return tf.reduce_mean(tf.cast(correct, "float"), name=name)
