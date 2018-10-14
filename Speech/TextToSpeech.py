@@ -42,8 +42,8 @@ def _write_file(file, content):
     f.write(content)
   f.close()
 
-def text_to_speech(content, prefix, app_id='5b7f49bd',
-                   api_key='95855982aa95346883233f1059d18855'):
+def text_to_speech(content, prefix, app_id='5bc3d24e',
+                   api_key='e7de2164525ef40e02cf81d09280a236'):
   '''
   :param content: content to be processed
   :param prefix: prefix assigned to the audio
