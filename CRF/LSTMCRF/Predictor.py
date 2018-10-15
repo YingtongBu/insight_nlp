@@ -28,6 +28,9 @@ class Predictor(object):
     print(f"loading model: '{model_prefix}'")
     saver = tf.train.import_meta_graph(f"{model_prefix}.meta")
     saver.restore(self._sess, f"{model_prefix}")
+    
+  def translate(self, word_list: list, predict_seq: list):
+    return Trainer.translate(word_list, predict_seq, self.param["tag_list"])
 
   def predict_dataset(self, file_name):
     data = DataSet(data_file=file_name,
@@ -55,6 +58,8 @@ class Predictor(object):
     
   def predict(self, batch_x, batch_y):
     '''
+    :param batch_x: must be of the length used in training.
+    :param batch_y: could be None
     :return: [seq, seq_prob, accuracy]
     '''
     return Trainer.predict(self._sess, batch_x, batch_y)

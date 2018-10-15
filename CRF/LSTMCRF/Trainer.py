@@ -28,6 +28,7 @@ class Trainer(object):
     self._sess.run(tf.local_variables_initializer())
     
     param = self.param
+    #tag_list: guarantee to be pre-sorted, "O" is the first one
     train_data = DataSet(data_file=param["train_file"],
                          tag_list=param["tag_list"],
                          vob=self.vob)
@@ -104,11 +105,30 @@ class Trainer(object):
       
     print(f"evaluation: accuracy: {accuracy:.4f} "
           f"best: {self._best_vali_accuracy:.4f}\n")
+    
+  @staticmethod
+  def translate(word_list: list, predict_seq: list, tag_list: list):
+    ret = []
+    for idx, label in enumerate(predict_seq):
+      if idx == len(word_list):
+        break
+      
+      if label == 0:
+        continue
+      
+      elif label % 2 == 1:
+        ret.append([tag_list[(label + 1) // 2]])
+        ret[-1].append(word_list[idx])
+        
+      elif label % 2 == 0:
+        ret[-1].append(word_list[idx])
+        
+    return ret
 
   @staticmethod
   def predict(sess, batch_x, batch_y=None):
     if batch_y is None:
-      batch_y = [-1] * len(batch_x)
+      batch_y = [[0] * len(_) for _ in batch_x]
   
     graph = sess.graph
     result = sess.run(
