@@ -18,3 +18,7 @@ if __name__ == '__main__':
 
   predictor = Predictor(model_path)
   predictor.predict_dataset(test_norm_file)
+  
+  text = '"Second Boer War: Boers attempt to end the Siege of Ladysmith, ' \
+         'which leads to the Battle of Platrand."'
+  print(predictor.predict_text(text))

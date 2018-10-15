@@ -82,7 +82,6 @@ def normalize_data_file(file_name, norm_text_func):
   data = read_pydict_file(file_name)
   for sample in data:
     text  = sample["text"]
-    text = Chinese.convert_full_to_half(text)
     sample["word_list"] = norm_text_func(text).split()
   
   out_file_name = file_name.replace(".pydict", ".norm.pydict")
@@ -95,6 +94,8 @@ def normalize_text(string: str):
   NOTE: you should deal with text by your special intention first, and then
   run this function.
   '''
+  string = Chinese.convert_full_to_half(string)
+  
   string = re.sub(r"[^A-Za-z0-9\u4e00-\u9fa5()（）！？，,!?\'\`]", " ", string)
   string = re.sub(r"\'s", " \'s", string)
   string = re.sub(r"\'ve", " \'ve", string)

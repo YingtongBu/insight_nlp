@@ -18,7 +18,7 @@ class Predictor(object):
 
     self.vob = Vocabulary(self.param["remove_OOV"],
                           self.param["max_seq_length"])
-    self.vob.load_model()
+    self.vob.load_model(self.param["vob_file"])
 
     names = [extract_id(name) for name in os.listdir(model_path)
              if name.endswith(".index")]
@@ -54,6 +54,12 @@ class Predictor(object):
     
     accuracy = correct / data.size()
     print(f"Test: '{file_name}': {accuracy:.4f}")
+    
+  def predict_text(self, text: str):
+    word_list = normalize_text(text).split()
+    word_idx = self.vob.convert_to_word_ids(word_list)
+    preds, accuracy, probs = self.predict([word_idx], None)
+    return preds[0], probs[0]
     
   def predict(self, batch_x, batch_y):
     return Trainer.predict(self._sess, batch_x, batch_y)
