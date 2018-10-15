@@ -30,3 +30,31 @@ def segment_sentence(text, pos_tagging=False):
     return words, tags
   else:
     return list(jieba.cut(text, cut_all=False))
+  
+def split_and_norm_string(text: str):
+  '''
+  Tokenization/string cleaning for Chinese and English mixed data
+  '''
+  text = convert_full_to_half(text)
+  
+  text = re.sub(r"[^A-Za-z0-9\u4e00-\u9fa5()（）！？，,!?\'\`]", " ", text)
+  text = re.sub(r"\'s", " \'s", text)
+  text = re.sub(r"\'ve", " \'ve", text)
+  text = re.sub(r"n\'t", " n\'t", text)
+  text = re.sub(r"\'re", " \'re", text)
+  text = re.sub(r"\'d", " \'d", text)
+  text = re.sub(r"\'ll", " \'ll", text)
+  text = re.sub(r",", " , ", text)
+  text = re.sub(r"!", " ! ", text)
+  text = re.sub(r"\(", " \( ", text)
+  text = re.sub(r"\)", " \) ", text)
+  text = re.sub(r"\?", " \? ", text)
+  text = re.sub(r"\s{2,}", " ", text)
+  # clean for chinese character
+  new_string = ""
+  for char in text:
+    if re.findall(r"[\u4e00-\u9fa5]", char) != []:
+      char = " " + char + " "
+    new_string += char
+    
+  return new_string.strip().lower().replace('\ufeff', '')

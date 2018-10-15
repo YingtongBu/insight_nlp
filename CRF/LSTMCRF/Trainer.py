@@ -108,7 +108,11 @@ class Trainer(object):
     
   @staticmethod
   def translate(word_list: list, predict_seq: list, tag_list: list):
-    ret = []
+    '''
+    :param word_list: must be normalized word list.
+    :return: {"PERSON": [str1, str2], "ORG": [str1, str2]}
+    '''
+    buffer = []
     for idx, label in enumerate(predict_seq):
       if idx == len(word_list):
         break
@@ -117,11 +121,18 @@ class Trainer(object):
         continue
       
       elif label % 2 == 1:
-        ret.append([tag_list[(label + 1) // 2]])
-        ret[-1].append(word_list[idx])
+        buffer.append([tag_list[(label + 1) // 2]])
+        buffer[-1].append(word_list[idx])
         
       elif label % 2 == 0:
-        ret[-1].append(word_list[idx])
+        buffer[-1].append(word_list[idx])
+       
+    ret = defaultdict(list)
+    for match in buffer:
+      value = " ".join(match[1:])
+      if not value.isalpha():
+        value = "".join(match[1:])
+      ret[match[0]].append(value)
         
     return ret
 

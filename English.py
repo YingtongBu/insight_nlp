@@ -4,7 +4,7 @@
 
 import re
 
-def tokenize_string_english(string):
+'''def tokenize_string_english(string):
   """
   Tokenization/string cleaning for all ENGLISH datasets
   """
@@ -22,3 +22,4 @@ def tokenize_string_english(string):
   string = re.sub(r"\?", " \? ", string)
   string = re.sub(r"\s{2,}", " ", string)
   return string.strip().lower()
+  '''

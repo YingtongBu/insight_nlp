@@ -88,33 +88,3 @@ def normalize_data_file(file_name, norm_text_func):
   write_pydict_file(data, out_file_name)
   return out_file_name
   
-def normalize_text(string: str):
-  '''
-  Tokenization/string cleaning for Chinese and English mixed data
-  NOTE: you should deal with text by your special intention first, and then
-  run this function.
-  '''
-  string = Chinese.convert_full_to_half(string)
-  
-  string = re.sub(r"[^A-Za-z0-9\u4e00-\u9fa5()（）！？，,!?\'\`]", " ", string)
-  string = re.sub(r"\'s", " \'s", string)
-  string = re.sub(r"\'ve", " \'ve", string)
-  string = re.sub(r"n\'t", " n\'t", string)
-  string = re.sub(r"\'re", " \'re", string)
-  string = re.sub(r"\'d", " \'d", string)
-  string = re.sub(r"\'ll", " \'ll", string)
-  string = re.sub(r",", " , ", string)
-  string = re.sub(r"!", " ! ", string)
-  string = re.sub(r"\(", " \( ", string)
-  string = re.sub(r"\)", " \) ", string)
-  string = re.sub(r"\?", " \? ", string)
-  string = re.sub(r"\s{2,}", " ", string)
-  # clean for chinese character
-  new_string = ""
-  for char in string:
-    if re.findall(r"[\u4e00-\u9fa5]", char) != []:
-      char = " " + char + " "
-    new_string += char
-    
-  return new_string.strip().lower().replace('\ufeff', '')
-
