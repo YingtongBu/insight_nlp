@@ -12,10 +12,11 @@ from Vocabulary import *
 which would be fed in a DL model.
 '''
 
-def create_classifier_parameter(
+def create_parameter(
   train_file,
   vali_file,  # can be None
   num_classes,
+  vob_file,
   max_seq_length=64,
   epoch_num=1,
   batch_size=1024,
@@ -37,6 +38,7 @@ def create_classifier_parameter(
     "train_file": os.path.realpath(train_file),
     "vali_file": os.path.realpath(vali_file),
     "num_classes": num_classes,
+    "vob_file": vob_file,
     "max_seq_length": max_seq_length,
     "epoch_num": epoch_num,
     "batch_size": batch_size,

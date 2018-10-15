@@ -49,7 +49,7 @@ class Vocabulary:
       
     self._update_special_tokens()
     
-  def save_model(self, vob_file="vob.data"):
+  def save_model(self, vob_file):
     '''
     each line: word idx freq
     '''
@@ -59,7 +59,7 @@ class Vocabulary:
         freq = self._word2freq[word]
         print(f"{word} {idx} {freq}", file=fou)
         
-  def load_model(self, vob_file="vob.data"):
+  def load_model(self, vob_file):
     ''' The first word each line would be read.
     '''
     self._clear()
@@ -103,9 +103,9 @@ class Vocabulary:
       
     return ids
   
-def create_vocabulary(file_name, min_freq, attr_name="word_list"):
+def create_vocabulary(file_name, min_freq, vob_file, attr_name="word_list"):
   data = read_pydict_file(file_name)
   data = [sample.get(attr_name) for sample in data]
   vob = Vocabulary(None, None)
   vob.create_vob_from_data(data, min_freq)
-  vob.save_model()
+  vob.save_model(vob_file)

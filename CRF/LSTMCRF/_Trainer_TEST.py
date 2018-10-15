@@ -13,7 +13,7 @@ if __name__ == '__main__':
   train_file = os.path.join(data_path, "train.pydict")
   vali_file = os.path.join(data_path, "test.pydict")
   
-  param = create_classifier_parameter(
+  param = create_parameter(
     train_file=train_file,
     vali_file=vali_file,
     vob_file="vob.txt",
@@ -31,7 +31,7 @@ if __name__ == '__main__':
     GPU=-1,
     model_dir="model")
  
-  create_vocabulary(param["train_file"], min_freq=1)
+  create_vocabulary(param["train_file"], 1, param["vob_file"])
   
   Trainer().train(param)
   print("Training is Done")

@@ -20,7 +20,7 @@ class Trainer(object):
     os.environ["CUDA_VISIBLE_DEVICES"] = str(param["GPU"])
     
     self.vob = Vocabulary(param["remove_OOV"], param["max_seq_length"])
-    self.vob.load_model()
+    self.vob.load_model(param["vob_file"])
    
     self._create_model()
     self._sess = tf.Session()

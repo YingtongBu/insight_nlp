@@ -11,7 +11,7 @@ tags = [[pos_from, pos_to, tag_name, source_text] ... ]
 }
 '''
 
-def create_classifier_parameter(
+def create_parameter(
   train_file,
   vali_file,  # can be None
   vob_file,

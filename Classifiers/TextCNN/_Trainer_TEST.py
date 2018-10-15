@@ -17,10 +17,11 @@ if __name__ == '__main__':
   train_norm_file = normalize_data_file(train_file, normalize_text)
   vali_norm_file = normalize_data_file(vali_file, normalize_text)
 
-  param = create_classifier_parameter(
+  param = create_parameter(
     train_file=train_norm_file,
     vali_file=vali_norm_file,
     num_classes=45,
+    vob_file="vob.data",
     max_seq_length=32,
     epoch_num=5,
     batch_size=32,
@@ -35,7 +36,7 @@ if __name__ == '__main__':
     GPU=-1,
     model_dir="model")
  
-  create_vocabulary(param["train_file"], min_freq=1)
+  create_vocabulary(param["train_file"], 1, "vob.data")
   
   Trainer().train(param)
   print("Training is Done")
