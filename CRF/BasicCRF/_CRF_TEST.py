@@ -19,8 +19,9 @@ if __name__ == '__main__':
     "CRF/BasicCRF/SampleData"
   )
   
-  train_data = os.path.join(data_path, "train.pydict")
-  test_data  = os.path.join(data_path, "test.data")
+  train_data = os.path.join(data_path, "why.train.pydict")
+  # train_data = os.path.join(data_path, "train.pydict")
+  # test_data  = os.path.join(data_path, "why.test.txt")
 
   #train
   crf_trainer = CRFTrainer(model_name,
@@ -32,7 +33,10 @@ if __name__ == '__main__':
   crf_predictor = CRFPredictor(model_name, FeatureExtraction())
 
   #predict a sample
-  crf_predictor.predict('1.当事人:尉氏县第三人民医院', 'output_text.result')
+  # text = "招标人:漳州市交通建设投资开发有限公司"
+  text = "亚马逊与哪些公司有相同员工"
+  crf_predictor.predict(text, 'output_text.result')
+  print(open("output_text.result").read())
 
   #predict in batch
-  crf_predictor.predict_file(test_data, 'output_file.result')
+  # crf_predictor.predict_file(test_data, 'output_file.result')

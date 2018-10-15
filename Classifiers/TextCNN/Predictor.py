@@ -55,13 +55,13 @@ class Predictor(object):
     accuracy = correct / data.size()
     print(f"Test: '{file_name}': {accuracy:.4f}")
     
-  def predict_one_sample(self, normed_word_list: str):
+  def predict_one_sample(self, normed_word_list: list):
     '''
     :param normed_word_list:
     :return: label, probs
     '''
-    word_idx = self._vob.convert_to_word_ids(normed_word_list.split())
-    preds, accuracy, probs = self.predict([word_idx], None)
+    word_ids = self._vob.convert_to_word_ids(normed_word_list)
+    preds, accuracy, probs = self.predict([word_ids], None)
     return preds[0], probs[0]
     
   def predict(self, batch_x, batch_y):

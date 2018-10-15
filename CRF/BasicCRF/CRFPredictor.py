@@ -6,6 +6,7 @@
 
 import pycrfsuite
 from CRF.BasicCRF._DataProcessing import _DataProcessing
+from CRF.BasicCRF.FeatureExtraction import FeatureExtraction
 
 class CRFPredictor(object):
   '''

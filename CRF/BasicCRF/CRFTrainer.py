@@ -38,7 +38,8 @@ class CRFTrainer(object):
     :return: return None but generate a specific CRF model
     '''
     data_processing = _DataProcessing(self._data_file)
-    data = data_processing._process_train_data()
+    # data = data_processing._process_train_data()
+    data = data_processing.process_train_data()
     X = [self._feature_extractor._extract_features(sample) for sample in data]
     y = [data_processing._get_labels(sample) for sample in data]
     self._train(X, y)

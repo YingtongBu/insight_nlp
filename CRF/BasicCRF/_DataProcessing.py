@@ -9,7 +9,42 @@ class _DataProcessing(object):
 
   def __init__(self, data_file):
     self.data_file = data_file
-
+    
+  def _locate(self, phrase: str, words: list):
+    phrase = "".join(phrase.split())
+    for p in range(len(words)):
+      length = 1
+      while True:
+        substr = "".join(words[p: p + length])
+        if not phrase.startswith(substr):
+          break
+          
+        if phrase == substr:
+          return p, p + length
+          break
+          
+        length += 1
+        
+    print(f"words: {words}, phrase: {phrase}")
+    
+  def process_train_data(self):
+    data = read_pydict_file(self.data_file)
+    ret = []
+    
+    for d in data:
+      words, pos_tags = segment_sentence(d['text'], True)
+      sample = [[word, pt, "O"] for word, pt in zip(words, pos_tags)]
+      
+      for _, _, tag_name, value in d["tags"]:
+        f, t = self._locate(value, words)
+        sample[f][2] = f"B-{tag_name}"
+        for p in range(f + 1, t):
+          sample[p][2] = f"I-{tag_name}"
+          
+      ret.append(sample)
+      
+    return ret
+    
   def _process_train_data(self):
     '''
     preprocess training dataset
