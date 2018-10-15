@@ -2,7 +2,7 @@
 #author: Tian Xia (summer.xia1@pactera.com)
 
 from Classifiers.TextCNN.Trainer import *
-from Classifiers.TextCNN.Data import normalize_text
+from Chinese import split_and_norm_string
 from Common import *
 
 if __name__ == '__main__':
@@ -14,8 +14,8 @@ if __name__ == '__main__':
   train_file = os.path.join(data_path, "data.1.train.pydict")
   vali_file = os.path.join(data_path, "data.1.train.pydict")
   
-  train_norm_file = normalize_data_file(train_file, normalize_text)
-  vali_norm_file = normalize_data_file(vali_file, normalize_text)
+  train_norm_file = normalize_data_file(train_file, split_and_norm_string)
+  vali_norm_file = normalize_data_file(vali_file, split_and_norm_string)
 
   param = create_parameter(
     train_file=train_norm_file,

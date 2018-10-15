@@ -16,9 +16,9 @@ class Predictor(object):
     param_file = os.path.join(model_path, "param.pydict")
     self.param = read_pydict_file(param_file)[0]
 
-    self.vob = Vocabulary(self.param["remove_OOV"],
-                          self.param["max_seq_length"])
-    self.vob.load_model(self.param["vob_file"])
+    self._vob = Vocabulary(self.param["remove_OOV"],
+                           self.param["max_seq_length"])
+    self._vob.load_model(self.param["vob_file"])
 
     names = [extract_id(name) for name in os.listdir(model_path)
              if name.endswith(".index")]
@@ -33,7 +33,7 @@ class Predictor(object):
   def predict_dataset(self, file_name):
     data = DataSet(data_file=file_name,
                    num_class=self.param["num_classes"],
-                   vob=self.vob)
+                   vob=self._vob)
     data_iter = data.create_batch_iter(batch_size=self.param["batch_size"],
                                        epoch_num=1,
                                        shuffle=False)
@@ -55,9 +55,12 @@ class Predictor(object):
     accuracy = correct / data.size()
     print(f"Test: '{file_name}': {accuracy:.4f}")
     
-  def predict_text(self, text: str):
-    word_list = normalize_text(text).split()
-    word_idx = self.vob.convert_to_word_ids(word_list)
+  def predict_one_sample(self, normed_word_list: str):
+    '''
+    :param normed_word_list:
+    :return: label, probs
+    '''
+    word_idx = self._vob.convert_to_word_ids(normed_word_list.split())
     preds, accuracy, probs = self.predict([word_idx], None)
     return preds[0], probs[0]
     
@@ -68,7 +71,7 @@ class Predictor(object):
     self._model = _Model(
       max_seq_length=self.param["max_seq_length"],
       num_classes=self.param["num_classes"],
-      vob_size=self.vob.size(),
+      vob_size=self._vob.size(),
       embedding_size=self.param["embedding_size"],
       kernels=self.param["kernels"],
       filter_num=self.param["filter_num"],

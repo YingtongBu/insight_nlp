@@ -75,14 +75,14 @@ class DataSet:
     return create_batch_iter_helper(self._data_name, self._data, batch_size,
                                     epoch_num, shuffle)
 
-def normalize_data_file(file_name, norm_text_func):
+def normalize_data_file(file_name, split_and_norm_text_func):
   '''
   :return: normalized file name
   '''
   data = read_pydict_file(file_name)
   for sample in data:
     text  = sample["text"]
-    sample["word_list"] = norm_text_func(text).split()
+    sample["word_list"] = split_and_norm_text_func(text)
   
   out_file_name = file_name.replace(".pydict", ".norm.pydict")
   write_pydict_file(data, out_file_name)

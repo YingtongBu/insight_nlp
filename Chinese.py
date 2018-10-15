@@ -34,6 +34,7 @@ def segment_sentence(text, pos_tagging=False):
 def split_and_norm_string(text: str):
   '''
   Tokenization/string cleaning for Chinese and English mixed data
+  :return: a list
   '''
   text = convert_full_to_half(text)
   
@@ -57,4 +58,4 @@ def split_and_norm_string(text: str):
       char = " " + char + " "
     new_string += char
     
-  return new_string.strip().lower().replace('\ufeff', '')
+  return new_string.strip().lower().replace('\ufeff', '').split()
