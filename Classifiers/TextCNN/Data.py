@@ -2,6 +2,7 @@
 #author: Tian Xia (summer.xia1@pactera.com)
 
 from Vocabulary import *
+import Chinese
 
 '''The format of data is defined as
 1. each line is a python dict string, denoting a sample dict.
@@ -81,6 +82,7 @@ def normalize_data_file(file_name, norm_text_func):
   data = read_pydict_file(file_name)
   for sample in data:
     text  = sample["text"]
+    text = Chinese.convert_full_to_half(text)
     sample["word_list"] = norm_text_func(text).split()
   
   out_file_name = file_name.replace(".pydict", ".norm.pydict")
