@@ -17,7 +17,7 @@ class Predictor(object):
     
     self.vob = Vocabulary(self.param["remove_OOV"],
                           self.param["max_seq_length"])
-    self.vob.load_model()
+    self.vob.load_model(self.param["vob_file"])
 
     names = [extract_id(name) for name in os.listdir(model_path)
              if name.endswith(".index")]

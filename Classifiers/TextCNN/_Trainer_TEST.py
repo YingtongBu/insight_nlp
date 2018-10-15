@@ -36,7 +36,7 @@ if __name__ == '__main__':
     GPU=-1,
     model_dir="model")
  
-  create_vocabulary(param["train_file"], 1, "vob.data")
+  create_vocabulary(param["train_file"], 1, param["vob_file"])
   
   Trainer().train(param)
   print("Training is Done")
