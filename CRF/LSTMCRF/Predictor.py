@@ -22,12 +22,17 @@ class Predictor(object):
     names = [extract_id(name) for name in os.listdir(model_path)
              if name.endswith(".index")]
     best_iter = max(names)
-
-    self._sess = tf.Session()
     model_prefix = f"{model_path}/iter-{best_iter}"
     print(f"loading model: '{model_prefix}'")
-    saver = tf.train.import_meta_graph(f"{model_prefix}.meta")
-    saver.restore(self._sess, f"{model_prefix}")
+    
+    graph = tf.Graph()
+    with graph.as_default():
+      saver = tf.train.import_meta_graph(f"{model_prefix}.meta")
+
+    self._sess = tf.Session(graph=graph)
+    with self._sess.as_default():
+      with graph.as_default():
+        saver.restore(self._sess, f"{model_prefix}")
     
   def translate(self, word_list: list, predict_seq: list):
     return Trainer.translate(word_list, predict_seq, self.param["tag_list"])
