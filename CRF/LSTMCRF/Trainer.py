@@ -130,7 +130,7 @@ class Trainer(object):
     ret = defaultdict(list)
     for match in buffer:
       value = " ".join(match[1:])
-      if not value.isalpha():
+      if not value.replace(" ", "").isalpha():
         value = "".join(match[1:])
       ret[match[0]].append(value)
         
