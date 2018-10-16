@@ -6,6 +6,23 @@ from Common import *
 import jieba
 import jieba.posseg as pseg
 
+def join_Ch_and_En(ch_list: list):
+  '''
+  :param ch_list: ["我", "爱", "American", "English", "的", "感", "觉"]
+  :return: "我爱American English的感觉"
+  '''
+  if len(ch_list) <= 1:
+    return "".join(ch_list)
+  
+  ret = ch_list[0]
+  for ch in ch_list[1:]:
+    if ord(ret[-1]) < 128 and ord(ch[0]) < 128:
+      ret += " " + ch
+    else:
+      ret += ch
+      
+  return ret
+
 def convert_full_to_half(s):
   '''全角转半角'''
   n = []

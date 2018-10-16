@@ -17,3 +17,5 @@ if __name__ == "__main__":
   sq = convert_full_to_half(s)
   for ch in sq:
     print(f"char='{ch}', ord={ord(ch)}")
+    
+  print(join_Ch_and_En(["我", "爱", "American", "English", "的", "感", "觉"]))

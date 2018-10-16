@@ -11,6 +11,7 @@
 from Tensorflow import *
 from CRF.LSTMCRF._Model import _Model
 from CRF.LSTMCRF.Data import *
+import Chinese
 
 class Trainer(object):
   def train(self, param):
@@ -129,11 +130,8 @@ class Trainer(object):
        
     ret = defaultdict(list)
     for match in buffer:
-      value = " ".join(match[1:])
-      if not value.replace(" ", "").isalpha():
-        value = "".join(match[1:])
-      ret[match[0]].append(value)
-        
+      ret[match[0]].append(Chinese.join_Ch_and_En(match[1:]))
+      
     return ret
 
   @staticmethod

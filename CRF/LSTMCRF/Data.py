@@ -63,14 +63,30 @@ class DataSet:
     vob.remove_OOV = False
     self._data = [self._gen_label(sample, vob) for sample in samples]
     self._data_name = os.path.basename(data_file)
+   
+  def _locate(self, phrase: str, words: list):
+    phrase = "".join(phrase.split())
+    for p in range(len(words)):
+      length = 1
+      while True:
+        substr = "".join(words[p: p + length])
+        if not phrase.startswith(substr):
+          break
+          
+        if phrase == substr:
+          return p, p + length
+          
+        length += 1
+        
+    print(f"ERR: phrase: '{phrase}', not in '{words}'")
+    assert False
     
   def _gen_label(self, sample, vob: Vocabulary):
     word_list = sample["word_list"]
     word_ids = vob.convert_to_word_ids(word_list)
     labels = [0] * len(word_ids)
-    for pos_from, pos_to, tag_name, src_text in sample["tags"]:
-      #todo: to fix
-      # assert " ".join(word_list[pos_from: pos_to]).lower() == src_text.lower()
+    for tag_name, src_text in sample["tags"]:
+      pos_from, pos_to = self._locate(src_text.lower(), word_list)
       for pos in range(pos_from, min(vob.output_length, pos_to)):
         if pos == pos_from:
           labels[pos] = self._tag_list.index(tag_name) * 2 - 1
