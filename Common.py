@@ -33,6 +33,14 @@ import time
 INF         = float("inf")
 EPSILON     = 1e-6
 
+def ensure_folder_exists(folder: str):
+  if not os.path.exists(folder):
+    os.system(f"mkdir {folder}")
+  
+  elif os.path.isfile(folder):
+    print(f"WARN: The folder '{folder} to make preexists as a file.'")
+    os.system(f"rm {fold}; mkdir {folder}")
+    
 def split_to_sublist(data):
   '''
   :param data: [[a1, b1, ...], [a2, b2, ...], ...]
