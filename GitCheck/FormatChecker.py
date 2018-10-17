@@ -64,11 +64,21 @@ class FormatChecker:
         self.error += 1
         return
       
-      name = name.replace("_TEST.py", ".py")
+    if "_RUN.py" in name:
+      if not name.startswith("_"):
+        print("Error! run脚本的文件名以_作为前缀，例如_FileName_RUN.py")
+        self.error += 1
+        return
       
+    name = name.replace("_TEST.py", ".py")
+    name = name.replace("_RUN.py", ".py")
+    
     if name.startswith("_"):
       name = name[1:]
       
+    # OK for "Model_001_02.py"
+    name = re.sub(r"_[\d]+(?=[._])", "", name)
+    
     if name[0].islower() or name.isupper() or '_' in name:
       print("Error! 文件名称采用类命名形式，例如FileName.py")
       self.error += 1
@@ -128,10 +138,17 @@ class FormatChecker:
 
   def _rule_analyze_class_name(self, lnNum, ln):
     if ln.strip().startswith("class "):
-      toks = ln.split()
-      class_name = toks[toks.index("class") + 1]
+      class_name = re.findall(r"class\s+([^(]+)", ln)[0].strip()
+      
+      # ln = ln[: ln.find("(")]
+      # toks = ln.split()
+      # class_name = toks[toks.index("class") + 1]
+      
       if class_name.startswith("_"):
         class_name = class_name[1:]
+        
+      class_name = re.sub(r"_[\d]+", "", class_name)
+      
       if class_name[0].islower() or "_" in class_name or class_name.isupper():
         print(f"Error! line:{lnNum} 类命名每个单词首字母大写，中间不加下划线。")
         self.error += 1
