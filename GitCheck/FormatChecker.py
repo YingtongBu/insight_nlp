@@ -60,13 +60,13 @@ class FormatChecker:
       return
     if "_TEST.py" in name:
       if not name.startswith("_"):
-        print("Error! 测试脚本的文件名以_作为前缀，例如_FileName_TEST.py")
+        print("Error! 测试脚本的文件名MUST以'_'作为前缀，例如'_FileName_TEST.py'")
         self.error += 1
         return
       
     if "_RUN.py" in name:
-      if not name.startswith("_"):
-        print("Error! run脚本的文件名以_作为前缀，例如_FileName_RUN.py")
+      if name.startswith("_"):
+        print("Error! run脚本的文件名do NOT以_作为前缀，例如'FileName_RUN.py'")
         self.error += 1
         return
       
