@@ -19,8 +19,7 @@ if __name__ == '__main__':
   parser.add_option('-a', '--audio_file',
                     default='company')
   (options, args) = parser.parse_args()
-  SpeechRecognition.listen_and_recognize(options.device_index,
-                                         options.phrase_time_limit,
+  SpeechRecognition.listen_and_recognize(
                                          options.timeout,
                                          options.language)
   # for i in range(100):

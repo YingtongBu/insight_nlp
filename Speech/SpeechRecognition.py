@@ -18,8 +18,7 @@ def audio_file_recognize(audio_file,
     audio = r.record(source)
     print(r.recognize_google(audio, language=language_selection))
 
-def listen_and_recognize(input_device_index, time_limit, 
-                         time_out, language_selection):
+def listen_and_recognize(time_out, language_selection):
   '''
   :param input_device_index: assigned index for the specific input device
   :param time_limit: set min time for the listening time
@@ -28,10 +27,11 @@ def listen_and_recognize(input_device_index, time_limit,
   :return: print recognized audio content
   '''
   r = sr.Recognizer()
-  mic = sr.Microphone(device_index=input_device_index)
+  mic = sr.Microphone()
   with mic as source:
+    print("Say something!")
     r.adjust_for_ambient_noise(source)
-    audio = r.listen(source, phrase_time_limit=time_limit, timeout=time_out)
+    audio = r.listen(source, timeout=time_out)
   try:
     print(r.recognize_google(audio, show_all=True, language=language_selection))
   except:
