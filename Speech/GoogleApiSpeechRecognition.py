@@ -10,8 +10,12 @@ from google.cloud import speech
 from google.cloud.speech import enums
 from google.cloud.speech import types
 
+'''
+Google Speech Api:支持的语音格式为FLAC或WAV或SPEEX
+'''
 document_path = common.get_module_path("Speech.SpeechRecognition")
-credential_path = os.path.join(document_path,"Speech/SRProject-088b9b20625c.json")
+credential_path = os.path.join(document_path,
+                               "Speech/SRProject-088b9b20625c.json")
 print(credential_path)
 os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = credential_path
 def audio_recognition(file_name, language='en-US'):
