@@ -11,6 +11,9 @@ def audio_file_recognize(audio_file,
   :param audio_file: audio file to be recognized
   :param language_selection: selected language code
   :return: print recognized audio content
+  :支持的文件格式:SpeechRecognition 目前支持的文件类型有：
+    WAV: 必须是 PCM/LPCM 格式, AIFF, AIFF-C
+    FLAC: 必须是初始 FLAC 格式；OGG-FLAC 格式不可用
   '''
   r = sr.Recognizer()
   stock_audio = sr.AudioFile(audio_file)
