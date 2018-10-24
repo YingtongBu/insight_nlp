@@ -89,7 +89,7 @@ class DataSet:
     word_list = sample["word_list"]
     word_ids = vob.convert_to_word_ids(word_list)
     labels = [0] * len(word_ids)
-    for tag_name, src_text in sample["tags"]:
+    for tag_name, src_text in sample["tags"].items():
       for pos_from, pos_to in self._locate(src_text.lower(), word_list):
         for pos in range(pos_from, min(vob.output_length, pos_to)):
           if pos == pos_from:
