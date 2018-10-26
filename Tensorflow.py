@@ -3,6 +3,16 @@
 
 import tensorflow as tf
 
+activations = tf.keras.activations
+estimator = tf.estimator
+layers = tf.layers
+losses = tf.losses
+nn = tf.nn
+rnn_cell = tf.nn.rnn_cell
+
+init1 = tf.truncated_normal_initializer(stddev=0.1)
+init2 = tf.random_uniform_initializer(-1, 1)
+
 def linear_layer(input, output_size, scope=None):
     '''
     Linear map: output[k] = sum_i(Matrix[k, i] * input_[i] ) + Bias[k]
@@ -145,3 +155,21 @@ def create_bi_LSTM(word_ids, vob_size, embedding_size, LSTM_layer_num,
   
   outputs = [tf.concat(o, axis=1) for o in zip(outputs1, outputs2)]
   return outputs
+
+def basic_attention(status: list):
+  '''
+  :param status, a tensor with shape [?, status-number, hidden-unit]
+  '''
+  hidden_unit = status.shape.as_list()[2]
+  context = tf.Variable(tf.random_uniform([hidden_unit], -1., 1),
+                        dtype=tf.float32)
+  scores = tf.reduce_sum(status * context, 2)
+  probs = tf.keras.activations.softmax(scores)
+
+  status = tf.transpose(status, [0, 2, 1])
+  probs = tf.expand_dims(probs, 2)
+  weighted_out = tf.matmul(status, probs)
+  weighted_out = tf.squeeze(weighted_out, 2)
+
+  return weighted_out
+
