@@ -10,7 +10,7 @@ if __name__ == '__main__':
     "CRF/LSTMCRF/SampleData"
   )
 
-  model_path = os.path.join(data_path, "../model")
+  model_path = "model"
   predictor = Predictor(model_path)
 
   train_file = os.path.join(data_path, "train.pydict")
