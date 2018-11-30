@@ -103,27 +103,25 @@ def write_pydict_file(data: list, file_name):
         print(f"ERR: in write_pydict_file: not '\\n' is allowed: '{obj_str}'")
       print(obj, file=fou)
 
+def get_extension(short_name):
+  toks = short_name.split(".")
+  return short_name if len(toks) == 1 else toks[-1]
+
 def get_files_in_folder(data_path, file_exts=None, resursive=False):
   '''
-    do NOT set fileExt=html, as in some rare cases, all data files do not have
-    an file extension.
+  file_exts: should be a set, or None
     return: an iterator, [fullFilePath]
   '''
-  def get_extension(short_name):
-    toks = short_name.split(".")
-    return short_name if len(toks) == 1 else toks[-1]
-  
-  for path, folders, files in os.walk(data_path):
+  def legal_file(short_name):
+    if short_name.startswith("."):
+      return False
+    ext = get_extension(short_name)
+    return is_none_or_empty(file_exts) or ext in file_exts
+
+  for path, folders, files in os.walk(data_path, resursive):
     for short_name in files:
-      if short_name.startswith("."):
-        continue
-      ext = get_extension(short_name)
-      if not is_none_or_empty(file_exts) and ext not in file_exts:
-        continue
-      
-      yield os.path.realpath(os.path.join(path, short_name))
-      if not resursive:
-        break
+      if legal_file(short_name):
+        yield os.path.realpath(os.path.join(path, short_name))
 
 def create_list(shape: list, value=None):
   assert len(shape) > 0
