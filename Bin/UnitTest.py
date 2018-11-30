@@ -48,8 +48,7 @@ def get_testing_files(cwd, args):
     yield from file_names
 
 def execute_testing_file(cwd: str, full_file_name: str):
-  title = ">" * 32 + f"Testing {full_file_name}" +  ">" * 32
-  print(title)
+  print(">" * 32, f"Testing {full_file_name}")
   os.chdir("/tmp")
   execute_cmd(f"cp {full_file_name} .")
 
@@ -57,7 +56,7 @@ def execute_testing_file(cwd: str, full_file_name: str):
   code = execute_cmd(f"python3 {short_file_name}")
 
   os.chdir(cwd)
-  print("<" * len(title), "\n")
+  print("<" * 32, "[fail]" if code != 0 else "[OK]", full_file_name, "\n")
 
   return code
 
