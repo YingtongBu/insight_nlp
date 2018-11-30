@@ -4,6 +4,9 @@
 
 import Speech.SpeechRecognition as SpeechRecognition
 import optparse
+
+#code review: testing file should have not input. 
+#you could set default input.
 if __name__ == '__main__':
   usage = "usage: %prog [options]"
   parser = optparse.OptionParser(usage=usage)

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 #coding: utf8
 #author: Xinlu Yu (xinlu.yu1@pactera.com)
 
