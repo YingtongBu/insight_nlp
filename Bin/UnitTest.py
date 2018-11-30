@@ -45,7 +45,7 @@ def get_testing_files(cwd, args):
       print("\n".join(buff))
       exit(1)
 
-    yield from file_names
+    yield from list_files
 
 def execute_testing_file(cwd: str, full_file_name: str):
   print(">" * 32, f"Testing {full_file_name}")
