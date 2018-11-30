@@ -109,7 +109,7 @@ def get_extension(short_name):
 
 def get_files_in_folder(data_path, file_exts=None, resursive=False):
   '''
-  file_exts: should be a set, or None
+    file_exts: should be a set, or None
     return: an iterator, [fullFilePath]
   '''
   def legal_file(short_name):
@@ -117,6 +117,10 @@ def get_files_in_folder(data_path, file_exts=None, resursive=False):
       return False
     ext = get_extension(short_name)
     return is_none_or_empty(file_exts) or ext in file_exts
+
+  if file_exts is not None:
+    assert isinstance(file_exts, (list, dict))
+    file_exts = set(file_exts)
 
   for path, folders, files in os.walk(data_path, resursive):
     for short_name in files:
@@ -153,6 +157,7 @@ def execute_cmd(cmd):
   date = time.strftime('%x %X')
   print(f"{date} [{status}] executing '{cmd}'")
   sys.stdout.flush()
+  return ret
 
 def to_utf8(line):
   if type(line) is str:
