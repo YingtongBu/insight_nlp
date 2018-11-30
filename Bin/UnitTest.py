@@ -49,9 +49,11 @@ def get_testing_files(cwd, args):
 
 def execute_testing_file(cwd: str, full_file_name: str):
   print(">" * 32, f"Testing {full_file_name}")
-  os.chdir("/tmp")
-  execute_cmd(f"cp {full_file_name} .")
+  folder = f"/tmp/{os.getlogin()}"
+  ensure_folder_exists(folder)
+  os.chdir(folder)
 
+  execute_cmd(f"cp {full_file_name} .")
   short_file_name = os.path.basename(full_file_name)
   code = execute_cmd(f"python3 {short_file_name}")
 
