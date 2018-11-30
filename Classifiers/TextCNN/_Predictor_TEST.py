@@ -15,7 +15,7 @@ if __name__ == '__main__':
   test_file = os.path.join(data_path, "data.1.test.pydict")
   test_norm_file = normalize_data_file(test_file, split_and_norm_string)
   
-  model_path = "model")
+  model_path = "model"
 
   predictor = Predictor(model_path)
   predictor.predict_dataset(test_norm_file)
