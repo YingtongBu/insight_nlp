@@ -13,15 +13,43 @@ def get_testing_files(cwd, args):
       yield os.path.join(cwd, short_file)
 
   else:
+    file_names = []
     for file_name in get_files_in_folder(".", ["py"], True):
       if file_name.endswith("TEST.py"):
         base_name = os.path.basename(file_name)
         if not base_name.startswith("_"):
           assert False, f"Wrong file name: {file_name}"
 
-        yield file_name
+        file_names.append(file_name)
+
+    unit_list_file = "UnitTestList.data"
+    if not os.path.exists(unit_list_file):
+      print(f"You should set '{unit_list_file}' file, and put all scripts to "
+            f"test into this file")
+      exit(1)
+
+    list_files = [os.path.realpath(name) for name in
+                  open(unit_list_file).read().split()]
+
+    set1 = set(file_names)
+    set2 = set(list_files)
+    buff = set1 - set2
+    if len(buff) > 0:
+      print(f"You missed {len(buff)} files!")
+      print("\n".join(buff))
+      exit(1)
+
+    buff = set2 - set1
+    if len(buff) > 0:
+      print(f"You have extra {len(buff)} files!")
+      print("\n".join(buff))
+      exit(1)
+
+    yield from file_names
 
 def execute_testing_file(cwd: str, full_file_name: str):
+  title = ">" * 32 + f"Testing {full_file_name}" +  ">" * 32
+  print(title)
   os.chdir("/tmp")
   execute_cmd(f"cp {full_file_name} .")
 
@@ -29,6 +57,8 @@ def execute_testing_file(cwd: str, full_file_name: str):
   code = execute_cmd(f"python3 {short_file_name}")
 
   os.chdir(cwd)
+  print("<" * len(title), "\n")
+
   return code
 
 def main():
