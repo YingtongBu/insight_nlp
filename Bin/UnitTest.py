@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #coding: utf8
 #author: Tian Xia (summer.xia1@pactera.com)
 
@@ -32,22 +32,27 @@ def execute_testing_file(cwd: str, full_file_name: str):
   return code
 
 def main():
-  os.system("clear")
-
   parser = optparse.OptionParser(usage="cmd [optons] [file1.py file2.py ...]")
   #parser.add_option("-q", "--quiet", action="store_true", dest="verbose",
                      #default=False, help="")
+  parser.add_option("--show", action="store_true",
+                    help="show all scripts to test")
   (options, args) = parser.parse_args()
 
   cwd = os.getcwd()
   error_testings = []
   all_testing_files = list(get_testing_files(cwd, args))
+  print(f"There are {len(all_testing_files)} testing files.")
+
+  if options.show:
+    print("\n".join(all_testing_files))
+    return
+
   for full_file_name in all_testing_files:
     code = execute_testing_file(cwd, full_file_name)
     if code != 0:
       error_testings.append(full_file_name)
 
-  print(f"There are {len(all_testing_files)} testing files.")
   print(f"{len(error_testings)} testing fail!")
   print("\n".join(error_testings))
 
