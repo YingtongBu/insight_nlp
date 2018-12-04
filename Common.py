@@ -30,11 +30,12 @@ import scipy
 import struct
 import sys
 import time
+import typing
 
 INF         = float("inf")
 EPSILON     = 1e-6
 
-def ensure_folder_exists(folder: str):
+def ensure_folder_exists(folder: str)-> None:
   if not os.path.exists(folder):
     os.system(f"mkdir {folder}")
   
@@ -42,7 +43,7 @@ def ensure_folder_exists(folder: str):
     print(f"WARN: The folder '{folder} to make preexists as a file.'")
     os.system(f"rm {fold}; mkdir {folder}")
     
-def split_to_sublist(data):
+def split_to_sublist(data)-> list:
   '''
   :param data: [[a1, b1, ...], [a2, b2, ...], ...]
   :return: [a1, a2, ...], [b1, b2, ...]
@@ -58,7 +59,7 @@ def split_to_sublist(data):
   
   return result
   
-def get_module_path(module_name):
+def get_module_path(module_name)-> str:
   '''
   e.g., get_module_path("NLP.translation.Translate")
   '''
@@ -74,7 +75,7 @@ def get_module_path(module_name):
   
   return None
 
-def norm_regex(regexExpr):
+def norm_regex(regexExpr)-> str:
   return regexExpr\
     .replace("*", "\*")\
     .replace("+", "\+")\
@@ -84,7 +85,7 @@ def norm_regex(regexExpr):
     .replace("{", "\{").replace("}", "\}")\
     .replace(".", "\.")
 
-def read_pydict_file(file_name):
+def read_pydict_file(file_name)-> list:
   assert file_name.endswith(".pydict")
   data = []
   for idx, ln in enumerate(open(file_name)):
@@ -96,7 +97,7 @@ def read_pydict_file(file_name):
       
   return data
 
-def write_pydict_file(data: list, file_name):
+def write_pydict_file(data: list, file_name)-> None:
   with open(file_name, "w") as fou:
     for obj in data:
       obj_str = str(obj)
@@ -104,7 +105,7 @@ def write_pydict_file(data: list, file_name):
         print(f"ERR: in write_pydict_file: not '\\n' is allowed: '{obj_str}'")
       print(obj, file=fou)
 
-def get_extension(short_name):
+def get_extension(short_name)-> str:
   toks = short_name.split(".")
   return short_name if len(toks) == 1 else toks[-1]
 
@@ -144,7 +145,7 @@ def split_by(data, func):
       data2.append(d)
   return data1, data2
 
-def is_none_or_empty(data):
+def is_none_or_empty(data)-> bool:
   '''This applies to any data type which has a __len__ method'''
   if data is None:
     return True
@@ -152,7 +153,7 @@ def is_none_or_empty(data):
     return len(data) == 0
   return False
 
-def execute_cmd(cmd):
+def execute_cmd(cmd)-> int:
   ret = os.system(cmd)
   status = "OK" if ret == 0 else "fail"
   date = time.strftime('%x %X')
@@ -160,7 +161,7 @@ def execute_cmd(cmd):
   sys.stdout.flush()
   return ret
 
-def to_utf8(line):
+def to_utf8(line)-> str:
   if type(line) is str:
     try:
       return line.encode("utf8")
