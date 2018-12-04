@@ -11,4 +11,5 @@ if __name__ == '__main__':
     common.get_module_path("Common"),
     "Speech/audio.wav"
   )
-  SpeechRecognition.audio_file_recognize(data_path, language="Zh-cn")
+  SpeechRecognition.audio_file_recognize(data_path,
+                                         language_selection="Zh-cn")
