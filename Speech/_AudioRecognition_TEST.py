@@ -3,17 +3,12 @@
 #author: Xinlu Yu (xinlu.yu1@pactera.com)
 
 import Speech.SpeechRecognition as SpeechRecognition
-import optparse
+import Common as common
+import os
 
-#code review: testing file should have not input. 
-#you could set default input.
 if __name__ == '__main__':
-  usage = "usage: %prog [options]"
-  parser = optparse.OptionParser(usage=usage)
-  parser.add_option('-a', '--audio_file',
-                    default='company')
-  parser.add_option('-l', '--language',
-                    default='cmn-Hans-CN')
-  (options, args) = parser.parse_args()
-  SpeechRecognition.audio_file_recognize(options.audio_file,
-                                         options.language)
+  data_path = os.path.join(
+    common.get_module_path("Common"),
+    "Speech/audio.wav"
+  )
+  SpeechRecognition.audio_file_recognize(data_path, language="Zh-cn")
