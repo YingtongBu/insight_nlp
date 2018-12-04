@@ -7,7 +7,7 @@ from crf.lstm_crf.Data import *
 if __name__ == '__main__':
   data_path = os.path.join(
     get_module_path("Common"),
-    "crf/lstm_crf/SampleData"
+    "crf/lstm_crf/test_data"
   )
   
   train_file = os.path.join(data_path, "train.pydict")

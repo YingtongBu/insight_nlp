@@ -7,7 +7,7 @@ from Common import *
 if __name__ == '__main__':
   data_path = os.path.join(
     get_module_path("Common"),
-    "crf/lstm_crf/SampleData"
+    "crf/lstm_crf/test_data"
   )
 
   model_path = "model"

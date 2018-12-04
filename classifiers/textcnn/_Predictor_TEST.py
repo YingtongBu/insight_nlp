@@ -9,7 +9,7 @@ from Chinese import split_and_norm_string
 if __name__ == '__main__':
   data_path = os.path.join(
     get_module_path("Common"),
-    "classifiers/textcnn/SampleData"
+    "classifiers/textcnn/test_data"
   )
 
   test_file = os.path.join(data_path, "data.1.test.pydict")
