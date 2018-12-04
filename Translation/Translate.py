@@ -9,8 +9,8 @@ import os
 import Common as common
 
 os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = \
-  common.get_module_path("Insight_NLP.Translation.Translate") + \
-  "/Insight_NLP/Translation/ZSProject-94cb8e930aab.json"
+  common.get_module_path("Common") + \
+  "/Translation/ZSProject-94cb8e930aab.json"
 
 def translate_sentence(text, target='Zh-cn'):
   # Imports the Google Cloud client library
