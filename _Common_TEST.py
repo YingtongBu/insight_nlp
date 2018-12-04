@@ -21,7 +21,7 @@ if __name__ == "__main__":
   data[0][0][0] = 1
   print(data)
   
-  print(get_module_path("NLP.Translation.Translate"))
+  print(get_module_path("NLP.translation.Translate"))
   
   path = "."
   for full_name in get_files_in_folder(path, ["py"], True):

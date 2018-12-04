@@ -1,15 +1,15 @@
 #coding: utf8
 #author: Tian Xia (summer.xia1@pactera.com)
 
-from Classifiers.TextCNN.Predictor import Predictor
+from classifiers.textcnn.Predictor import Predictor
 from Common import *
-from Classifiers.TextCNN.Data import normalize_data_file
+from classifiers.textcnn.Data import normalize_data_file
 from Chinese import split_and_norm_string
 
 if __name__ == '__main__':
   data_path = os.path.join(
     get_module_path("Common"),
-    "Classifiers/TextCNN/SampleData"
+    "classifiers/textcnn/SampleData"
   )
 
   test_file = os.path.join(data_path, "data.1.test.pydict")

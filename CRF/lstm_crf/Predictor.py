@@ -2,8 +2,8 @@
 #author: Tian Xia (summer.xia1@pactera.com)
 
 from Tensorflow import *
-from CRF.LSTMCRF.Data import *
-from CRF.LSTMCRF.Trainer import Trainer
+from crf.lstm_crf.Data import *
+from crf.lstm_crf.Trainer import Trainer
 
 class Predictor(object):
   def __init__(self, model_path):

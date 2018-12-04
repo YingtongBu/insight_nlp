@@ -1,7 +1,7 @@
 #coding: utf8
 #author: Yu Liu (yu.liu55@pactera.com)
 
-from Web.SearchEngine import SearchEngine
+from web.SearchEngine import SearchEngine
 
 if __name__ == '__main__':
   searcher = SearchEngine()

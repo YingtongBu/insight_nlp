@@ -2,7 +2,7 @@
 #coding: utf8
 #author: Xinlu Yu (xinlu.yu1@pactera.com)
 
-from Web.NewsScraper import NewsScraper
+from web.NewsScraper import NewsScraper
 
 if __name__ == '__main__':
   news = NewsScraper(

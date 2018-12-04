@@ -3,7 +3,7 @@
 #author: Tian Xia (summer.xia1@pactera.com)
 
 from Common import *
-from GitCheck.FormatChecker import *
+from git_check.FormatChecker import *
 
 USER_WHITE_LIST = set(["summer"])
 

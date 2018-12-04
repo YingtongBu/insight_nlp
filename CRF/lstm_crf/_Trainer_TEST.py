@@ -1,13 +1,13 @@
 #coding: utf8
 #author: Tian Xia (summer.xia1@pactera.com)
 
-from CRF.LSTMCRF.Trainer import *
-from CRF.LSTMCRF.Data import *
+from crf.lstm_crf.Trainer import *
+from crf.lstm_crf.Data import *
 
 if __name__ == '__main__':
   data_path = os.path.join(
     get_module_path("Common"),
-    "CRF/LSTMCRF/SampleData"
+    "crf/lstm_crf/SampleData"
   )
   
   train_file = os.path.join(data_path, "train.pydict")

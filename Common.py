@@ -6,6 +6,7 @@ from operator import methodcaller, attrgetter, itemgetter, add
 from optparse import OptionParser
 from scipy import array
 
+import abc
 import bisect
 import collections
 import copy
@@ -59,7 +60,7 @@ def split_to_sublist(data):
   
 def get_module_path(module_name):
   '''
-  e.g., get_module_path("NLP.Translation.Translate")
+  e.g., get_module_path("NLP.translation.Translate")
   '''
   module_name = module_name.replace(".", "/") + ".py"
   for path in sys.path:

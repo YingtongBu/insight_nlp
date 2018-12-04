@@ -1,14 +1,14 @@
 #coding: utf8
 #author: Tian Xia (summer.xia1@pactera.com)
 
-from Classifiers.TextCNN.Trainer import *
+from classifiers.textcnn.Trainer import *
 from Chinese import split_and_norm_string
 from Common import *
 
 if __name__ == '__main__':
   data_path = os.path.join(
     get_module_path("Common"),
-    "Classifiers/TextCNN/SampleData"
+    "classifiers/textcnn/SampleData"
   )
 
   train_file = os.path.join(data_path, "data.1.train.pydict")

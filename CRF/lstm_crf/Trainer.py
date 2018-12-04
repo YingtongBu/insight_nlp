@@ -9,8 +9,8 @@
 '''
 
 from Tensorflow import *
-from CRF.LSTMCRF._Model import _Model
-from CRF.LSTMCRF.Data import *
+from crf.lstm_crf._Model import _Model
+from crf.lstm_crf.Data import *
 import Chinese
 
 class Trainer(object):

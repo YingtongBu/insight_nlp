@@ -1,13 +1,13 @@
 #coding: utf8
 #author: Tian Xia (summer.xia1@pactera.com)
 
-from CRF.LSTMCRF.Predictor import *
+from crf.lstm_crf.Predictor import *
 from Common import *
 
 if __name__ == '__main__':
   data_path = os.path.join(
     get_module_path("Common"),
-    "CRF/LSTMCRF/SampleData"
+    "crf/lstm_crf/SampleData"
   )
 
   model_path = "model"

@@ -2,9 +2,9 @@
 #author: Tian Xia (summer.xia1@pactera.com)
 
 from Tensorflow import *
-from Classifiers.TextCNN._Model import _Model
-from Classifiers.TextCNN.Data import *
-from Classifiers.TextCNN.Trainer import Trainer
+from classifiers.textcnn._Model import _Model
+from classifiers.textcnn.Data import *
+from classifiers.textcnn.Trainer import Trainer
 
 class Predictor(object):
   def __init__(self, model_path):

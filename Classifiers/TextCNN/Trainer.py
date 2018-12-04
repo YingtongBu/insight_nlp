@@ -2,8 +2,8 @@
 #author: Tian Xia (summer.xia1@pactera.com)
 
 from Tensorflow import *
-from Classifiers.TextCNN._Model import _Model
-from Classifiers.TextCNN.Data import *
+from classifiers.textcnn._Model import _Model
+from classifiers.textcnn.Data import *
 
 class Trainer(object):
   def train(self, param):
