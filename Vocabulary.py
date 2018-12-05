@@ -5,10 +5,10 @@ from Common import *
 
 '''This class has added two special tokens, <empty> and <oov> by default.
 '''
-EMPTY_TOKEN = "<empty>"
-OOV_TOKEN   = "<oov>"
-
 class Vocabulary:
+  EMPTY_TOKEN = "<empty>"
+  OOV_TOKEN   = "<oov>"
+
   def __init__(self, remove_OOV: bool, output_length: int):
     '''
     :param remove_OOV:
@@ -19,10 +19,10 @@ class Vocabulary:
     self._clear()
     
   def _update_special_tokens(self):
-    self.add_word(EMPTY_TOKEN)
-    self.add_word(OOV_TOKEN)
-    self.id_EMPTY_TOKEN = self.get_word_id(EMPTY_TOKEN)
-    self.id_OOV_TOKEN = self.get_word_id(OOV_TOKEN)
+    self.add_word(self.EMPTY_TOKEN)
+    self.add_word(self.OOV_TOKEN)
+    self.id_EMPTY_TOKEN = self.get_word_id(self.EMPTY_TOKEN)
+    self.id_OOV_TOKEN = self.get_word_id(self.OOV_TOKEN)
     
   def _clear(self):
     self._word2freq = defaultdict(int)

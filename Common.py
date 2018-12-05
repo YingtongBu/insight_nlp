@@ -61,6 +61,7 @@ def split_to_sublist(data)-> list:
   
 def get_module_path(module_name)-> str:
   '''
+  This applys for use-defined moudules.
   e.g., get_module_path("NLP.translation.Translate")
   '''
   module_name = module_name.replace(".", "/") + ".py"
@@ -105,11 +106,11 @@ def write_pydict_file(data: list, file_name)-> None:
         print(f"ERR: in write_pydict_file: not '\\n' is allowed: '{obj_str}'")
       print(obj, file=fou)
 
-def get_extension(short_name)-> str:
+def get_file_extension(short_name)-> str:
   toks = short_name.split(".")
   return short_name if len(toks) == 1 else toks[-1]
 
-def get_files_in_folder(data_path, file_exts=None, resursive=False):
+def get_files_in_folder(data_path, file_extensions: list=None, resursive=False):
   '''
     file_exts: should be a set, or None
     return: an iterator, [fullFilePath]
@@ -117,12 +118,12 @@ def get_files_in_folder(data_path, file_exts=None, resursive=False):
   def legal_file(short_name):
     if short_name.startswith("."):
       return False
-    ext = get_extension(short_name)
-    return is_none_or_empty(file_exts) or ext in file_exts
+    ext = get_file_extension(short_name)
+    return is_none_or_empty(file_extensions) or ext in file_extensions
 
-  if file_exts is not None:
-    assert isinstance(file_exts, (list, dict))
-    file_exts = set(file_exts)
+  if file_extensions is not None:
+    assert isinstance(file_extensions, (list, dict))
+    file_extensions = set(file_extensions)
 
   for path, folders, files in os.walk(data_path, resursive):
     for short_name in files:
@@ -136,7 +137,7 @@ def create_list(shape: list, value=None):
   else:
     return [create_list(shape[1:], value) for _ in range(shape[0])]
 
-def split_by(data, func):
+def split_data_by_func(data, func):
   data1, data2 = [], []
   for d in data:
     if func(d):
@@ -175,13 +176,13 @@ def to_utf8(line)-> str:
   print("Error: wrong type in toUtf8(...)")
   return None
 
-def print_with_flush(cont, stream=None):
+def print_with_flush(cont, stream=None)-> None:
   if stream is None:
     stream = sys.stdout
   print(cont, file=stream)
   stream.flush()
 
-def get_installed_packages():
+def get_installed_packages()-> list:
   import pip
   packages = pip.get_installed_distributions()
   packages = sorted(["%s==%s" % (i.key, i.version) for i in packages])
@@ -190,12 +191,12 @@ def get_installed_packages():
 def eq(v1, v2, prec=EPSILON):
   return abs(v1 - v2) < prec
 
-def get_memory(size_type="rss"):
+def get_memory(size_type="rss")-> float:
   '''Generalization; memory sizes (MB): rss, rsz, vsz.'''
   content = os.popen(f"ps -p {os.getpid()} -o {size_type} | tail -1").read()
   return round(content / 1024, 3)
 
-def discrete_sample(dists):
+def discrete_sample(dists)-> int:
   '''each probability must be greater than 0'''
   dists = array(dists)
   assert all(dists >= 0)

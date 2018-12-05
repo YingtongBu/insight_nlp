@@ -75,7 +75,7 @@ class DataSet:
     return create_batch_iter_helper(self._data_name, self._data, batch_size,
                                     epoch_num, shuffle)
 
-def normalize_data_file(file_name, split_and_norm_text_func):
+def normalize_data_file(file_name, split_and_norm_text_func)-> str:
   '''
   :return: normalized file name
   '''

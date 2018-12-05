@@ -130,7 +130,7 @@ class Trainer(object):
        
     ret = defaultdict(list)
     for match in buffer:
-      ret[match[0]].append(Chinese.join_Ch_and_En(match[1:]))
+      ret[match[0]].append(Chinese.join_ch_en_tokens(match[1:]))
       
     return ret
 

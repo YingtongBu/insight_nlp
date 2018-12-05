@@ -6,7 +6,7 @@ from Common import *
 import jieba
 import jieba.posseg as pseg
 
-def join_Ch_and_En(ch_list: list):
+def join_ch_en_tokens(ch_list: list)-> str:
   '''
   :param ch_list: ["我", "爱", "American", "English", "的", "感", "觉"]
   :return: "我爱American English的感觉"
@@ -23,7 +23,7 @@ def join_Ch_and_En(ch_list: list):
       
   return ret
 
-def convert_full_to_half(s):
+def convert_full_to_half(s)-> str:
   '''全角转半角'''
   n = []
   for char in s:
