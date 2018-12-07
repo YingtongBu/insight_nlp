@@ -2,7 +2,7 @@
 #coding: utf8
 #author: Tian Xia (summer.xia1@pactera.com)
 
-from audio.AudioConverter import AudioHelper
+from audio.AudioHelper import AudioHelper
 import Common as cm
 import os
 
