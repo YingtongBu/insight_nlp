@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "zinc-shard-207022",
+  "private_key_id": "088b9b20625c75683c3166e5184ecedeb1b10cdc",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDIbd6reFdm2RXY\nEqNWLIUffH9fIUAytfx3EStU67xbedmeF9viDJoG9PCirYbHrW/luc0+aF8UwyVa\nmeVDXgJ8CInPmp6QhY9K+LYQu5VR00kkkodz9YcGuNRFL33oTEcF0xUQVR8CdS7X\n/Kqwe4a/YIpDryqrsgk1jQf9qivQ3DeskQPFqb7FPv/BsO+zGg6JJ4vHEV/CsOSE\ne5JDv5xfQbtvZ5tYw4wBZ0Kr8vsqzFbnw7CTghW23Zd5M3+H4/7ey0wSYtJJgYhf\nYPKyRnt7CEG0aQUdSOhp2b1XsdQxBm0KY20MibXaJAGGbFr3/5HIXjwLkTY5TJ9q\nvpP8ww/HAgMBAAECggEAS+6X79VRI3U12dzBxalrK7ESXjtuI2gfxAocpPkELJG+\nuK6oTnzgs6cDLVZZW/egj2MzVyPadbayxZ7NJRcOEOh5MU4OKYl37nrIGxG98bh+\nmtzqdSt9IrZOMQHbjPCs7Y95CO1+qIM1on0mO2Mo+wL7jsXjgBWceI28C8V3ARJo\nMa4u4ma+vy7A4/J7F0gVLmw/MlWnt5ROAaWY6IL263W89PrEblzmrx4/UE4g4F1d\nhVAn857Pbp+kFmK+0/ZBNVEN9DdamMiIS7MhtXMePMjsdXKdcLVWfmc7xvY2gpnX\naDRo4oeaJyVRujvAz57shVw5PB9bdMjIoBc1QTUF1QKBgQD+v/tJvecuzbTNjfhx\nivGzrNlwe92Nz1KpKbrw6+du2uBDWRLmQeGVtFHcnz73O/hbnFb/MNMLpsDC1Be/\nBBhC+mZgw17CJWwOxa7+x8rLVRRI+vKDWXBJxuHqvQjBMtmCHacszqVeNvNfgJMO\niaI6oh1H/LEKE3mn4MG990IlmwKBgQDJaaZwkMM0jC86mmwLIf7EWC3RPHBhMfrT\nQLDmkXpDYb1+RCo5EhBqqFLvDDq/vOFgXm+NKTl4fITWhW+A/lFBlJN9bfcr4Wx1\n7rkr1yxF3G+S+W4QRX7fe8Op+lQjy88e8SEuiKEilhCQC6i8C8v3zEpB/564GAae\nlvHd84oXRQKBgQCFsIiWbXOaa1e8HApKw+kOKuK9ljNyDWBK6FxzvMlqsrDIh0FU\n1zQklUn0pxmrM6ylnwlEyQGodq1oUVfY5bQ5yiDaHQ1og60On42zpXP2e0K2/gMx\nDUnRXe8HeobSpPXiw98Ms7GzHNFhyB7knTQm4xbMxX6/U/MfN+NU5yKuiwKBgQC7\nujlj2cnYBIFQwfXKOplXMEkkKI0mSotas4UuopGulD8mnSotn2SlxNXn8SIg7E+0\nntCiZbYnUwgNWrmfJWtfELiXxBMJV0bcdPEqp5egVeG4v7uSdvPWIWkx2RzrcF9Q\nm7ctxDNMJUqyt+tBuk0WXdcoxLSPKfWhg1dUZFZlcQKBgGiDKnObhvn9CIuZvj3M\nxrO2HNxwq+AsNquWw1mZ6HOykZwvGHJOnsd0KFdxbAWTAmuUNFAsHtbLNwxgo2xS\nO8xbuXa9HNXBe71jwH+tadMMeVGcwI+ernNiCEt5ar1sx/8IDhwId5qzmrMtmhRS\njDEKbIEhZ8vnJUYpXYLK/gt0\n-----END PRIVATE KEY-----\n",
+  "client_email": "speech-client-api@zinc-shard-207022.iam.gserviceaccount.com",
+  "client_id": "101931297306451928334",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/speech-client-api%40zinc-shard-207022.iam.gserviceaccount.com"
+}
