@@ -35,7 +35,7 @@ class AudioHelper:
       return -1
 
   @staticmethod
-  def convert_to_flac(in_file: str):
+  def convert_to_flac(in_file: str)-> typing.Union[str, None]:
     ''' Return in_file: return flac format.
     Only convert files appearing in AUDIO_EXTENSIONS'''
     file_ext = get_file_extension(in_file)
