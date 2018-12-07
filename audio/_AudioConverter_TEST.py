@@ -24,4 +24,5 @@ if __name__ == '__main__':
 
     else:
       print(f"[ERR] {in_file}")
+      assert False
 
