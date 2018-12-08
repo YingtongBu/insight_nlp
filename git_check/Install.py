@@ -20,7 +20,7 @@ if __name__ == "__main__":
   scipt_folder = os.path.split(real_path)[0]
   # print(sciptFolder)
   
-  scipt = os.path.join(scipt_folder, "PrePushCheck.py")
+  scipt = os.path.join(scipt_folder, "prepush_check.py")
   
   hook_dir = os.path.join(options.repoPath, ".git/hooks")
   os.system(f"cd {hook_dir};"

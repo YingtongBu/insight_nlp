@@ -1,8 +1,8 @@
 # coding: utf8
 # author: Tian Xia (summer.xia1@pactera.com)
 
-from Common import *
-from Measure import *
+from common import *
+from measure import *
 
 if __name__ == "__main__":
   parser = OptionParser(usage="cmd dev1@dir1 dir2")

@@ -1,8 +1,8 @@
 #coding: utf8
 #author: Tian Xia (summer.xia1@pactera.com)
 
-from crf.lstm_crf.Trainer import *
-from crf.lstm_crf.Data import *
+from crf.lstm_crf.trainer import *
+from crf.lstm_crf.data import *
 
 if __name__ == '__main__':
   data_path = os.path.join(

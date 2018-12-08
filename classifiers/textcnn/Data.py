@@ -1,8 +1,8 @@
 #coding: utf8
 #author: Tian Xia (summer.xia1@pactera.com)
 
-from Vocabulary import *
-import Chinese
+from vocabulary import *
+import chinese
 
 '''The format of data is defined as
 1. each line is a python dict string, denoting a sample dict.

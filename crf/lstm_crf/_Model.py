@@ -1,9 +1,9 @@
 #coding: utf8
 #author: Tian Xia (summer.xia1@pactera.com)
 
-import Tensorflow as TF
+import nlp_tensorflow as TF
 import tensorflow as tf
-from Common import *
+from common import *
 
 class _Model(object):
   def __init__(self,

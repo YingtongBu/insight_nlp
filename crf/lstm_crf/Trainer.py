@@ -8,10 +8,10 @@
    e.g., 1634--> one token。
 '''
 
-from Tensorflow import *
-from crf.lstm_crf._Model import _Model
-from crf.lstm_crf.Data import *
-import Chinese
+from nlp_tensorflow import *
+from crf.lstm_crf._model import _Model
+from crf.lstm_crf.data import *
+import chinese
 
 class Trainer(object):
   def train(self, param):
@@ -130,7 +130,7 @@ class Trainer(object):
        
     ret = defaultdict(list)
     for match in buffer:
-      ret[match[0]].append(Chinese.join_ch_en_tokens(match[1:]))
+      ret[match[0]].append(chinese.join_ch_en_tokens(match[1:]))
       
     return ret
 

@@ -3,7 +3,7 @@
 
 #Author: hong xu(hong.xu55@pactera.com)
 
-import translation.Translate as Trans
+import translation.translate as Trans
 
 if __name__ == '__main__':
   src = "Beijing"

@@ -6,7 +6,7 @@
 
 from google.cloud import translate
 import os
-import Common as common
+import common as common
 
 os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = \
   common.get_module_path("Common") + \

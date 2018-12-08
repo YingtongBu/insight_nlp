@@ -1,8 +1,8 @@
 #coding: utf8
 #author: Tian Xia (summer.xia1@pactera.com)
 
-from crf.lstm_crf.Predictor import *
-from Common import *
+from crf.lstm_crf.predictor import *
+from common import *
 
 if __name__ == '__main__':
   data_path = os.path.join(

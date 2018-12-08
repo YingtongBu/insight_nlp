@@ -1,9 +1,9 @@
 #coding: utf8
 #author: Tian Xia (summer.xia1@pactera.com)
 
-from Tensorflow import *
-from crf.lstm_crf.Data import *
-from crf.lstm_crf.Trainer import Trainer
+from nlp_tensorflow import *
+from crf.lstm_crf.data import *
+from crf.lstm_crf.trainer import Trainer
 
 class Predictor(object):
   def __init__(self, model_path):

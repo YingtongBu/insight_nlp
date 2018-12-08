@@ -1,9 +1,9 @@
 #coding: utf8
 #author: Tian Xia (summer.xia1@pactera.com)
 
-from classifiers.textcnn.Trainer import *
-from Chinese import split_and_norm_string
-from Common import *
+from classifiers.textcnn.trainer import *
+from chinese import split_and_norm_string
+from common import *
 
 if __name__ == '__main__':
   data_path = os.path.join(

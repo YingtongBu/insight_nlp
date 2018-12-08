@@ -2,7 +2,7 @@
 #coding: utf8
 #author: Tian Xia (summer.xia1@pactera.com)
 
-from Vocabulary import *
+from vocabulary import *
 
 if __name__ == "__main__":
   data = [

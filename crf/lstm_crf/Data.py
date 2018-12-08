@@ -1,7 +1,7 @@
 #coding: utf8
 #author: Tian Xia (summer.xia1@pactera.com)
 
-from Vocabulary import *
+from vocabulary import *
 
 '''The format of data is defined as
 Each line is a python dict string, denoting a sample dict.

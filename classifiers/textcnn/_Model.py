@@ -2,7 +2,7 @@
 #author: Tian Xia (summer.xia1@pactera.com)
 
 import tensorflow as tf
-import Tensorflow as TF
+import nlp_tensorflow as TF
 
 class _Model(object):
   def __init__(self,

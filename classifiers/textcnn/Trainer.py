@@ -1,9 +1,9 @@
 #coding: utf8
 #author: Tian Xia (summer.xia1@pactera.com)
 
-from Tensorflow import *
-from classifiers.textcnn._Model import _Model
-from classifiers.textcnn.Data import *
+from nlp_tensorflow import *
+from classifiers.textcnn._model import _Model
+from classifiers.textcnn.data import *
 
 class Trainer(object):
   def train(self, param):
