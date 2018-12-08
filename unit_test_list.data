@@ -1,18 +1,19 @@
-crf/lstm_crf/_Trainer_TEST.py
-crf/lstm_crf/_Predictor_TEST.py
+crf/lstm_crf/_trainer_TEST.py
+crf/lstm_crf/_predictor_TEST.py
 
-classifiers/textcnn/_Trainer_TEST.py
-classifiers/textcnn/_Predictor_TEST.py
+classifiers/textcnn/_trainer_TEST.py
+classifiers/textcnn/_predictor_TEST.py
 
-speech/_AudioRecognition_TEST.py
-speech/_GoogleApiSpeechRecognition_TEST.py
-speech/_SpeechRecognition_TEST.py
-speech/_TextToSpeech_TEST.py
-translation/_Translate_TEST.py
-web/_NewsScraper_TEST.py
-web/_SearchEngine_TEST.py
-_Chinese_TEST.py
-_Common_TEST.py
-_Measure_TEST.py
-_Tensorflow_TEST.py
-_Vocabulary_TEST.py
+_vocabulary_TEST.py
+web/_search_engine_TEST.py
+audio/_speech_recognition_TEST.py
+audio/_audio_helper_TEST.py
+_chinese_TEST.py
+_measure_TEST.py
+_nlp_tensorflow_TEST.py
+audio/_text_to_speech_TEST.py
+audio/_google_api_speech_recognition_TEST.py
+web/_news_scraper_TEST.py
+_common_TEST.py
+translation/_translate_TEST.py
+audio/_audio_recognition_TEST.py
