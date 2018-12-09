@@ -16,10 +16,6 @@ def get_testing_files(cwd, args):
     file_names = []
     for file_name in get_files_in_folder(".", ["py"], True):
       if file_name.endswith("TEST.py"):
-        base_name = os.path.basename(file_name)
-        if not base_name.startswith("_"):
-          assert False, f"Wrong file name: {file_name}"
-
         file_names.append(file_name)
 
     unit_list_file = "unit_test_list.data"
