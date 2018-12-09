@@ -50,23 +50,17 @@ class FormatChecker:
       # self._rule13AnalyzeBlanks(lnNum, ln)
       self._rule_analyze_no_blanks_in_func_arg(lnNum, ln)
       self._rule_anlyze_code_review(lnNum, ln)
-      self._rule_analyze_chdir(lnNum, ln)
-      
+
     return self.error
 
   def _rule_analyze_file_name(self):
     name = self.base_name
     if name == "__init__.py":
       return
-    if "_TEST.py" in name:
-      if not name.startswith("_"):
-        print("Error! 测试脚本的文件名MUST以'_'作为前缀，例如'_FileName_TEST.py'")
-        self.error += 1
-        return
-      
+
     if "_RUN.py" in name:
       if name.startswith("_"):
-        print("Error! run脚本的文件名do NOT以_作为前缀，例如'FileName_RUN.py'")
+        print("Error! run脚本的文件名do NOT以_作为前缀，例如'do_something_RUN.py'")
         self.error += 1
         return
       
@@ -79,8 +73,8 @@ class FormatChecker:
     # OK for "Model_001_02.py"
     name = re.sub(r"_[\d]+(?=[._])", "", name)
     
-    if name[0].islower() or name.isupper() or '_' in name:
-      print("Error! 文件名称采用类命名形式，例如FileName.py")
+    if name.lower() != name:
+      print("Error! 文件名称采用变量名形式，例如FileName.py")
       self.error += 1
 
   def _rule_analyze_utf8_setting(self):
@@ -92,17 +86,6 @@ class FormatChecker:
 
   def _rule_analyze_main_func_definition(self):
     return
-    '''for ln in self.lines:
-      if "__name__" in ln and "__main__" in ln:
-        return'''
-    
-    print("Error! 每⼀个py⽂件必须添加“伪主函数”部分")
-    self.error += 1
-
-  def _rule_analyze_chdir(self, lnNum, ln):
-    if "chdir(" in ln:
-      print(f"Error! line:{lnNum}: 不能使用chdir函数。")
-      self.error += 1
 
   def _rule_analyze_tab(self, lnNum, ln):
     if ln == "":

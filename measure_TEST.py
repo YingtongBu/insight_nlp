@@ -1,5 +1,5 @@
-# coding: utf8
-# author: Tian Xia (summer.xia1@pactera.com)
+#coding: utf8
+#author: Tian Xia (summer.xia1@pactera.com)
 
 from common import *
 from measure import *

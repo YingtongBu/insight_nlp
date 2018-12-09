@@ -35,6 +35,22 @@ import typing
 INF         = float("inf")
 EPSILON     = 1e-6
 
+def norm1(vec):
+  vec = array(vec)
+  nm = float(sum(abs(vec)))
+  return vec if eq(nm, 0) else vec / nm
+
+def norm2(vec):
+  vec = array(vec)
+  nm = math.sqrt(sum(vec * vec))
+  return vec if eq(nm, EPSILON) else vec / nm
+
+def cmp(a, b)-> int:
+  return (a > b) - (a < b)
+
+def get_home_dir():
+  return os.environ["HOME"]
+
 def ensure_folder_exists(folder: str)-> None:
   if not os.path.exists(folder):
     os.system(f"mkdir {folder}")

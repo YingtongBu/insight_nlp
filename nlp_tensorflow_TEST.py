@@ -30,4 +30,3 @@ if __name__ == "__main__":
   z = basic_attention(d)
   print(z)
 
-  

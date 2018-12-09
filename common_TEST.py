@@ -22,7 +22,10 @@ if __name__ == "__main__":
   print(data)
   
   print(get_module_path("NLP.translation.Translate"))
-  
+
+  print(eq(0, 0, EPSILON))
+  print(eq(1.2345678912345678e30, 1.23456789123456689e30, 1e-13))
+
   path = "."
   for full_name in get_files_in_folder(path, ["py"], True):
     is_existed = os.path.exists(full_name)
