@@ -8,7 +8,7 @@ from chinese import split_and_norm_string
 
 if __name__ == '__main__':
   data_path = os.path.join(
-    get_module_path("Common"),
+    get_module_path("common"),
     "classifiers/textcnn/test_data"
   )
 

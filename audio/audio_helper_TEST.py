@@ -8,7 +8,7 @@ import os
 
 if __name__ == '__main__':
   data_path = os.path.join(
-    cm.get_module_path("Common"),
+    cm.get_module_path("common"),
     "audio/test_data"
   )
 
