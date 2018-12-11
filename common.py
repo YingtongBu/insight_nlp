@@ -240,6 +240,23 @@ def log_f_prime(fss, weight):
     pdw += math.exp(weight.dot(fs) - dn) * fs
   return pdw
 
+def group_by_key(dataIter):
+  # dataIter.next() --> (key, data)
+  # return: (key, [data1, ...])
+  sample = []
+  prevKey = None
+  for key, inst in dataIter:
+    if sample == [] or key == prevKey:
+      sample.append(inst)
+    else:
+      yield prevKey, sample
+      sample = [inst]
+
+    prevKey = key
+
+  if sample != []:
+    yield prevKey, sample
+
 def create_batch_iter_helper(title: str, data, batch_size, epoch_num,
                              shuffle=True):
   '''

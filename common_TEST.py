@@ -31,3 +31,11 @@ if __name__ == "__main__":
     is_existed = os.path.exists(full_name)
     print(f"{full_name}, {is_existed}")
     assert is_existed
+
+
+  data = [("a", 1), ("a", 2), ("b", 3), ("c", 4)]
+  print(list(group_by_key(iter(data))))
+
+  dists = [1, 2, 3, 4]
+  print(collections.Counter([discrete_sample(dists) for freq in range(100000)]))
+
