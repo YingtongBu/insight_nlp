@@ -57,7 +57,7 @@ def ensure_folder_exists(folder: str)-> None:
   
   elif os.path.isfile(folder):
     print(f"WARN: The folder '{folder} to make preexists as a file.'")
-    os.system(f"rm {fold}; mkdir {folder}")
+    os.system(f"rm {folder}; mkdir {folder}")
     
 def split_to_sublist(data)-> list:
   '''
@@ -127,10 +127,8 @@ def get_file_extension(short_name)-> str:
   return short_name if len(toks) == 1 else toks[-1]
 
 def get_files_in_folder(data_path, file_extensions: list=None, resursive=False):
-  '''
-    file_exts: should be a set, or None
-    return: an iterator, [fullFilePath]
-  '''
+  '''file_exts: should be a set, or None
+  return: an iterator, [fullFilePath]'''
   def legal_file(short_name):
     if short_name.startswith("."):
       return False
@@ -170,10 +168,13 @@ def is_none_or_empty(data)-> bool:
     return len(data) == 0
   return False
 
+def get_log_time():
+  return time.strftime('%x %X')
+
 def execute_cmd(cmd)-> int:
+  date = get_log_time()
   ret = os.system(cmd)
   status = "OK" if ret == 0 else "fail"
-  date = time.strftime('%x %X')
   print(f"{date} [{status}] executing '{cmd}'")
   sys.stdout.flush()
   return ret
@@ -197,12 +198,6 @@ def print_with_flush(cont, stream=None)-> None:
     stream = sys.stdout
   print(cont, file=stream)
   stream.flush()
-
-def get_installed_packages()-> list:
-  import pip
-  packages = pip.get_installed_distributions()
-  packages = sorted(["%s==%s" % (i.key, i.version) for i in packages])
-  return packages
 
 def eq(v1, v2, prec=EPSILON):
   return abs(v1 - v2) < prec
@@ -257,8 +252,8 @@ def group_by_key(dataIter):
   if sample != []:
     yield prevKey, sample
 
-def create_batch_iter_helper(title: str, data, batch_size, epoch_num,
-                             shuffle=True):
+def create_batch_iter_helper(title: str, data: list, batch_size: int,
+                             epoch_num: int, shuffle=True):
   '''
   :param data: [[word-ids, label], ...]
   :return: iterator of batch of [words-ids, label]
