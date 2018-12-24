@@ -168,15 +168,43 @@ def is_none_or_empty(data)-> bool:
     return len(data) == 0
   return False
 
+def to_readable_time(seconds: float):
+  result = []
+  days = seconds // (3600 * 24)
+  if days > 0:
+    result.append(f"{days} d")
+    seconds -= days * 3600 * 24
+
+  hours = seconds // 3600
+  if hours > 0:
+    result.append(f"{hours} h")
+    seconds -= 3600 * hours
+
+  minutes = seconds // 60
+  if minutes > 0:
+    result.append(f"{minutes} m")
+    seconds -= 60 * minutes
+
+  if seconds > 0:
+    result.append(f"{seconds:3} s")
+
+  return " ".join(result)
+
 def get_log_time():
   return time.strftime('%x %X')
 
 def execute_cmd(cmd)-> int:
-  date = get_log_time()
+  start = time.time()
+  print(f"{get_log_time()} [start] executing '{cmd}'")
+
   ret = os.system(cmd)
   status = "OK" if ret == 0 else "fail"
-  print(f"{date} [{status}] executing '{cmd}'")
+  duration = time.time() - start
+  readable_time = to_readable_time(duration)
+  print(f"{get_log_time()} [{status}] {readable_time}, executing '{cmd}'")
+
   sys.stdout.flush()
+
   return ret
 
 def to_utf8(line)-> str:
