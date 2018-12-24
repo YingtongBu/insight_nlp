@@ -170,17 +170,17 @@ def is_none_or_empty(data)-> bool:
 
 def to_readable_time(seconds: float):
   result = []
-  days = seconds // (3600 * 24)
+  days = int(seconds // (3600 * 24))
   if days > 0:
     result.append(f"{days} d")
     seconds -= days * 3600 * 24
 
-  hours = seconds // 3600
+  hours = int(seconds // 3600)
   if hours > 0:
     result.append(f"{hours} h")
     seconds -= 3600 * hours
 
-  minutes = seconds // 60
+  minutes = int(seconds // 60)
   if minutes > 0:
     result.append(f"{minutes} m")
     seconds -= 60 * minutes
