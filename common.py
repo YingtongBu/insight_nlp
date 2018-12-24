@@ -186,14 +186,15 @@ def to_readable_time(seconds: float):
     seconds -= 60 * minutes
 
   if seconds > 0:
-    result.append(f"{seconds:3} s")
+    result.append(f"{seconds:.3} s")
 
   return " ".join(result)
 
 def get_log_time():
   return time.strftime('%x %X')
 
-def execute_cmd(cmd)-> int:
+def execute_cmd(*cmds)-> int:
+  cmd = " ".join(cmds)
   start = time.time()
   print(f"{get_log_time()} [start] executing '{cmd}'")
 
