@@ -75,7 +75,7 @@ def split_to_sublist(data)-> list:
   
   return result
   
-def get_module_path(module_name)-> str:
+def get_module_path(module_name)-> typing.Union[str, None]:
   '''
   This applys for use-defined moudules.
   e.g., get_module_path("NLP.translation.Translate")
@@ -196,19 +196,16 @@ def get_log_time():
 def execute_cmd(*cmds)-> int:
   cmd = " ".join(cmds)
   start = time.time()
-  print(f"{get_log_time()} [start] executing '{cmd}'")
+  print_flush(f"{get_log_time()} [start] executing '{cmd}'")
 
   ret = os.system(cmd)
   status = "OK" if ret == 0 else "fail"
   duration = time.time() - start
   readable_time = to_readable_time(duration)
-  print(f"{get_log_time()} [{status}] {readable_time}, executing '{cmd}'")
-
-  sys.stdout.flush()
-
+  print_flush(f"{get_log_time()} [{status}] {readable_time}, executing '{cmd}'")
   return ret
 
-def to_utf8(line)-> str:
+def to_utf8(line)-> typing.Union[str, None]:
   if type(line) is str:
     try:
       return line.encode("utf8")
@@ -222,7 +219,7 @@ def to_utf8(line)-> str:
   print("Error: wrong type in toUtf8(...)")
   return None
 
-def print_with_flush(cont, stream=None)-> None:
+def print_flush(cont, stream=None)-> None:
   if stream is None:
     stream = sys.stdout
   print(cont, file=stream)
