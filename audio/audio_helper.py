@@ -2,9 +2,12 @@
 #coding: utf8
 #author: Tian Xia (summer.xia1@pactera.com)
 
-from mutagen.flac import *
 from common import *
-from multiprocessing import Pool
+from mutagen.flac import *
+# from mutagen.mp3 import MP3
+from pydub import AudioSegment
+from pydub.utils import mediainfo
+# import audioread
 import typing
 
 class AudioHelper:
@@ -14,6 +17,55 @@ class AudioHelper:
     "wav",
     "sph"       # converted to wav
   ]
+
+  @staticmethod
+  def segment_audio(flac_file: str, time_segments: list):
+    '''
+    :param time_segments: [(12,97, 18.89), (18.43, 27.77) ...] in seconds.
+    '''
+    assert flac_file.endswith(".flac")
+
+    audio = AudioSegment.from_file(flac_file , "flac")
+    duration = len(audio)
+    for file_id, (time_from, time_to) in enumerate(time_segments):
+      t_from = time_from * 1000
+      t_to = time_to * 1000
+
+      assert 0 <= t_from < t_to < duration
+      audio_seg = audio[t_from: t_to]
+
+      seg_name = flac_file.replace(
+        ".flac", f".part{file_id:05}.time.{time_from}-{time_to}.flac"
+      )
+      audio_seg.export(seg_name)
+
+  @staticmethod
+  def print_audio_info(flac_file: str):
+    assert flac_file.endswith(".flac")
+
+    print(f"======= from mediainfo('{flac_file}') =======")
+    info = mediainfo("sample.flac")
+    print(info)
+    print("=" * 32)
+
+    audio = AudioSegment.from_file(flac_file , "flac")
+    channel_count = audio.channels    #Get channels
+    print(f"channel count: {channel_count}")
+
+    sample_width = audio.sample_width #Get sample width
+    print(f"sample width: {sample_width}")
+
+    duration_in_sec = len(audio) / 1000 #Length of audio in sec
+    print(f"duration: {duration_in_sec} seconds")
+
+    sample_rate = audio.frame_rate
+    print(f"sample rate: {sample_rate}")
+
+    bit_rate = sample_width * 8
+    print(f"bit rate: {bit_rate}")
+    #in bytes.
+    # file_size = (sample_rate * bit_rate * channel_count * duration_in_sec) / 8
+    # print(f"audio file size: {file_size} bytes")
 
   @staticmethod
   def seconds_to_str(seconds: float):
