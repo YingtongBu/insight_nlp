@@ -19,11 +19,18 @@ class AudioHelper:
   ]
 
   @staticmethod
-  def segment_audio(flac_file: str, time_segments: list):
+  def segment_audio(flac_file: str, time_segments: list, dest_folder: str):
     '''
     :param time_segments: [(12,97, 18.89), (18.43, 27.77) ...] in seconds.
+    :return all new segment fils in respective with time_segments. 
+    If one time segment is invalid, the its corresponding retuned file 
+    name is None.
     '''
     assert flac_file.endswith(".flac")
+    assert os.path.exists(dest_folder)
+
+    base_name = os.path.basename(flac_file)
+    segment_file_names = []
 
     audio = AudioSegment.from_file(flac_file , "flac")
     duration = len(audio)
@@ -31,13 +38,20 @@ class AudioHelper:
       t_from = time_from * 1000
       t_to = time_to * 1000
 
-      assert 0 <= t_from < t_to < duration
-      audio_seg = audio[t_from: t_to]
+      if not (0 <= t_from < t_to < duration):
+        print(f"WARN: {flac_file} is not complete. "
+              f"Actual length: {duration / 1000} seconds, "
+              f"while time segment is {time_from}-{time_to}")
+        segment_file_names.append(None)
+        continue
 
-      seg_name = flac_file.replace(
-        ".flac", f".part{file_id:05}.time.{time_from}-{time_to}.flac"
+      seg_name = base_name.replace(
+        ".flac", f"-{file_id:04}.flac"
       )
-      audio_seg.export(seg_name)
+      segment_file_names.append(os.path.join(dest_folder, seg_name))
+      audio[t_from: t_to].export(segment_file_names[-1])
+
+    return segment_file_names
 
   @staticmethod
   def print_audio_info(flac_file: str):
