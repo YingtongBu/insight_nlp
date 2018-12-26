@@ -68,14 +68,6 @@ class AudioHelper:
     # print(f"audio file size: {file_size} bytes")
 
   @staticmethod
-  def seconds_to_str(seconds: float):
-    hours = seconds // 3600
-    minutes = (seconds - hours * 3600) // 60
-    seconds = int(seconds - hours * 3600 - minutes * 60)
-
-    return f"{hours} h {minutes} m {seconds} s"
-
-  @staticmethod
   def get_music_length(flac_file: str)-> float:
     assert flac_file.endswith(".flac")
 
