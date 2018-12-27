@@ -19,19 +19,17 @@ class AudioHelper:
   ]
 
   @staticmethod
-  def segment_audio(flac_file: str, time_segments: list, dest_folder: str):
+  def segment_audio(flac_file: str, time_segments: list,
+                    dest_folder: str)-> typing.Iterator:
     '''
-    :param time_segments: [(12,97, 18.89), (18.43, 27.77) ...] in seconds.
-    :return all new segment fils in respective with time_segments. 
-    If one time segment is invalid, the its corresponding retuned file 
-    name is None.
+    time_segments: [(12,97, 18.89), (18.43, 27.77) ...] in seconds.
+    return: an iterator retuning a new segment file. If one time segment is
+    invalid, then the its corresponding segment file name is None.
     '''
     assert flac_file.endswith(".flac")
     assert os.path.exists(dest_folder)
 
     base_name = os.path.basename(flac_file)
-    segment_file_names = []
-
     audio = AudioSegment.from_file(flac_file , "flac")
     duration = len(audio)
     for file_id, (time_from, time_to) in enumerate(time_segments):
@@ -42,16 +40,13 @@ class AudioHelper:
         print(f"WARN: {flac_file} is not complete. "
               f"Actual length: {duration / 1000} seconds, "
               f"while time segment is {time_from}-{time_to}")
-        segment_file_names.append(None)
+        yield None
         continue
 
-      seg_name = base_name.replace(
-        ".flac", f"-{file_id:04}.flac"
-      )
-      segment_file_names.append(os.path.join(dest_folder, seg_name))
-      audio[t_from: t_to].export(segment_file_names[-1])
-
-    return segment_file_names
+      seg_name = os.path.join(dest_folder,
+                              base_name.replace(".flac", f".{file_id:04}.flac"))
+      audio[t_from: t_to].export(seg_name, format="flac")
+      yield seg_name
 
   @staticmethod
   def print_audio_info(flac_file: str):

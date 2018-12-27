@@ -9,7 +9,7 @@ class Vocabulary:
   EMPTY_TOKEN = "<empty>"
   OOV_TOKEN   = "<oov>"
 
-  def __init__(self, remove_OOV: bool, output_length: int):
+  def __init__(self, remove_OOV: bool, output_length: typing.Union[int, None]):
     '''
     :param remove_OOV:
     :param output_length: int, or None
@@ -70,7 +70,7 @@ class Vocabulary:
     
     print(f"loaded {self.size()} words from {vob_file}.")
 
-  def add_word(self, word):
+  def add_word(self, word: str)-> int:
     ''' add word if it does not exist, and then return its id.
     '''
     self._word2freq[word] += 1
@@ -81,16 +81,16 @@ class Vocabulary:
     self._word2Id[word] = len(self._word2Id)
     return len(self._words) - 1
 
-  def get_word_id(self, word):
+  def get_word_id(self, word)-> typing.Union[int, None]:
     return self._word2Id.get(word, None)
 
-  def get_word(self, idx):
+  def get_word(self, idx)-> typing.Union[str, None]:
     return self._words[idx] if 0 <= idx < len(self._words) else None
 
-  def size(self):
+  def size(self)-> int:
     return len(self._words)
   
-  def convert_to_word_ids(self, words: list):
+  def convert_to_word_ids(self, words: list)-> list:
     ids = [self.get_word_id(word) for word in words]
     if self.remove_OOV:
       ids = [id for id in ids if id is not None]
@@ -103,9 +103,10 @@ class Vocabulary:
       
     return ids
   
-def create_vocabulary(file_name, min_freq, vob_file, attr_name="word_list"):
+def create_vocabulary(file_name: str, min_freq: int, vob_file: str,
+                      attr_name: str="word_list"):
   data = read_pydict_file(file_name)
   data = [sample.get(attr_name) for sample in data]
-  vob = Vocabulary(None, None)
+  vob = Vocabulary(False, None)
   vob.create_vob_from_data(data, min_freq)
   vob.save_model(vob_file)
