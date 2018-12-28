@@ -126,7 +126,8 @@ def get_file_extension(short_name)-> str:
   toks = short_name.split(".")
   return short_name if len(toks) == 1 else toks[-1]
 
-def get_files_in_folder(data_path, file_extensions: list=None, resursive=False):
+def get_files_in_folder(data_path, file_extensions: list=None,
+                        resursive=False)-> typing.Iterator:
   '''file_exts: should be a set, or None
   return: an iterator, [fullFilePath]'''
   def legal_file(short_name):
