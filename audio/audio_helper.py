@@ -45,8 +45,13 @@ class AudioHelper:
 
       seg_name = os.path.join(dest_folder,
                               base_name.replace(".flac", f".{file_id:04}.flac"))
-      audio[t_from: t_to].export(seg_name, format="flac")
-      yield seg_name
+      try:
+        audio[t_from: t_to].export(seg_name, format="flac")
+        yield seg_name
+
+      except Exception as error:
+        print_flush(error)
+        yield None
 
   @staticmethod
   def print_audio_info(flac_file: str):
