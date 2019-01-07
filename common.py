@@ -302,3 +302,24 @@ def create_batch_iter_helper(title: str, data: list, batch_size: int,
      
     print(f"The '{title}' {epoch_id + 1}/{epoch_num} epoch has finished!")
 
+def create_batch_iter_helper1(title: str, data: list, batch_size: int,
+                             epoch_num: int, shuffle=True):
+  '''
+  :param data: [[word-ids, label, other1, other2], ...]
+  :return: iterator of batch of [words-ids, label, other1, other2]
+  '''
+  for epoch_id in range(epoch_num):
+    if shuffle:
+      random.shuffle(data)
+
+    next = iter(data)
+    _ = range(batch_size)
+    while True:
+      batch = list(map(itemgetter(1), zip(_, next)))
+      if batch == []:
+        break
+
+      yield split_to_sublist(batch)
+
+    print(f"The '{title}' {epoch_id + 1}/{epoch_num} epoch has finished!")
+
