@@ -27,58 +27,41 @@ def calc_mfcc_delta(audio_file: str, mfcc_dim: int):
 def parallel_calc_features(audio_files: list, mfcc_dim: int,
                            output_file: str, process_num: int,
                            queue_capacity: int=1024):
-  def write_process(feat_data_pipe: mp.Queue):
+  def run_process(process_id: int, audio_file_pipe: mp.Queue):
     count = 0
-    with open(output_file, "w") as fou:
+    with open(f"{output_file}.part.{process_id}", "w") as fou:
       while True:
-        record = feat_data_pipe.get()
-        if record is None:
+        audio_file = audio_file_pipe.get()
+        if audio_file is None:
+          print(f"run_process[{process_id}] exits!")
           break
 
-        if 0 < count and count % 100 == 0:
-          nlp.print_flush(f"So far, {count} audio files have been processed")
-          fou.flush()
+        feature = calc_mfcc_delta(audio_file, mfcc_dim)
+        print([audio_file, feature], file=fou)
 
-        name, feat = record
-        print([name, feat], file=fou)
         count += 1
-
-  def run_process(process_id: int, audio_file_pipe: mp.Queue,
-                  feat_data_pipe: mp.Queue):
-    while True:
-      audio_file = audio_file_pipe.get()
-      if audio_file is None:
-        print(f"run_process[{process_id}] exits!")
-        break
-
-      feature = calc_mfcc_delta(audio_file, mfcc_dim)
-      feat_data_pipe.put([audio_file, feature])
+        if count % 100 == 0:
+          nlp.print_flush(f"So far, process[{process_id}] have processed "
+                          f"{count} audio files.")
 
   assert 1 <= process_num
 
   start_time = time.time()
-  audio_file_pipe = mp.Queue(queue_capacity)
-  feat_data_pipe = mp.Queue(queue_capacity)
-  process_runners = [mp.Process(target=run_process,
-                                args=(idx, audio_file_pipe, feat_data_pipe))
+  file_pipe = mp.Queue(queue_capacity)
+  process_runners = [mp.Process(target=run_process, args=(idx, file_pipe))
                      for idx in range(process_num)]
-  process_writer = mp.Process(target=write_process, args=(feat_data_pipe,))
-  process_writer.start()
 
   for p in process_runners:
     p.start()
 
   for audio_file in audio_files:
-    audio_file_pipe.put(audio_file)
+    file_pipe.put(audio_file)
 
   for _ in process_runners:
-    audio_file_pipe.put(None)
+    file_pipe.put(None)
 
   for p in process_runners:
     p.join()
-
-  feat_data_pipe.put(None)
-  process_writer.join()
 
   duration = nlp.to_readable_time(time.time() - start_time)
   print(f"It takes {duration} to process {len(audio_files)} audio files")
