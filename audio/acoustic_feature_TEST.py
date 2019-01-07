@@ -5,8 +5,9 @@
 import common as nlp
 import optparse
 import os
+import time
 from audio.audio_helper import AudioHelper
-from audio.acoustic_feature import calc_mfcc_delta
+from audio.acoustic_feature import *
 import librosa
 import tensorflow as tf
 
@@ -21,6 +22,13 @@ if __name__ == "__main__":
     "audio/test_data/102-129232-0009.flac"
   )
 
-  features = calc_mfcc_delta(audio_file, 100)
+  start = time.time()
+  mfcc_dim = 100
+  features = calc_mfcc_delta(audio_file, mfcc_dim)
   print(f"#frame: {len(features)}, #feat: {len(features[0])}")
+  print(f"duration: {time.time() - start}")
+
+  parallel_calc_features(
+    [audio_file] * 1000, mfcc_dim, "test-features.data", 8
+  )
 
