@@ -25,11 +25,11 @@ def calc_mfcc_delta(audio_file: str, mfcc_dim: int):
   return feature
 
 def parallel_calc_features(audio_files: list, mfcc_dim: int,
-                           output_file: str, process_num: int,
+                           output_folder: str, process_num: int,
                            queue_capacity: int=1024):
   def run_process(process_id: int, audio_file_pipe: mp.Queue):
     count = 0
-    with open(f"{output_file}.part.{process_id}", "w") as fou:
+    with open(f"{output_folder}/part.{process_id}.feat", "w") as fou:
       while True:
         audio_file = audio_file_pipe.get()
         if audio_file is None:
@@ -45,6 +45,7 @@ def parallel_calc_features(audio_files: list, mfcc_dim: int,
                           f"{count} audio files.")
 
   assert 1 <= process_num
+  nlp.ensure_folder_exists(output_folder)
 
   start_time = time.time()
   file_pipe = mp.Queue(queue_capacity)
