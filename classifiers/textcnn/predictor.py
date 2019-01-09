@@ -72,16 +72,3 @@ class Predictor(object):
   def predict(self, batch_x, batch_y):
     return Trainer.predict(self._sess, batch_x, batch_y)
 
-  def _create_model(self):
-    self._model = _Model(
-      max_seq_length=self.param["max_seq_length"],
-      num_classes=self.param["num_classes"],
-      vob_size=self._vob.size(),
-      embedding_size=self.param["embedding_size"],
-      kernels=self.param["kernels"],
-      filter_num=self.param["filter_num"],
-      l2_reg_lambda=self.param["l2_reg_lambda"])
-      
-    optimizer = tf.train.AdamOptimizer(self.param["learning_rate"])
-    grads_and_vars = optimizer.compute_gradients(self._model.loss)
-    self._train_optimizer = optimizer.apply_gradients(grads_and_vars)
