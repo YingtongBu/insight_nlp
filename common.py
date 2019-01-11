@@ -128,7 +128,7 @@ def get_file_extension(short_name)-> str:
 
 def get_files_in_folder(data_path, file_extensions: list=None,
                         resursive=False)-> typing.Iterator:
-  '''file_exts: should be a set, or None
+  '''file_exts: should be a set, or None, e.g, ["wav", "flac"]
   return: an iterator, [fullFilePath]'''
   def legal_file(short_name):
     if short_name.startswith("."):

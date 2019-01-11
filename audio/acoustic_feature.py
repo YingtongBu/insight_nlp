@@ -45,6 +45,7 @@ def parallel_calc_features(audio_files: list, mfcc_dim: int,
                           f"{count} audio files.")
 
   assert 1 <= process_num
+  nlp.execute_cmd(f"rm -r {output_folder}")
   nlp.ensure_folder_exists(output_folder)
 
   start_time = time.time()

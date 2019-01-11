@@ -29,6 +29,7 @@ class Microphone:
     my_buf = []
     time_start = time.time()
     last_second = 0
+    print(f"time: {last_second} s")
     while True:
       duration = time.time() - time_start
       if duration >= max_time:
@@ -62,7 +63,3 @@ class Microphone:
     stream.close()
     p.terminate()
 
-if __name__  ==  '__main__':
-  microphone = Microphone()
-  microphone.record("test1.wav", 5)
-  microphone.play("test1.wav")
