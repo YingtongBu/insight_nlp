@@ -108,6 +108,9 @@ def read_pydict_file(file_name, max_num: int=-1)-> list:
   for idx, ln in enumerate(open(file_name)):
     if max_num >= 0 and idx + 1 > max_num:
       break
+    if idx > 0 and idx % 1000 == 0:
+      print_flush(f"{idx} lines have been loaded.")
+
     try:
       obj = eval(ln)
       data.append(obj)
