@@ -102,10 +102,12 @@ def norm_regex(regexExpr)-> str:
     .replace("{", "\{").replace("}", "\}")\
     .replace(".", "\.")
 
-def read_pydict_file(file_name)-> list:
+def read_pydict_file(file_name, max_num: int=-1)-> list:
   assert file_name.endswith(".pydict")
   data = []
   for idx, ln in enumerate(open(file_name)):
+    if max_num >= 0 and idx + 1 > max_num:
+      break
     try:
       obj = eval(ln)
       data.append(obj)
