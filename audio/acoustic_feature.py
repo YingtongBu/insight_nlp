@@ -5,13 +5,16 @@ import typing
 import time
 import multiprocessing as mp
 
+HOP_LENGTH = 512
+
 def calc_mfcc_delta(audio_file: str, mfcc_dim: int):
   '''
   :return: [mfcc, mfcc_delta, mfcc_delta2]
   '''
   wav_data, sample_rate = librosa.load(audio_file)
   mfcc = np.transpose(
-    librosa.feature.mfcc(wav_data, sample_rate, n_mfcc=mfcc_dim),
+    librosa.feature.mfcc(wav_data, sample_rate, n_mfcc=mfcc_dim,
+                         hop_length=HOP_LENGTH),
     [1, 0]
   )
 
