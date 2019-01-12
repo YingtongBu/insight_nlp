@@ -10,8 +10,9 @@ losses = tf.losses
 nn = tf.nn
 rnn_cell = tf.nn.rnn_cell
 
-init1 = tf.truncated_normal_initializer(stddev=0.1)
-init2 = tf.random_uniform_initializer(-1, 1)
+norm_init1 = tf.truncated_normal_initializer(stddev=0.1)
+rand_init1 = tf.random_uniform_initializer(-1, 1)
+const_init = tf.constant_initializer
 
 def linear_layer(input, output_size, scope=None):
     '''
@@ -168,4 +169,39 @@ def basic_attention(status: list):
   weighted_out = tf.squeeze(weighted_out, 2)
 
   return weighted_out
+
+def batch_norm_wrapper(inputs, scope_name, is_train: bool, decay=0.99,
+                       float_type=tf.float32):
+  epsilon = 1e-3
+  shape = inputs.get_shape().as_list()
+
+  with tf.variable_scope(f"bn_{scope_name}"):
+    offset = tf.get_variable("offset", shape[-1], dtype=float_type,
+                             initializer=const_init(0))
+    scale = tf.get_variable("scale", shape[-1], dtype=float_type,
+                            initializer=const_init(1))
+    pop_mean = tf.get_variable("mean", shape[-1], dtype=float_type,
+                               initializer=const_init(0))
+    pop_var = tf.get_variable("variance", shape[-1], dtype=float_type,
+                              initializer=const_init(1))
+    if is_train:
+      batch_mean, batch_var = tf.nn.moments(
+        inputs, axes=list(range(len(shape)-1))
+      )
+      update_pop_mean = tf.assign(
+        pop_mean, pop_mean * decay + batch_mean * (1 - decay)
+      )
+      update_pop_var =tf.assign(
+        pop_var, pop_var * decay + batch_var * (1 - decay)
+      )
+
+      with tf.control_dependencies([update_pop_mean, update_pop_var]):
+        return tf.nn.batch_normalization(
+          inputs, batch_mean, batch_var, offset, scale, epsilon
+        )
+
+    else:
+      return tf.nn.batch_normalization(
+        inputs, pop_mean, pop_var, offset, scale, epsilon
+      )
 
