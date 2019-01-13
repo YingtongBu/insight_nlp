@@ -5,6 +5,7 @@ import typing
 import time
 import multiprocessing as mp
 
+# output length = (seconds) * (sample rate) / (hop_length)
 HOP_LENGTH = 512
 
 def calc_mfcc_delta(audio_file: str, mfcc_dim: int):
