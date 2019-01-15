@@ -1,7 +1,9 @@
 #coding: utf8
 #author: Tian Xia (summer.xia1@pactera.com)
 
-from common import *
+import common as nlp
+from collections import defaultdict, Counter
+from common import EPSILON
 
 class Measure:
   @staticmethod

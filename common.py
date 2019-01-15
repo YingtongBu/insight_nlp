@@ -120,6 +120,7 @@ def read_pydict_file(file_name, max_num: int=-1)-> list:
   return data
 
 def write_pydict_file(data: list, file_name)-> None:
+  assert file_name.endswith(".pydict")
   with open(file_name, "w") as fou:
     for obj in data:
       obj_str = str(obj)
@@ -127,9 +128,15 @@ def write_pydict_file(data: list, file_name)-> None:
         print(f"ERR: in write_pydict_file: not '\\n' is allowed: '{obj_str}'")
       print(obj, file=fou)
 
-def get_file_extension(short_name)-> str:
-  toks = short_name.split(".")
-  return short_name if len(toks) == 1 else toks[-1]
+def get_file_extension(file_name: str)-> str:
+  return file_name.split(".")[-1]
+
+def get_file_base(file_name: str)-> str:
+  '''
+  :param "/tmp/summer.wav" 
+  :return: summer 
+  '''
+  return os.path.basename(file_name).split(".")[0]
 
 def get_files_in_folder(data_path, file_extensions: list=None,
                         resursive=False)-> typing.Iterator:

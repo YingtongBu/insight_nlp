@@ -82,7 +82,7 @@ class AudioHelper:
     # print(f"audio file size: {file_size} bytes")
 
   @staticmethod
-  def get_music_length(flac_file: str)-> float:
+  def get_audio_length(flac_file: str)-> float:
     assert flac_file.endswith(".flac")
 
     try:
@@ -126,19 +126,20 @@ class AudioHelper:
   @staticmethod
   def _convert_wav_to_flac(full_in_name: str)-> typing.Union[str, None]:
     assert full_in_name.endswith(".wav")
-    out_name = full_in_name + ".flac"
-    if os.path.exists(out_name):
-      return out_name
+    out_file = full_in_name.replace(".wav", ".flac")
+    if os.path.exists(out_file):
+      return out_file
 
-    cmd = f"sox {full_in_name} {out_name}"
+    cmd = f"sox {full_in_name} {out_file}"
     if execute_cmd(cmd) == 0:
-      return out_name
+      return out_file
 
     return None
 
   @staticmethod
   def _convert_mp3_to_wav(full_in_name: str)-> typing.Union[str, None]:
-    out_file = full_in_name + ".wav"
+    assert full_in_name.endswith(".mp3")
+    out_file = full_in_name.replace(".mp3", ".wav")
     if os.path.exists(out_file):
       return out_file
 
@@ -150,7 +151,8 @@ class AudioHelper:
 
   @staticmethod
   def _convert_sph_to_wav(full_in_name: str)-> typing.Union[str, None]:
-    out_file = full_in_name + ".wav"
+    assert full_in_name.endswith(".sph")
+    out_file = full_in_name.replace(".sph", ".wav")
     if os.path.exists(out_file):
       return out_file
 

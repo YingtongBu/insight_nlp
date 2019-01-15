@@ -18,7 +18,7 @@ if __name__ == '__main__':
   for in_file in files:
     out_file = AudioHelper.convert_to_flac(in_file)
     if out_file is not None:
-      length = AudioHelper.get_music_length(out_file)
+      length = AudioHelper.get_audio_length(out_file)
       length_str = nlp.to_readable_time(length)
       print(f"[OK] {in_file} to {out_file}, {length_str}")
 
