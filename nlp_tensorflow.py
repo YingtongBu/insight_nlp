@@ -48,9 +48,9 @@ def high_way_layer(input, size, num_layers=1, bias=-2.0, activation=tf.nn.relu,
   
   return output
 
-def accuracy(prediction, label, name):
+def accuracy(prediction, label):
   correct = tf.equal(prediction, label)
-  return tf.reduce_mean(tf.cast(correct, "float"), name=name)
+  return tf.reduce_mean(tf.cast(correct, "float"))
 
 def lookup0(table, pos):
   '''

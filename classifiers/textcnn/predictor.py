@@ -2,73 +2,101 @@
 #author: Tian Xia (summer.xia1@pactera.com)
 
 from nlp_tensorflow import *
-from classifiers.textcnn._model import _Model
+from classifiers.textcnn._model import Model
 from classifiers.textcnn.data import *
-from classifiers.textcnn.trainer import Trainer
+from measure import Measure
 
 class Predictor(object):
-  def __init__(self, model_path):
-    ''' We only load the best model in {model_path}
-    '''
-    def extract_id(model_file):
-      return int(re.findall(r"iter-(.*?).index", model_file)[0])
+  def __init__(self):
+    self._param = read_pydict_file("model/param.pydict")[0]
 
-    param_file = os.path.join(model_path, "param.pydict")
-    self.param = read_pydict_file(param_file)[0]
+    self._vob = Vocabulary(self._param["remove_OOV"],
+                           self._param["max_seq_length"])
+    self._vob.load_model(self._param["vob_file"])
 
-    self._vob = Vocabulary(self.param["remove_OOV"],
-                           self.param["max_seq_length"])
-    self._vob.load_model(self.param["vob_file"])
+    self._graph = tf.Graph()
+    with self._graph.as_default():
+      self._model = Model(
+        max_seq_len=self._param["max_seq_length"],
+        num_classes=self._param["num_classes"],
+        vob_size=self._vob.size(),
+        embedding_size=self._param["embedding_size"],
+        kernels=self._param["kernels"],
+        filter_num=self._param["filter_num"],
+        is_train=False,
+        neg_sample_weight=1,
+        l2_reg_lambda=self._param["l2_reg_lambda"]
+      )
 
-    names = [extract_id(name) for name in os.listdir(model_path)
-             if name.endswith(".index")]
-    best_iter = max(names)
-    model_prefix = f"{model_path}/iter-{best_iter}"
-    print(f"loading model: '{model_prefix}'")
-    
-    graph = tf.Graph()
-    with graph.as_default():
-      saver = tf.train.import_meta_graph(f"{model_prefix}.meta")
+    self._sess = tf.Session(graph=self._graph)
 
-    self._sess = tf.Session(graph=graph)  # 创建新的sess
-    with self._sess.as_default():
-      with graph.as_default():
-        saver.restore(self._sess, f"{model_prefix}")
+  def load_model(self, model_path: str):
+    print(f"loading model from '{model_path}'")
+    with self._graph.as_default():
+      tf.train.Saver().restore(
+        self._sess,
+        tf.train.latest_checkpoint(model_path)
+      )
 
-  def predict_dataset(self, file_name):
-    data = DataSet(data_file=file_name,
-                   num_class=self.param["num_classes"],
-                   vob=self._vob)
-    data_iter = data.create_batch_iter(batch_size=self.param["batch_size"],
-                                       epoch_num=1,
-                                       shuffle=False)
-    fou = open(file_name.replace(".pydict", ".pred.pydict"), "w")
-    correct = 0.
-    for batch_x, batch_y in data_iter:
-      preds, accuracy, class_probs = self.predict(batch_x, batch_y)
-      correct += accuracy * len(batch_x)
-      
-      for idx, y in enumerate(batch_y):
-        pred = {
-          "label": y,
-          "predicted_label": preds[idx],
-          "class_probilities": list(class_probs[idx]),
-        }
-        print(pred, file=fou)
-    fou.close()
-    
-    accuracy = correct / data.size()
-    print(f"Test: '{file_name}': {accuracy:.4f}")
-    
+  def predict_dataset(self, data_set: DataSet):
+    time_start = time.time()
+    pred_file = data_set.data_file.replace(".pydict", ".pred.pydict")
+    all_true_labels, all_pred_labels = [], []
+    with open(pred_file, "w") as fou:
+      for batch_x, batch_y in data_set.create_batch_iter(32, 1, False):
+        pred_y, pred_prob = self._sess.run(
+          fetches=[
+            self._model.predicted_class,
+            self._model.class_probs,
+          ],
+          feed_dict={
+            self._model.input_x: batch_x,
+            self._model.input_y: batch_y,
+          }
+        )
+
+        all_true_labels.extend(batch_y)
+        all_pred_labels.extend(pred_y)
+
+        for idx, y in enumerate(batch_y):
+          pred = {
+            "label": y,
+            "predicted_label": pred_y[idx],
+            "class_probilities": list(pred_prob[idx]),
+          }
+          print(pred, file=fou)
+
+    eval = Measure.calc_precision_recall_fvalue(all_true_labels,
+                                                all_pred_labels)
+    print(f"evaluate({data_set.data_file}): "
+          f"#sample: {len(all_true_labels)} {eval}")
+
+    duration = time.time() - time_start
+    print(f"evaluation takes {duration:.2f} seconds.")
+    print("-" * 80)
+
   def predict_one_sample(self, normed_word_list: list):
     '''
-    :param normed_word_list:
+    :param a list of normed_word_list:
     :return: label, probs
     '''
-    word_ids = self._vob.convert_to_word_ids(normed_word_list)
-    preds, accuracy, probs = self.predict([word_ids], None)
-    return preds[0], probs[0]
-    
-  def predict(self, batch_x, batch_y):
-    return Trainer.predict(self._sess, batch_x, batch_y)
+    batch_x = []
+    for normed_words in normed_word_list:
+      word_ids = self._vob.convert_to_word_ids(normed_words)
+      batch_x.append(word_ids)
+
+    preds, probs = self.predict(batch_x)
+    return preds, probs
+
+  def predict(self, batch_x):
+    pred_y, pred_prob = self._sess.run(
+      fetches=[
+        self._model.predicted_class,
+        self._model.class_probs,
+      ],
+      feed_dict={
+        self._model.input_x: batch_x,
+      }
+    )
+    return pred_y, pred_prob
 

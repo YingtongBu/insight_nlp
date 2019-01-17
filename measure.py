@@ -31,21 +31,22 @@ class Measure:
       prec = correct / (preded_label_num.get(label, 0) + EPSILON)
       f_value = 2 * (recall * prec) / (recall + prec + EPSILON)
       result[label] = {
-        "recall": recall,
-        "precision": prec,
-        "f": f_value
+        "recall": round(recall, 4),
+        "precision": round(prec, 4),
+        "f": round(f_value, 4),
       }
      
     total_f = sum([result[label]["f"] for label in label_stat.keys()])
     avg_f_value = total_f / len(label_stat)
-    result["average_f"] = avg_f_value
+    result["average_f"] = round(avg_f_value, 4)
     
     total_f = sum([result[label]["f"] * label_stat.get(label, 0)
                    for label in label_stat.keys()])
     weighted_f_value = total_f / len(true_labels)
-    result["weighted_f"] = weighted_f_value
+    result["weighted_f"] = round(weighted_f_value, 4)
     
-    result["precision"] = sum(correct_label.values()) / len(true_labels)
+    result["precision"] = round(sum(correct_label.values()) / len(true_labels),
+                                4)
     
     return result
 

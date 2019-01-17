@@ -3,6 +3,7 @@
 
 from vocabulary import *
 import chinese
+import typing
 
 '''The format of data is defined as
 1. each line is a python dict string, denoting a sample dict.
@@ -14,10 +15,11 @@ which would be fed in a DL model.
 '''
 
 def create_parameter(
-  train_file,
-  vali_file,  # can be None
-  num_classes,
-  vob_file,
+  train_file: str,
+  vali_files: typing.Union[list, None],  # can be None
+  num_classes: int,
+  vob_file: str,
+  neg_sample_ratio: float=1,  # usually equlas=#neg/#pos.
   max_seq_length=64,
   epoch_num=1,
   batch_size=1024,
@@ -30,16 +32,19 @@ def create_parameter(
   evaluate_frequency=100,  # must divided by 100.
   remove_OOV=True,
   GPU: int=-1,  # which_GPU_to_run: [0, 4), and -1 denote CPU.
-  model_dir: str= "model"):
+):
   
   assert os.path.isfile(train_file)
-  assert os.path.isfile(vali_file)
+  if vali_files is not None:
+    for vali_file in vali_files:
+      assert os.path.isfile(vali_file)
   
   return {
     "train_file": os.path.realpath(train_file),
-    "vali_file": os.path.realpath(vali_file),
+    "vali_files": [os.path.realpath(f) for f in vali_files],
     "num_classes": num_classes,
     "vob_file": vob_file,
+    "neg_sample_ratio": neg_sample_ratio,
     "max_seq_length": max_seq_length,
     "epoch_num": epoch_num,
     "batch_size": batch_size,
@@ -52,12 +57,12 @@ def create_parameter(
     "evaluate_frequency":  evaluate_frequency,
     "remove_OOV": remove_OOV,
     "GPU":  GPU,
-    "model_dir": os.path.realpath(model_dir),
   }
 
 class DataSet:
   def __init__(self, data_file, num_class, vob: Vocabulary):
     self._data = []
+    self.data_file = data_file
     samples = read_pydict_file(data_file)
     self._data_name = os.path.basename(data_file)
     for sample in samples:
@@ -72,8 +77,9 @@ class DataSet:
     return len(self._data)
       
   def create_batch_iter(self, batch_size, epoch_num, shuffle: bool):
-    return create_batch_iter_helper(self._data_name, self._data, batch_size,
-                                    epoch_num, shuffle)
+    return create_batch_iter_helper(
+      self._data_name, self._data, batch_size, epoch_num, shuffle
+    )
 
 def normalize_data_file(file_name, split_and_norm_text_func)-> str:
   '''

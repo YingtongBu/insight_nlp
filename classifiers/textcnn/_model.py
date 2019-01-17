@@ -4,23 +4,23 @@
 import tensorflow as tf
 import nlp_tensorflow as TF
 
-class _Model(object):
-  def __init__(self,
-               max_seq_length,
-               num_classes,
-               vob_size,
-               embedding_size,
-               kernels: list,
-               filter_num,
-               l2_reg_lambda=0.0):
-    self.input_x = tf.placeholder(tf.int32, [None, max_seq_length], 
-                                  name="input_x")
-    self.input_y = tf.placeholder(tf.int32, [None], name="input_y")
-    self.dropout_keep_prob = tf.placeholder(tf.float32, name="dropout")
-    print(f"name(input_x):{self.input_x.name}")
-    print(f"name(input_y):{self.input_y.name}")
-    print(f"name(dropout_keep_prob):{self.dropout_keep_prob.name}")
-    
+class Model(object):
+  def __init__(
+    self,
+    max_seq_len: int,
+    num_classes: int,
+    vob_size: int,
+    embedding_size: int,
+    kernels: list,
+    filter_num: int,
+    neg_sample_weight: float,   # let ratio=#pos/#neg
+    is_train: bool,
+    l2_reg_lambda=0.0
+  ):
+    self.input_x = tf.placeholder(tf.int32, [None, max_seq_len])
+    self.input_y = tf.placeholder(tf.int32, [None])
+    self.dropout_keep_prob = tf.placeholder(tf.float32)
+
     with tf.device('/cpu:0'), tf.name_scope("embedding"):
       W = tf.Variable(tf.random_uniform([vob_size, embedding_size], -1.0, 1.0))
       embedded_chars = tf.nn.embedding_lookup(W, self.input_x)
@@ -39,7 +39,7 @@ class _Model(object):
 
         h = tf.nn.relu(tf.nn.bias_add(conv, b))
         pooled = tf.nn.max_pool(h,
-                                ksize=[1, max_seq_length - kernel + 1, 1, 1],
+                                ksize=[1, max_seq_len - kernel + 1, 1, 1],
                                 strides=[1, 1, 1, 1],
                                 padding='VALID')
         pooled_outputs.append(pooled)
@@ -48,7 +48,10 @@ class _Model(object):
     h_pool = tf.concat(pooled_outputs, 3)
     h_pool_flat = tf.reshape(h_pool, [-1, num_filters_total])
 
-    h_drop = tf.nn.dropout(h_pool_flat, self.dropout_keep_prob)
+    if is_train:
+      h_drop = tf.nn.dropout(h_pool_flat, self.dropout_keep_prob)
+    else:
+      h_drop = h_pool_flat
 
     l2_loss = tf.constant(0.0)
     with tf.name_scope("output"):
@@ -59,22 +62,24 @@ class _Model(object):
       l2_loss += tf.nn.l2_loss(W)
       l2_loss += tf.nn.l2_loss(b)
       class_scores = tf.nn.xw_plus_b(h_drop, W, b)
-      #output
       self.class_probs = tf.keras.activations.softmax(class_scores)
-      print(f"name(class_probs):{self.class_probs.name}")
-      #output
       self.predicted_class = tf.argmax(class_scores, 1,
                                        name="predictions",
                                        output_type=tf.int32)
-      print(f"name(predicted_class):{self.predicted_class.name}")
 
-      input_y = tf.one_hot(self.input_y, num_classes)
-      #output
-      losses = tf.losses.softmax_cross_entropy(input_y, class_scores)
+      if is_train:
+        y = tf.cast(self.input_y, tf.float32)
+        weights = y + (1 - y) * neg_sample_weight
+      else:
+        weights = 1
+
+      one_hot_y = tf.one_hot(self.input_y, num_classes)
+      losses = tf.losses.softmax_cross_entropy(
+        onehot_labels=one_hot_y,
+        logits=class_scores,
+        weights=weights
+      )
+
       self.loss = losses + l2_reg_lambda * l2_loss
-      print(f"name(loss):{self.loss.name}")
-      
-      self.accuracy = TF.accuracy(self.predicted_class, self.input_y,
-                                  "accuracy")
-      print(f"name(accuracy):{self.accuracy.name}")
-    
+
+      self.accuracy = TF.accuracy(self.predicted_class, self.input_y)
