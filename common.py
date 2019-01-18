@@ -108,15 +108,17 @@ def read_pydict_file(file_name, max_num: int=-1)-> list:
   for idx, ln in enumerate(open(file_name)):
     if max_num >= 0 and idx + 1 > max_num:
       break
-    if idx > 0 and idx % 1000 == 0:
-      print_flush(f"{idx} lines have been loaded.")
+    if idx > 0 and idx % 5000 == 0:
+      print_flush(f"{file_name}: {idx} lines have been loaded.")
 
     try:
       obj = eval(ln)
       data.append(obj)
     except:
       print(f"ERR in reading {file_name}:{idx + 1}: '{ln}'")
-      
+
+  print(f"{file_name}: #data={len(data)}")
+
   return data
 
 def write_pydict_file(data: list, file_name)-> None:
