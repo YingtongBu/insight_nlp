@@ -2,7 +2,7 @@
 #author: Tian Xia (summer.xia1@pactera.com)
 
 from nlp_tensorflow import *
-from classifiers.textcnn._model import Model
+from classifiers.textcnn.config import Model
 from classifiers.textcnn.data import *
 from measure import Measure
 
