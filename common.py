@@ -36,13 +36,10 @@ INF         = float("inf")
 EPSILON     = 1e-6
 
 def uniq(data: list)->list:
-  elements = set()
   result = []
   for d in data:
-    if d in elements:
-      continue
-    elements.add(d)
-    result.append(d)
+    if result == [] or d != result[-1]:
+      result.append(d)
 
   return result
 

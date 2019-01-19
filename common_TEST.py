@@ -9,7 +9,7 @@ if __name__ == "__main__":
   #default = False, help = "")
   (options, args) = parser.parse_args()
 
-  print(uniq(["summer", "rain", "rain", 2, 2, 3, 1]))
+  print(uniq(["summer", "rain", "rain", 2, 2, 3, 1, "rain", "rain"]))
 
   data = create_list([10])
   data[0] = 1
