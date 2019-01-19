@@ -17,6 +17,7 @@ class Vocabulary:
     self.remove_OOV = remove_OOV
     self.output_length = output_length
     self._clear()
+    self._update_special_tokens()
     
   def _update_special_tokens(self):
     self.add_word(self.EMPTY_TOKEN)
