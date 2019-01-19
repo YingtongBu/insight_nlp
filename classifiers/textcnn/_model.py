@@ -24,24 +24,44 @@ class Model(object):
     with tf.device('/cpu:0'), tf.name_scope("embedding"):
       W = tf.Variable(tf.random_uniform([vob_size, embedding_size], -1.0, 1.0))
       embedded_chars = tf.nn.embedding_lookup(W, self.input_x)
-      embedded_chars_expanded = tf.expand_dims(embedded_chars, -1)
+      input_x = tf.expand_dims(embedded_chars, -1)
     
     pooled_outputs = []
     for idx, kernel in enumerate(kernels):
       with tf.name_scope(f"conv-maxpool-{idx}-{kernel}"):
-        filter_shape = [kernel, embedding_size, 1, filter_num]
-        W = tf.Variable(tf.truncated_normal(filter_shape, stddev=0.1))
-        b = tf.Variable(tf.constant(0.1, shape=[filter_num]))
-        conv = tf.nn.conv2d(embedded_chars_expanded,
-                            W,
-                            strides=[1, 1, 1, 1],
-                            padding="VALID")
+        layer1 = tf.layers.conv2d(
+          inputs=input_x,
+          filters=filter_num,
+          kernel_size=[kernel, 10],
+          strides=[1, 1],
+          padding="VALID",
+          activation=tf.nn.relu
+        )
 
-        h = tf.nn.relu(tf.nn.bias_add(conv, b))
-        pooled = tf.nn.max_pool(h,
-                                ksize=[1, max_seq_len - kernel + 1, 1, 1],
-                                strides=[1, 1, 1, 1],
-                                padding='VALID')
+        pooled = tf.layers.max_pooling2d(
+          inputs=layer1,
+          pool_size=[3, 3],
+          strides=[2, 2]
+        )
+
+        shape = pooled.shape.as_list()
+        layer2 = tf.layers.conv2d(
+          inputs=pooled,
+          filters=filter_num,
+          kernel_size=[kernel, shape[2]],
+          strides=[1, 1],
+          padding="VALID",
+          activation=tf.nn.relu,
+          kernel_initializer=tf.truncated_normal_initializer(stddev=0.1),
+        )
+
+        shape = layer2.shape.as_list()
+        pooled = tf.layers.max_pooling2d(
+          inputs=layer2,
+          pool_size=[shape[1], 1],
+          strides=[1, 1]
+        )
+
         pooled_outputs.append(pooled)
 
     num_filters_total = filter_num * len(kernels)
