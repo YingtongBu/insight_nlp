@@ -35,6 +35,17 @@ import typing
 INF         = float("inf")
 EPSILON     = 1e-6
 
+def uniq(data: list)->list:
+  elements = set()
+  result = []
+  for d in data:
+    if d in elements:
+      continue
+    elements.add(d)
+    result.append(d)
+
+  return result
+
 def norm1(vec):
   vec = array(vec)
   nm = float(sum(abs(vec)))
