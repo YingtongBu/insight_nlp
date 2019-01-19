@@ -4,8 +4,41 @@
 import common as nlp
 from collections import defaultdict, Counter
 from common import EPSILON
+import numpy
 
 class Measure:
+  @staticmethod
+  def WER(ref_words_list: list, hyp_words_list: list):
+    def WER_single(ref_words: list, hyp_words: list):
+      # initialisation
+      d = numpy.zeros((len(ref_words) + 1) * (len(hyp_words) + 1), dtype=numpy.uint8)
+      d = d.reshape((len(ref_words) + 1, len(hyp_words) + 1))
+      for i in range(len(ref_words) + 1):
+        for j in range(len(hyp_words) + 1):
+          if i == 0:
+            d[0][j] = j
+          elif j == 0:
+            d[i][0] = i
+
+      # computation
+      for i in range(1, len(ref_words) + 1):
+        for j in range(1, len(hyp_words) + 1):
+          if ref_words[i - 1] == hyp_words[j - 1]:
+            d[i][j] = d[i - 1][j - 1]
+          else:
+            substitution = d[i - 1][j - 1] + 1
+            insertion = d[i][j - 1] + 1
+            deletion = d[i - 1][j] + 1
+            d[i][j] = min(substitution, insertion, deletion)
+
+      return d[len(ref_words)][len(hyp_words)]
+
+    error = sum([WER_single(ref, hyp)
+                 for ref, hyp in zip(ref_words_list, hyp_words_list)])
+    ref_count = max(1, sum([len(hyp) for hyp in ref_words_list]))
+
+    return error / ref_count
+
   @staticmethod
   def calc_precision_recall_fvalue(true_labels, preded_labels):
     '''
