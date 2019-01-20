@@ -82,6 +82,23 @@ class AudioHelper:
     }
 
   @staticmethod
+  def convert_to_wav(in_file: str)-> typing.Union[str, None]:
+    file_ext = nlp.get_file_extension(in_file)
+    if file_ext == "wav":
+      return in_file
+
+    flac_file = AudioHelper.convert_to_flac(in_file)
+    out_file = flac_file.replace(".flac", ".wav")
+    if os.path.exists(out_file):
+      return out_file
+
+    cmd = f"sox {flac_file} {out_file}"
+    if nlp.execute_cmd(cmd) == 0:
+      return out_file
+
+    return None
+
+  @staticmethod
   def convert_to_flac(in_file: str)-> typing.Union[str, None]:
     ''' Return in_file: return flac format.
     Only convert files appearing in AUDIO_EXTENSIONS'''
