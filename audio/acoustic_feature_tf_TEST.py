@@ -27,7 +27,7 @@ def process(data_graph_mfcc: DataGraphMFCC, wav_file: str, mfcc: int):
   print(f"#length: {file_length}")
 
   start_time = time.time()
-  feat_mfcc, feat_delta1, feat_delta2 = data_graph_mfcc.run(wav_file, 100_000)
+  feat_mfcc, feat_delta1, feat_delta2 = data_graph_mfcc.run(wav_file)
   print(f"tensorflow: {time.time() - start_time}")
   print(len(feat_mfcc), len(feat_mfcc[0]))
   print(f"#frame/sec: {len(feat_mfcc) / file_length}")
@@ -38,12 +38,12 @@ def process(data_graph_mfcc: DataGraphMFCC, wav_file: str, mfcc: int):
   print(f"python: {time.time() - start_time}")
 
 def main():
-  data_graph_mfcc = DataGraphMFCC(dct_coef_count=40, window_size=480,
-                                  stride=160)
+  data_graph_mfcc = DataGraphMFCC(dct_coef_count=40)
   wav_file = os.path.join(
     nlp.get_module_path("common"),
     "audio/test_data/AaronHuey_2010X.sph.wav",
   )
+  AudioHelper.get_basic_audio_info(AudioHelper.convert_to_flac(wav_file))
 
   process(data_graph_mfcc, wav_file, 40)
 

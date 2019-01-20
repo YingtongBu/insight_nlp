@@ -1,28 +1,14 @@
-import common as nlp
-import optparse
-import os
-import sys
-import wave
-from audio.audio_helper import AudioHelper
-import collections
 import tensorflow as tf
-from audio.acoustic_feature import calc_mfcc_delta
 from tensorflow.contrib.framework.python.ops import audio_ops as contrib_audio
 from tensorflow.python.ops import io_ops
-import json
-import random
-import time
-import numpy
-import numpy
 import librosa
+import common as nlp
 
 class DataGraphMFCC:
-  def __init__(
-    self,
-    dct_coef_count: int=13,
-    window_size: int=480,
-    stride: int=160,
-  ):
+  window_size: int=480
+  stride: int=160
+
+  def __init__(self, dct_coef_count: int=13):
    '''
    By default settings, the returned dimension would be [100, 13], [100, 13],
    [100, 13]
@@ -36,8 +22,8 @@ class DataGraphMFCC:
      audio_clamp = tf.clip_by_value(wav_decoder.audio, -1.0, 1.0)
      spectrogram = contrib_audio.audio_spectrogram(
        audio_clamp,
-       window_size=window_size,
-       stride=stride,
+       window_size=self.window_size,
+       stride=self.stride,
        magnitude_squared=True)
 
      feat_ts = contrib_audio.mfcc(
@@ -56,6 +42,7 @@ class DataGraphMFCC:
    self._sess = tf.Session(graph=self._graph)
 
   def run(self, wav_file: str, target_frame_num: int=-1):
+    assert nlp.get_file_extension(wav_file) == "wav"
     if target_frame_num <= 0:
       mfcc = self._sess.run(
         fetches=self._feat_ts,

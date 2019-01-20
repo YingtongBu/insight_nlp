@@ -2,12 +2,14 @@
 #coding: utf8
 #author: Tian Xia (summer.xia1@pactera.com)
 
-from common import *
-from mutagen.flac import *
 # from mutagen.mp3 import MP3
+# import audioread
+from mutagen.flac import *
+from common import print_flush, execute_cmd
 from pydub import AudioSegment
 from pydub.utils import mediainfo
-# import audioread
+import common as nlp
+import os
 import typing
 
 class AudioHelper:
@@ -54,49 +56,36 @@ class AudioHelper:
         yield None
 
   @staticmethod
-  def print_audio_info(flac_file: str):
-    assert flac_file.endswith(".flac")
+  def get_detailed_audio_info(audio_file: str):
+    return mediainfo(audio_file)
 
-    print(f"======= from mediainfo('{flac_file}') =======")
-    info = mediainfo("sample.flac")
-    print(info)
-    print("=" * 32)
+  @staticmethod
+  def get_basic_audio_info(audio_file: str):
+    file_ext = nlp.get_file_extension(audio_file)
 
-    audio = AudioSegment.from_file(flac_file , "flac")
-    channel_count = audio.channels    #Get channels
-    print(f"channel count: {channel_count}")
-
+    audio = AudioSegment.from_file(audio_file, file_ext)
+    channels = audio.channels    #Get channels
     sample_width = audio.sample_width #Get sample width
-    print(f"sample width: {sample_width}")
-
     duration_in_sec = len(audio) / 1000 #Length of audio in sec
-    print(f"duration: {duration_in_sec} seconds")
-
     sample_rate = audio.frame_rate
-    print(f"sample rate: {sample_rate}")
-
     bit_rate = sample_width * 8
-    print(f"bit rate: {bit_rate}")
     #in bytes.
     # file_size = (sample_rate * bit_rate * channel_count * duration_in_sec) / 8
     # print(f"audio file size: {file_size} bytes")
 
-  @staticmethod
-  def get_audio_length(flac_file: str)-> float:
-    assert flac_file.endswith(".flac")
-
-    try:
-      audio = FLAC(flac_file)
-      return audio.info.length
-    except Exception as error:
-      print(f"ERR: {error}")
-      return -1
+    return {
+      "channels": channels,
+      "sample_width": sample_width,
+      "duration": duration_in_sec,
+      "sample_rate": sample_rate,
+      "bit_rate": bit_rate,
+    }
 
   @staticmethod
   def convert_to_flac(in_file: str)-> typing.Union[str, None]:
     ''' Return in_file: return flac format.
     Only convert files appearing in AUDIO_EXTENSIONS'''
-    file_ext = get_file_extension(in_file)
+    file_ext = nlp.get_file_extension(in_file)
 
     if file_ext == "mp3":
       out_file = AudioHelper._convert_mp3_to_wav(in_file)
