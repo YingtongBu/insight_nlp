@@ -27,7 +27,7 @@ def process(data_graph_mfcc: DataGraphMFCC, wav_file: str, mfcc: int):
   print(f"#length: {file_length}")
 
   start_time = time.time()
-  feat_mfcc, feat_delta1, feat_delta2 = data_graph_mfcc.run(wav_file)
+  feat_mfcc, feat_delta1, feat_delta2 = data_graph_mfcc.run(wav_file, 100_000)
   print(f"tensorflow: {time.time() - start_time}")
   print(len(feat_mfcc), len(feat_mfcc[0]))
   print(f"#frame/sec: {len(feat_mfcc) / file_length}")

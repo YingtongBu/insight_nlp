@@ -5,7 +5,7 @@ def main():
   parser = optparse.OptionParser(usage="cmd [optons] ..]")
   #parser.add_option("-q", "--quiet", action="store_true", dest="verbose",
                      #default=False, help="")
-  parser.add_option("--time", type=int, default=5, help="default 5 seconds")
+  parser.add_option("--time", type=int, default=1, help="default 5 seconds")
   parser.add_option("--export_wav_file", default="/tmp/microphone.wav",
                     help="default microphone.wav")
   (options, args) = parser.parse_args()
