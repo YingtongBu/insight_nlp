@@ -5,8 +5,8 @@ import librosa
 import common as nlp
 
 class DataGraphMFCC:
-  window_size: int=480
-  stride: int=160
+  window_size: int=800
+  stride: int=480
 
   def __init__(self, dct_coef_count: int=13):
    '''
@@ -32,11 +32,11 @@ class DataGraphMFCC:
        dct_coefficient_count=dct_coef_count,
      )
      self._feat_ts = feat_ts[0]
-     shape = tf.shape(self._feat_ts)
+     self._real_length = tf.shape(self._feat_ts)[0]
 
      self._expanded_feat_ts = tf.pad(
        self._feat_ts,
-       [[0, self._frame_num - shape[0]], [0, 0]],
+       [[0, self._frame_num - self._real_length], [0, 0]],
      )
 
    self._sess = tf.Session(graph=self._graph)
@@ -44,15 +44,15 @@ class DataGraphMFCC:
   def run(self, wav_file: str, target_frame_num: int=-1):
     assert nlp.get_file_extension(wav_file) == "wav"
     if target_frame_num <= 0:
-      mfcc = self._sess.run(
-        fetches=self._feat_ts,
+      mfcc, real_length = self._sess.run(
+        fetches=[self._feat_ts, self._real_length],
         feed_dict={
           self._wav_file_ts: wav_file
         }
       )
     else:
-      mfcc = self._sess.run(
-        fetches=self._expanded_feat_ts,
+      mfcc, real_length = self._sess.run(
+        fetches=[self._expanded_feat_ts, self._real_length],
         feed_dict={
           self._wav_file_ts: wav_file,
           self._frame_num: target_frame_num
@@ -62,4 +62,4 @@ class DataGraphMFCC:
     mfcc_delta1 = librosa.feature.delta(mfcc)
     mfcc_delta2 = librosa.feature.delta(mfcc_delta1)
 
-    return [mfcc, mfcc_delta1, mfcc_delta2]
+    return [mfcc, mfcc_delta1, mfcc_delta2, real_length]
