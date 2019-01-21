@@ -149,7 +149,7 @@ def get_file_base(file_name: str)-> str:
   return os.path.basename(file_name).split(".")[0]
 
 def get_files_in_folder(data_path, file_extensions: list=None,
-                        resursive=False)-> typing.Iterator:
+                        resursive=False)-> list:
   '''file_exts: should be a set, or None, e.g, ["wav", "flac"]
   return: an iterator, [fullFilePath]'''
   def legal_file(short_name):
@@ -162,10 +162,13 @@ def get_files_in_folder(data_path, file_extensions: list=None,
     assert isinstance(file_extensions, (list, dict))
     file_extensions = set(file_extensions)
 
+  results = []
   for path, folders, files in os.walk(data_path, resursive):
     for short_name in files:
       if legal_file(short_name):
-        yield os.path.realpath(os.path.join(path, short_name))
+        results.append(os.path.realpath(os.path.join(path, short_name)))
+
+  return results
 
 def create_list(shape: list, value=None):
   assert len(shape) > 0

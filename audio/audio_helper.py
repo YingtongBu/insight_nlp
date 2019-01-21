@@ -21,34 +21,37 @@ class AudioHelper:
   ]
 
   @staticmethod
-  def segment_audio(flac_file: str, time_segments: list,
+  def segment_audio(flac_or_wav_file: str, time_segments: list,
                     dest_folder: str)-> typing.Iterator:
     '''
     time_segments: [(12,97, 18.89), (18.43, 27.77) ...] in seconds.
     return: an iterator retuning a new segment file. If one time segment is
     invalid, then the its corresponding segment file name is None.
     '''
-    assert flac_file.endswith(".flac")
+    file_ext = nlp.get_file_extension(flac_or_wav_file)
+    assert file_ext in ["flac", "wav"]
     assert os.path.exists(dest_folder)
 
-    base_name = os.path.basename(flac_file)
-    audio = AudioSegment.from_file(flac_file , "flac")
+    base_name = os.path.basename(flac_or_wav_file)
+    audio = AudioSegment.from_file(flac_or_wav_file, file_ext)
     duration = len(audio)
     for file_id, (time_from, time_to) in enumerate(time_segments):
       t_from = time_from * 1000
       t_to = time_to * 1000
 
       if not (0 <= t_from < t_to < duration):
-        print(f"WARN: {flac_file} is not complete. "
+        print(f"WARN: {flac_or_wav_file} is not complete. "
               f"Actual length: {duration / 1000} seconds, "
               f"while time segment is {time_from}-{time_to}")
         yield None
         continue
 
-      seg_name = os.path.join(dest_folder,
-                              base_name.replace(".flac", f".{file_id:04}.flac"))
+      seg_name = os.path.join(
+        dest_folder, base_name.replace(f".{file_ext}",
+                                       f".{file_id:04}.{file_ext}")
+      )
       try:
-        audio[t_from: t_to].export(seg_name, format="flac")
+        audio[t_from: t_to].export(seg_name, format=file_ext)
         yield seg_name
 
       except Exception as error:
@@ -56,11 +59,11 @@ class AudioHelper:
         yield None
 
   @staticmethod
-  def get_detailed_audio_info(audio_file: str):
+  def get_detailed_audio_info(audio_file: str)-> dict:
     return mediainfo(audio_file)
 
   @staticmethod
-  def get_basic_audio_info(audio_file: str):
+  def get_basic_audio_info(audio_file: str)-> dict:
     file_ext = nlp.get_file_extension(audio_file)
 
     audio = AudioSegment.from_file(audio_file, file_ext)
@@ -82,12 +85,8 @@ class AudioHelper:
     }
 
   @staticmethod
-  def convert_to_wav(in_file: str)-> typing.Union[str, None]:
-    file_ext = nlp.get_file_extension(in_file)
-    if file_ext == "wav":
-      return in_file
-
-    flac_file = AudioHelper.convert_to_flac(in_file)
+  def _convert_flac_to_wav(flac_file: str)-> typing.Union[str, None]:
+    assert flac_file.endswith(".flac")
     out_file = flac_file.replace(".flac", ".wav")
     if os.path.exists(out_file):
       return out_file
@@ -97,6 +96,26 @@ class AudioHelper:
       return out_file
 
     return None
+
+  @staticmethod
+  def convert_to_wav(in_file: str)-> typing.Union[str, None]:
+    file_ext = nlp.get_file_extension(in_file)
+
+    if file_ext == "mp3":
+      return AudioHelper._convert_mp3_to_wav(in_file)
+
+    elif file_ext == "flac":
+      return AudioHelper._convert_flac_to_wav(in_file)
+
+    elif file_ext == "wav":
+      return in_file
+
+    elif file_ext == "sph":
+      return AudioHelper._convert_sph_to_wav(in_file)
+
+    else:
+      assert False, \
+        f"{in_file} extension is not in {AudioHelper.AUDIO_EXTENSIONS}"
 
   @staticmethod
   def convert_to_flac(in_file: str)-> typing.Union[str, None]:
@@ -130,43 +149,43 @@ class AudioHelper:
         f"{in_file} extension is not in {AudioHelper.AUDIO_EXTENSIONS}"
 
   @staticmethod
-  def _convert_wav_to_flac(full_in_name: str)-> typing.Union[str, None]:
-    assert full_in_name.endswith(".wav")
-    out_file = full_in_name.replace(".wav", ".flac")
+  def _convert_wav_to_flac(wav_file: str)-> typing.Union[str, None]:
+    assert wav_file.endswith(".wav")
+    out_file = wav_file.replace(".wav", ".flac")
     if os.path.exists(out_file):
       return out_file
 
-    cmd = f"sox {full_in_name} {out_file}"
+    cmd = f"sox {wav_file} {out_file}"
     if execute_cmd(cmd) == 0:
       return out_file
 
     return None
 
   @staticmethod
-  def _convert_mp3_to_wav(full_in_name: str)-> typing.Union[str, None]:
-    assert full_in_name.endswith(".mp3")
-    out_file = full_in_name.replace(".mp3", ".wav")
+  def _convert_mp3_to_wav(map3_file: str)-> typing.Union[str, None]:
+    assert map3_file.endswith(".mp3")
+    out_file = map3_file.replace(".mp3", ".wav")
     if os.path.exists(out_file):
       return out_file
 
-    cmd = f"ffmpeg -i {full_in_name} {out_file}"
+    cmd = f"ffmpeg -i {map3_file} {out_file}"
     if execute_cmd(cmd) == 0:
       return out_file
 
     return None
 
   @staticmethod
-  def _convert_sph_to_wav(full_in_name: str)-> typing.Union[str, None]:
-    assert full_in_name.endswith(".sph")
-    out_file = full_in_name.replace(".sph", ".wav")
+  def _convert_sph_to_wav(sph_file: str)-> typing.Union[str, None]:
+    assert sph_file.endswith(".sph")
+    out_file = sph_file.replace(".sph", ".wav")
     if os.path.exists(out_file):
       return out_file
 
-    cmd = f"sox {full_in_name} {out_file}"
+    cmd = f"sox {sph_file} {out_file}"
     if execute_cmd(cmd) == 0:
       return out_file
 
-    cmd = f"sph2pipe -f rif {full_in_name} {out_file}"
+    cmd = f"sph2pipe -f rif {sph_file} {out_file}"
     if execute_cmd(cmd) == 0:
       return out_file
 
