@@ -2,6 +2,8 @@
 #author: Tian Xia (summer.xia1@pactera.com)
 
 import tensorflow as tf
+import typing
+from operator import itemgetter
 
 activations = tf.keras.activations
 estimator = tf.estimator
@@ -13,6 +15,26 @@ rnn_cell = tf.nn.rnn_cell
 norm_init1 = tf.truncated_normal_initializer(stddev=0.1)
 rand_init1 = tf.random_uniform_initializer(-1, 1)
 const_init = tf.constant_initializer
+
+def construct_optimizer(
+  loss: tf.Tensor,
+  learning_rate: typing.Union[float, tf.Tensor]=0.001,
+  gradient_norm: typing.Union[float, None]=None
+):
+  opt = tf.train.AdamOptimizer(learning_rate=learning_rate)
+  update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
+  with tf.control_dependencies(update_ops):
+    gradient = opt.compute_gradients(loss=loss)
+    if gradient_norm is None:
+      opt_op = opt.apply_gradients(gradient)
+
+    else:
+      grads = list(map(itemgetter(0), gradient))
+      parms = list(map(itemgetter(1), gradient))
+      grads, _ = tf.clip_by_global_norm(grads, gradient_norm)
+      opt_op = opt.apply_gradients(list(zip(grads, parms)))
+
+    return opt_op
 
 def linear_layer(input, output_size, scope=None):
     '''
