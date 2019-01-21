@@ -5,14 +5,18 @@ import librosa
 import common as nlp
 
 class DataGraphMFCC:
-  window_size: int=800
-  stride: int=480
+  window_size:  int=25        # ms
+  stride:       int=10        # ms
+  sample_rate:  int=16000
 
   def __init__(self, dct_coef_count: int=13):
     '''
-    By default settings, the returned dimension would be [100, 13], [100, 13],
-    [100, 13]
+    suppose the channel number is 1.
     '''
+    sample_per_second = DataGraphMFCC.sample_rate / 1000
+    window = DataGraphMFCC.window_size * sample_per_second
+    stride = DataGraphMFCC.stride * sample_per_second
+
     self._graph = tf.Graph()
     with self._graph.as_default():
       self._wav_file_ts = tf.placeholder(tf.string, [], name='wav_filename')
@@ -22,8 +26,8 @@ class DataGraphMFCC:
       audio_clamp = tf.clip_by_value(wav_decoder.audio, -1.0, 1.0)
       spectrogram = contrib_audio.audio_spectrogram(
         audio_clamp,
-        window_size=self.window_size,
-        stride=self.stride,
+        window_size=window,
+        stride=stride,
         magnitude_squared=True)
 
       feat_ts = contrib_audio.mfcc(

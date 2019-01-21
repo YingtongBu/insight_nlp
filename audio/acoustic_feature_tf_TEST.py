@@ -23,11 +23,12 @@ import librosa
 
 def process(data_graph_mfcc: DataGraphMFCC, wav_file: str, mfcc: int):
   flac_file = AudioHelper.convert_to_flac(wav_file)
-  file_length = AudioHelper.get_audio_length(flac_file)
+  file_info = AudioHelper.get_basic_audio_info(flac_file)
+  file_length = file_info["duration"]
   print(f"#length: {file_length}")
 
   start_time = time.time()
-  feat_mfcc, feat_delta1, feat_delta2 = data_graph_mfcc.run(wav_file)
+  feat_mfcc, feat_delta1, feat_delta2, real_len = data_graph_mfcc.run(wav_file)
   print(f"tensorflow: {time.time() - start_time}")
   print(len(feat_mfcc), len(feat_mfcc[0]))
   print(f"#frame/sec: {len(feat_mfcc) / file_length}")
