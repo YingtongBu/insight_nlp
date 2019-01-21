@@ -12,8 +12,9 @@ if __name__ == '__main__':
     "audio/test_data"
   )
 
-  files = nlp.get_files_in_folder(data_path,
-                                  file_extensions=AudioHelper.AUDIO_EXTENSIONS)
+  files = nlp.get_files_in_folder(
+    data_path, file_extensions=AudioHelper.AUDIO_EXTENSIONS
+  )
 
   for in_file in files:
     # out_file = AudioHelper.convert_to_flac(in_file)
