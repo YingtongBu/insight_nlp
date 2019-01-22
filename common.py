@@ -59,14 +59,13 @@ def cmp(a, b)-> int:
 def get_home_dir():
   return os.environ["HOME"]
 
-def ensure_folder_exists(folder: str)-> None:
+def ensure_folder_exists(folder: str, delete_first: bool=False)-> None:
+  if delete_first:
+    execute_cmd(f"rm -r {folder}")
+
   if not os.path.exists(folder):
     os.system(f"mkdir {folder}")
-  
-  elif os.path.isfile(folder):
-    print(f"WARN: The folder '{folder} to make preexists as a file.'")
-    os.system(f"rm {folder}; mkdir {folder}")
-    
+
 def split_to_sublist(data)-> list:
   '''
   :param data: [[a1, b1, ...], [a2, b2, ...], ...]

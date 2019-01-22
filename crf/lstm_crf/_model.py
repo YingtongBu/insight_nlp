@@ -33,8 +33,8 @@ class _Model(object):
     bi_LSTM_states = TF.create_bi_LSTM(word_ids=self.input_x,
                                        vob_size=vob_size,
                                        embedding_size=embedding_size,
-                                       LSTM_layer_num=LSTM_layer_num,
-                                       RNN_type=RNN_type)
+                                       rnn_layer_num=LSTM_layer_num,
+                                       rnn_type=RNN_type)
     bi_LSTM_states = tf.unstack(tf.nn.dropout(bi_LSTM_states,
                                               self.dropout_keep_prob))
     self.states2tags = [self._observation_tag_probs(state, pos)

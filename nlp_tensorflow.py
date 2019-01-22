@@ -139,58 +139,53 @@ def log_sum(tensor_list):
   tensor = tf.concat(tensor_list, 1)
   return tf.reduce_logsumexp(tensor, 1)
 
-def create_bi_LSTM(word_ids, vob_size, embedding_size, LSTM_layer_num,
-                   RNN_type="lstm"):
-  '''
-  :param word_ids: tensor, of shape [batch_size, length]
-  :param vob_size:
-  :param embedding_size:
-  :param LSTM_layer_num:
-  :return:
-  '''
-  def encode(input, score_name, reuse):
-    with tf.variable_scope(tf.get_variable_scope(), reuse=reuse):
-      embeddings = tf.get_variable("embeddings", [vob_size, embedding_size])
-     
+def create_bi_LSTM(
+  word_vec: tf.Tensor,  # [batch, max_len, embedding_size]
+  rnn_layer_num: int,
+  hidden_unit_num: int,
+  rnn_type: str= "lstm"
+)-> list:
+  def encode(input, score_name):
     with tf.variable_scope(score_name, reuse=False):
-      if RNN_type.lower() == "lstm":
+      if rnn_type.lower() == "lstm":
         cell = rnn_cell.LSTMCell
-      elif RNN_type.lower() == "gru":
+      elif rnn_type.lower() == "gru":
         cell = rnn_cell.GRUCell
       else:
         assert False
         
-      cell = rnn_cell.MultiRNNCell([cell(embedding_size)
-                                    for _ in range(LSTM_layer_num)])
-      word_vec = lookup0(embeddings, input)
-      word_list = tf.unstack(word_vec, axis=1)
+      cell = rnn_cell.MultiRNNCell(
+        [cell(hidden_unit_num) for _ in range(rnn_layer_num)]
+      )
+      word_list = tf.unstack(input, axis=1)
       outputs, encoding = tf.nn.static_rnn(cell, word_list, dtype=tf.float32)
+
       return outputs
-  
+
   rnn_cell = tf.nn.rnn_cell
-  outputs1 = encode(word_ids, "directed", reuse=False)
-  outputs2 = encode(tf.reverse(word_ids, [1]), "reversed", reuse=True)
+  outputs1 = encode(word_vec, "directed")
+  outputs2 = encode(tf.reverse(word_vec, [1]), "reversed")
   outputs2 = list(reversed(outputs2))
   
   outputs = [tf.concat(o, axis=1) for o in zip(outputs1, outputs2)]
+
   return outputs
 
-def basic_attention(status: list):
+def basic_attention(statuses: list, context: tf.Tensor)-> tf.Tensor:
   '''
-  :param status, a tensor with shape [?, status-number, hidden-unit]
+  status: list of [batch, hidden-unit]
+  context = tf.Variable(
+    tf.random_uniform([hidden_unit], -1., 1), dtype=tf.float32
+  )
   '''
-  hidden_unit = status.shape.as_list()[2]
-  context = tf.Variable(tf.random_uniform([hidden_unit], -1., 1),
-                        dtype=tf.float32)
+  status = tf.stack(statuses)
+  status = tf.transpose(status, [1, 0, 2])
+
   scores = tf.reduce_sum(status * context, 2)
-  probs = tf.keras.activations.softmax(scores)
-
-  status = tf.transpose(status, [0, 2, 1])
+  probs = tf.nn.softmax(scores)
   probs = tf.expand_dims(probs, 2)
-  weighted_out = tf.matmul(status, probs)
-  weighted_out = tf.squeeze(weighted_out, 2)
 
-  return weighted_out
+  return tf.reduce_sum(status * probs, 1)
 
 def batch_norm_wrapper(inputs, scope_name, is_train: bool, decay=0.99,
                        float_type=tf.float32):
