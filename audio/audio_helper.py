@@ -71,7 +71,7 @@ class AudioHelper:
     sample_width = audio.sample_width #Get sample width
     duration_in_sec = len(audio) / 1000 #Length of audio in sec
     sample_rate = audio.frame_rate
-    bit_rate = sample_width * 8
+    bit_per_sample = sample_width * 8
     #in bytes.
     # file_size = (sample_rate * bit_rate * channel_count * duration_in_sec) / 8
     # print(f"audio file size: {file_size} bytes")
@@ -81,7 +81,7 @@ class AudioHelper:
       "sample_width": sample_width,
       "duration": duration_in_sec,
       "sample_rate": sample_rate,
-      "bit_rate": bit_rate,
+      "bit_per_sample": bit_per_sample,
     }
 
   @staticmethod

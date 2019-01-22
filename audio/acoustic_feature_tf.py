@@ -14,8 +14,8 @@ class DataGraphMFCC:
     suppose the channel number is 1.
     '''
     sample_per_second = DataGraphMFCC.sample_rate / 1000
-    window = DataGraphMFCC.window_size * sample_per_second
-    stride = DataGraphMFCC.stride * sample_per_second
+    window = int(DataGraphMFCC.window_size * sample_per_second)
+    stride = int(DataGraphMFCC.stride * sample_per_second)
 
     self._graph = tf.Graph()
     with self._graph.as_default():
