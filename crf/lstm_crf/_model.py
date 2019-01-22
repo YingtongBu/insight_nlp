@@ -29,12 +29,16 @@ class _Model(object):
     trans_probs = tf.get_variable("raw_trans_probs",
                                   [tag_size, tag_size], tf.float32)
     self.trans_probs = self._norm(trans_probs, 1, "trans_probs")
-    
-    bi_LSTM_states = TF.create_bi_LSTM(word_ids=self.input_x,
-                                       vob_size=vob_size,
-                                       embedding_size=embedding_size,
-                                       rnn_layer_num=LSTM_layer_num,
-                                       rnn_type=RNN_type)
+
+    embeddings = tf.get_variable("embeddings", [vob_size, embedding_size])
+    word_vec = TF.lookup0(embeddings, self.input_x)
+
+    bi_LSTM_states = TF.create_bi_LSTM(
+      word_vec=word_vec,
+      rnn_layer_num=LSTM_layer_num,
+      hidden_unit_num=embedding_size,
+      rnn_type=RNN_type
+    )
     bi_LSTM_states = tf.unstack(tf.nn.dropout(bi_LSTM_states,
                                               self.dropout_keep_prob))
     self.states2tags = [self._observation_tag_probs(state, pos)
