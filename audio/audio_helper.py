@@ -72,6 +72,7 @@ class AudioHelper:
     duration_in_sec = len(audio) / 1000 #Length of audio in sec
     sample_rate = audio.frame_rate
     bit_per_sample = sample_width * 8
+    bit_rate = sample_rate * bit_per_sample * channels
     #in bytes.
     # file_size = (sample_rate * bit_rate * channel_count * duration_in_sec) / 8
     # print(f"audio file size: {file_size} bytes")
@@ -82,6 +83,7 @@ class AudioHelper:
       "duration": duration_in_sec,
       "sample_rate": sample_rate,
       "bit_per_sample": bit_per_sample,
+      "bit_rate": bit_rate,
     }
 
   @staticmethod
@@ -94,6 +96,18 @@ class AudioHelper:
     cmd = f"sox {flac_file} {out_file}"
     if nlp.execute_cmd(cmd) == 0:
       return out_file
+
+    return None
+
+  @staticmethod
+  def convert_to_16bits(wav_file: str)-> str:
+    assert wav_file.endswith(".wav")
+    new_file = wav_file.replace(".wav", ".16bits.wav")
+    if os.path.exists(new_file):
+      return new_file
+
+    if nlp.execute_cmd(f"sox {wav_file} -b 16 {new_file}") == 0:
+      return new_file
 
     return None
 
