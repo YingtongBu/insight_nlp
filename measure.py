@@ -6,6 +6,8 @@ from collections import defaultdict, Counter
 from common import EPSILON
 import numpy
 import multiprocessing as mp
+import contextlib
+import gc
 
 class Measure:
   @staticmethod
@@ -37,12 +39,24 @@ class Measure:
     return d[len(ref_words)][len(hyp_words)]
 
   @staticmethod
-  def WER(ref_words_list: list, hyp_words_list: list):
-    error = sum(
-      mp.Pool().map(Measure._WER_single, zip(ref_words_list, hyp_words_list))
-    )
-    ref_count = max(1, sum([len(hyp) for hyp in ref_words_list]))
+  def WER(ref_words_list: list, hyp_words_list: list, parallel: bool=False):
+    '''
+    In the parallel mode, the multiprocess.Pool() would leads memory leak.
+    '''
+    assert type(ref_words_list) is list and type(ref_words_list[0]) is list
 
+    if parallel:
+      pool = mp.Pool()
+      error = sum(
+        pool.map(Measure._WER_single, zip(ref_words_list, hyp_words_list))
+      )
+      pool.close()
+
+    else:
+      error = sum([Measure._WER_single([ref, hyp])
+                   for ref, hyp in zip(ref_words_list, hyp_words_list)])
+
+    ref_count = max(1, sum([len(hyp) for hyp in ref_words_list]))
     return error / ref_count
 
   @staticmethod

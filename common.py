@@ -256,7 +256,7 @@ def eq(v1, v2, prec=EPSILON):
 def get_memory(size_type="rss")-> float:
   '''Generalization; memory sizes (MB): rss, rsz, vsz.'''
   content = os.popen(f"ps -p {os.getpid()} -o {size_type} | tail -1").read()
-  return round(content / 1024, 3)
+  return round(float(content) / 1024, 3)
 
 def discrete_sample(dists)-> int:
   '''each probability must be greater than 0'''
