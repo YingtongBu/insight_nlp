@@ -7,13 +7,12 @@ from pa_nlp import common as nlp
 class DataGraphMFCC:
   window_size:  int=25        # ms
   stride:       int=10        # ms
-  sample_rate:  int=16000
 
-  def __init__(self, dct_coef_count: int=13):
+  def __init__(self, sample_rate: int, dct_coef_count: int):
     '''
     suppose the channel number is 1.
     '''
-    sample_per_second = DataGraphMFCC.sample_rate / 1000
+    sample_per_second = sample_rate / 1000
     window = int(DataGraphMFCC.window_size * sample_per_second)
     stride = int(DataGraphMFCC.stride * sample_per_second)
 

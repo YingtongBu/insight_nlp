@@ -28,11 +28,12 @@ def process(data_graph_mfcc: DataGraphMFCC, wav_file: str, mfcc: int):
   print(f"python: {time.time() - start_time}")
 
 def main():
-  data_graph_mfcc = DataGraphMFCC(dct_coef_count=40)
-  wav_file = os.path.join(
-    nlp.get_module_path("common"),
-    "audio/test_data/AaronHuey_2010X.sph.wav",
+  data_graph_mfcc = DataGraphMFCC(16000, 40)
+  audio_file = os.path.join(
+    nlp.get_module_path("pa_nlp.common"),
+    "pa_nlp/audio/test_data/AaronHuey_2010X.sph",
   )
+  wav_file = AudioHelper.convert_to_wav(audio_file)
   AudioHelper.get_basic_audio_info(AudioHelper.convert_to_flac(wav_file))
 
   process(data_graph_mfcc, wav_file, 40)
