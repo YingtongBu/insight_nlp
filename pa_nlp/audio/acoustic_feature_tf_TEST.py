@@ -9,7 +9,6 @@ from pa_nlp.audio.audio_helper import AudioHelper
 from pa_nlp.audio.acoustic_feature import calc_mfcc_delta
 import time
 
-
 def process(data_graph_mfcc: DataGraphMFCC, wav_file: str, mfcc: int):
   flac_file = AudioHelper.convert_to_flac(wav_file)
   file_info = AudioHelper.get_basic_audio_info(flac_file)

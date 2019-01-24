@@ -34,7 +34,6 @@ if __name__ == "__main__":
     print(f"{full_name}, {is_existed}")
     assert is_existed
 
-
   data = [("a", 1), ("a", 2), ("b", 3), ("c", 4)]
   print(list(group_by_key(iter(data))))
 

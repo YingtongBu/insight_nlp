@@ -1,3 +1,6 @@
+#coding: utf8
+#author: Tian Xia (summer.xia1@pactera.com)
+
 from pa_nlp.audio.microphone import Microphone
 import optparse
 

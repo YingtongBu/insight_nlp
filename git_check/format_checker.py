@@ -2,6 +2,7 @@
 #author: Tian Xia (summer.xia1@pactera.com)
 
 from optparse import OptionParser
+import pa_nlp.common as nlp
 import re, os
 
 debug = None
@@ -206,7 +207,7 @@ def get_all_source_files(args):
       yield from args
     
     else:
-      yield from common.get_files_in_folder(os.getcwd(), ["py"], True)
+      yield from nlp.get_files_in_folder(os.getcwd(), ["py"], True)
 
   for fname in getNextFile():
     if "format_checker.py" not in fname:

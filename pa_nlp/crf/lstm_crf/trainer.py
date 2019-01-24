@@ -13,7 +13,6 @@ from pa_nlp.crf.lstm_crf._model import _Model
 from pa_nlp.crf.lstm_crf.data import *
 from pa_nlp import chinese
 
-
 class Trainer(object):
   def train(self, param):
     self.param = param

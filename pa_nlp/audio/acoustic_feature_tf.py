@@ -1,3 +1,6 @@
+#coding: utf8
+#author: Tian Xia (summer.xia1@pactera.com)
+
 import tensorflow as tf
 from tensorflow.contrib.framework.python.ops import audio_ops as contrib_audio
 from tensorflow.python.ops import io_ops

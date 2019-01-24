@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 #coding: utf8
 #author: Tian Xia (summer.xia1@pactera.com)
 

@@ -4,7 +4,6 @@
 import tensorflow as tf
 from pa_nlp import tensorflow as TF
 
-
 class Model(object):
   def __init__(
     self,
@@ -84,3 +83,4 @@ class Model(object):
       self.loss = losses + l2_reg_lambda * l2_loss
 
       self.accuracy = TF.accuracy(self.predicted_class, self.input_y)
+

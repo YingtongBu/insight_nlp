@@ -1,3 +1,6 @@
+#coding: utf8
+#author: Tian Xia (summer.xia1@pactera.com)
+
 import librosa
 import numpy as np
 from pa_nlp import common as nlp
@@ -18,11 +21,11 @@ def calc_mfcc_delta(audio_file: str, mfcc_dim: int):
     [1, 0]
   )
 
-  mfcc_delta = librosa.feature.delta(mfcc)
-  mfcc_delta2 = librosa.feature.delta(mfcc, order=2)
+  delta1 = librosa.feature.delta(mfcc)
+  delta2 = librosa.feature.delta(mfcc, order=2)
 
   feature = []
-  for v1, v2, v3 in zip(mfcc.tolist(), mfcc_delta.tolist(), mfcc_delta2.tolist()):
+  for v1, v2, v3 in zip(mfcc.tolist(), delta1.tolist(), delta2.tolist()):
     feature.append(v1 + v2 + v3)
 
   return feature
