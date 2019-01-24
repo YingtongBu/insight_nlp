@@ -2,7 +2,7 @@
 #coding: utf8
 #author: Tian Xia (summer.xia1@pactera.com)
 
-from common import *
+from pa_nlp.common import *
 
 def get_testing_files(cwd, args):
   '''

@@ -2,7 +2,7 @@
 #coding: utf8
 #author: Tian Xia (summer.xia1@pactera.com)
 
-from common import *
+from pa_nlp.common import *
 from git_check.format_checker import *
 
 USER_WHITE_LIST = set(["summer"])

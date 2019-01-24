@@ -3,10 +3,10 @@
 #author: Tian Xia (summer.xia1@pactera.com)
 
 import optparse
-import common as nlp
+from pa_nlp import common as nlp
 import os
 import time
-from audio.audio_helper import AudioHelper
+from pa_nlp.audio.audio_helper import AudioHelper
 import multiprocessing as mp
 from collections import defaultdict
 

@@ -3,7 +3,6 @@
 
 from optparse import OptionParser
 import re, os
-import common as Common
 
 debug = None
 
@@ -207,7 +206,7 @@ def get_all_source_files(args):
       yield from args
     
     else:
-      yield from Common.get_files_in_folder(os.getcwd(), ["py"], True)
+      yield from common.get_files_in_folder(os.getcwd(), ["py"], True)
 
   for fname in getNextFile():
     if "format_checker.py" not in fname:

@@ -3,9 +3,8 @@
 #author: Tian Xia (summer.xia1@pactera.com)
 
 import optparse
-import common as nlp
 import os
-from audio.audio_helper import AudioHelper
+from pa_nlp.audio.audio_helper import AudioHelper
 
 def main():
   parser = optparse.OptionParser(usage="cmd [optons] [audio1, ...]")
