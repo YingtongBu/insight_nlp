@@ -2,7 +2,7 @@
 #author: Tian Xia (summer.xia1@pactera.com)
 
 import tensorflow as tf
-from pa_nlp import nlp_tensorflow as TF
+from pa_nlp import tensorflow as TF
 
 
 class Model(object):

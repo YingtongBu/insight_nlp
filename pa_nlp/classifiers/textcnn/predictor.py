@@ -1,7 +1,7 @@
 #coding: utf8
 #author: Tian Xia (summer.xia1@pactera.com)
 
-from pa_nlp.nlp_tensorflow import *
+from pa_nlp.tensorflow import *
 from pa_nlp.classifiers.textcnn.config import Model
 from pa_nlp.classifiers.textcnn.data import *
 from pa_nlp.measure import Measure

@@ -2,7 +2,7 @@
 #author: Tian Xia (summer.xia1@pactera.com)
 
 from pa_nlp.common import *
-from pa_nlp.nlp_tensorflow import *
+from pa_nlp.tensorflow import *
 
 if __name__ == "__main__":
   parser = OptionParser(usage="cmd dev1@dir1 dir2")

@@ -8,7 +8,7 @@
    e.g., 1634--> one token。
 '''
 
-from pa_nlp.nlp_tensorflow import *
+from pa_nlp.tensorflow import *
 from pa_nlp.crf.lstm_crf._model import _Model
 from pa_nlp.crf.lstm_crf.data import *
 from pa_nlp import chinese

@@ -1,7 +1,7 @@
 #coding: utf8
 #author: Tian Xia (summer.xia1@pactera.com)
 
-from pa_nlp.nlp_tensorflow import *
+from pa_nlp.tensorflow import *
 from pa_nlp.crf.lstm_crf.data import *
 from pa_nlp.crf.lstm_crf.trainer import Trainer
 

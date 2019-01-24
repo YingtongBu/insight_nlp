@@ -6,7 +6,6 @@ from pa_nlp.common import EPSILON
 import numpy
 import multiprocessing as mp
 
-
 class Measure:
   @staticmethod
   def _WER_single(param):
