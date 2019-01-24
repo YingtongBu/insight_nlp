@@ -6,7 +6,7 @@ from pyaudio import PyAudio, paInt16
 import time
 
 class Microphone:
-  FRAME_RATE    = 48000
+  SAMPLE_RATE    = 44100
   SAMPLE_NUM    = 8000
   CHANNEL_NUM   = 1
   SAMPLE_WIDTH  = 2
@@ -16,7 +16,7 @@ class Microphone:
     with wave.open(export_audio_name, 'wb') as wf:
       wf.setnchannels(self.CHANNEL_NUM)
       wf.setsampwidth(self.SAMPLE_WIDTH)
-      wf.setframerate(self.FRAME_RATE)
+      wf.setframerate(self.SAMPLE_RATE)
       wf.writeframes(b"".join(data))
 
     print(f"{export_audio_name} is saved!")
@@ -26,7 +26,7 @@ class Microphone:
 
     stream = PyAudio().open(format=paInt16,
                             channels=self.CHANNEL_NUM,
-                            rate=self.FRAME_RATE,
+                            rate=self.SAMPLE_RATE,
                             input=True,
                             frames_per_buffer=self.SAMPLE_NUM)
     my_buf = []
