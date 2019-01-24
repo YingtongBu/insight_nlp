@@ -17,16 +17,24 @@ if __name__ == "__main__":
                    [3.,]])
   output = log_sum([x, y])
   print(sess.run(output))
- 
+
   x = tf.constant([1, 2, 3, 4, 5, 6, 7, 8], dtype=tf.float32)
   x = tf.reshape(x, [2, -1])
-  
+
   y = tf.constant([2, 3, 4, 5, 6, 7, 8, 9], dtype=tf.float32)
   y = tf.reshape(y, [2, -1])
-  
+
   d = tf.stack([x, y])
   print(sess.run(d))
-  
-  z = basic_attention(d)
-  print(z)
+
+  context = tf.get_variable(
+    name="context", shape=[1, 4], dtype=tf.float32,
+    initializer=tf.initializers.ones()
+  )
+  sess.run(tf.global_variables_initializer())
+
+  print(sess.run(context))
+
+  z = basic_attention(d, context)
+  print(sess.run(z))
 
