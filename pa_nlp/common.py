@@ -64,7 +64,7 @@ def ensure_folder_exists(folder: str, delete_first: bool=False)-> None:
     execute_cmd(f"rm -r {folder}")
 
   if not os.path.exists(folder):
-    os.system(f"mkdir {folder}")
+    execute_cmd(f"mkdir {folder}")
 
 def split_to_sublist(data)-> list:
   '''

@@ -4,7 +4,6 @@ from tensorflow.python.ops import io_ops
 import librosa
 from pa_nlp import common as nlp
 
-
 class DataGraphMFCC:
   window_size:  int=25        # ms
   stride:       int=10        # ms
