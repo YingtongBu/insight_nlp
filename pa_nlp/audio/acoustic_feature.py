@@ -6,18 +6,30 @@ import numpy as np
 from pa_nlp import common as nlp
 import time
 import multiprocessing as mp
+from pa_nlp.audio.audio_helper import AudioHelper
 
 # output length = (seconds) * (sample rate) / (hop_length)
 HOP_LENGTH = 512
 
-def calc_mfcc_delta(audio_file: str, mfcc_dim: int):
+def calc_mfcc_delta(wav_file_16bits: str, mfcc_dim: int,
+                    file_sample_rate: int):
   '''
   :return: [mfcc, mfcc_delta, mfcc_delta2]
   '''
-  wav_data, sample_rate = librosa.load(audio_file)
+  file_info = AudioHelper.get_basic_audio_info(wav_file_16bits)
+  sample_width = file_info["sample_width"]
+  assert sample_width == 2
+
+  #librosa.load has be bug for sample_width=1
+  #import scipy.io.wavfile as wavfile #this is correct
+  #sample_rate, data = wavfile.read(wav_file_8_or_16_bits)
+  #sr=None, means loading native sample rate; otherwise, resample to it.
+  wav_data, real_sample_rate = librosa.load(wav_file_16bits, sr=None)
+  assert real_sample_rate == file_sample_rate
   mfcc = np.transpose(
-    librosa.feature.mfcc(wav_data, sample_rate, n_mfcc=mfcc_dim,
-                         hop_length=HOP_LENGTH),
+    librosa.feature.mfcc(
+      wav_data, real_sample_rate, n_mfcc=mfcc_dim, hop_length=HOP_LENGTH
+    ),
     [1, 0]
   )
 
@@ -30,9 +42,9 @@ def calc_mfcc_delta(audio_file: str, mfcc_dim: int):
 
   return feature
 
-def parallel_calc_features(audio_files: list, mfcc_dim: int,
-                           output_folder: str, process_num: int,
-                           queue_capacity: int=1024):
+def parallel_calc_features(wav_files_16bits: list, mfcc_dim: int,
+                           target_sample_rate: int, output_folder: str,
+                           process_num: int, queue_capacity: int=1024):
   def run_process(process_id: int, audio_file_pipe: mp.Queue):
     count = 0
     with open(f"{output_folder}/part.{process_id}.feat", "w") as fou:
@@ -42,7 +54,7 @@ def parallel_calc_features(audio_files: list, mfcc_dim: int,
           print(f"run_process[{process_id}] exits!")
           break
 
-        feature = calc_mfcc_delta(audio_file, mfcc_dim)
+        feature = calc_mfcc_delta(audio_file, mfcc_dim, target_sample_rate)
         print([audio_file, feature], file=fou)
 
         count += 1
@@ -62,7 +74,7 @@ def parallel_calc_features(audio_files: list, mfcc_dim: int,
   for p in process_runners:
     p.start()
 
-  for audio_file in audio_files:
+  for audio_file in wav_files_16bits:
     file_pipe.put(audio_file)
 
   for _ in process_runners:
@@ -72,4 +84,4 @@ def parallel_calc_features(audio_files: list, mfcc_dim: int,
     p.join()
 
   duration = nlp.to_readable_time(time.time() - start_time)
-  print(f"It takes {duration} to process {len(audio_files)} audio files")
+  print(f"It takes {duration} to process {len(wav_files_16bits)} audio files")

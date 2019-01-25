@@ -6,63 +6,85 @@ from tensorflow.contrib.framework.python.ops import audio_ops as contrib_audio
 from tensorflow.python.ops import io_ops
 import librosa
 from pa_nlp import common as nlp
+from pa_nlp.audio.audio_helper import AudioHelper
 
 class DataGraphMFCC:
-  window_size:  int=25        # ms
-  stride:       int=10        # ms
+  window_duration:  int=25        # ms
+  stride_duration:  int=10        # ms
 
   def __init__(self, sample_rate: int, dct_coef_count: int):
     '''
     suppose the channel number is 1.
     '''
-    sample_per_second = sample_rate / 1000
-    window = int(DataGraphMFCC.window_size * sample_per_second)
-    stride = int(DataGraphMFCC.stride * sample_per_second)
+    self._sample_rate = sample_rate
+    samples_per_second = sample_rate / 1000
+    window = int(DataGraphMFCC.window_duration * samples_per_second)
+    stride = int(DataGraphMFCC.stride_duration * samples_per_second)
 
     self._graph = tf.Graph()
     with self._graph.as_default():
-      self._wav_file_ts = tf.placeholder(tf.string, [], name='wav_filename')
-      self._frame_num = tf.placeholder(tf.int32, [])
-      wav_loader = io_ops.read_file(self._wav_file_ts)
+      self._in_wav_file = tf.placeholder(tf.string, [], name='wav_filename')
+      self._in_frame_num = tf.placeholder(tf.int32, [])
+      wav_loader = io_ops.read_file(self._in_wav_file)
       wav_decoder = contrib_audio.decode_wav(wav_loader, desired_channels=1)
-      audio_clamp = tf.clip_by_value(wav_decoder.audio, -1.0, 1.0)
+      self._out_audio = tf.squeeze(wav_decoder.audio)
+      self._out_sample_rate = wav_decoder.sample_rate
+
+      self._in_audio = tf.placeholder(tf.float32, [None])
+      in_audio = tf.expand_dims(self._in_audio, -1)
+
+      audio_clamp = tf.clip_by_value(in_audio, -1.0, 1.0)
       spectrogram = contrib_audio.audio_spectrogram(
         audio_clamp,
         window_size=window,
         stride=stride,
         magnitude_squared=True)
+      self._out_spectrogram = spectrogram
 
       feat_ts = contrib_audio.mfcc(
         spectrogram=spectrogram,
-        sample_rate=wav_decoder.sample_rate,
+        sample_rate=sample_rate,
         dct_coefficient_count=dct_coef_count,
       )
-      self._feat_ts = feat_ts[0]
-      self._real_length = tf.shape(self._feat_ts)[0]
+      self._out_mfcc = feat_ts[0]
+      self._out_real_mfcc_len = tf.shape(self._out_mfcc)[0]
 
-      self._expanded_feat_ts = tf.pad(
-        self._feat_ts,
-        [[0, self._frame_num - self._real_length], [0, 0]],
+      self._out_expanded_mfcc = tf.pad(
+        self._out_mfcc,
+        [[0, self._in_frame_num - self._out_real_mfcc_len], [0, 0]],
       )
 
     self._sess = tf.Session(graph=self._graph)
     print(f"DataGgraphMFCC graph is created!")
 
-  def run(self, wav_file: str, target_frame_num: int=-1):
-    assert nlp.get_file_extension(wav_file) == "wav"
+  def read_16bits_wav_file(self, wav_file: str):
+    audio, sr = self._sess.run(
+      fetches=[self._out_audio, self._out_sample_rate],
+      feed_dict={
+        self._in_wav_file: wav_file,
+      }
+    )
+    assert sr == self._sample_rate
+
+    return audio, sr
+
+  def calc_feats(self, audio_data: list, target_frame_num: int=-1):
     if target_frame_num <= 0:
       mfcc, real_length = self._sess.run(
-        fetches=[self._feat_ts, self._real_length],
+        fetches=[
+          self._out_mfcc,
+          self._out_real_mfcc_len,
+        ],
         feed_dict={
-          self._wav_file_ts: wav_file
+          self._in_audio: audio_data,
         }
       )
     else:
       mfcc, real_length = self._sess.run(
-        fetches=[self._expanded_feat_ts, self._real_length],
+        fetches=[self._out_expanded_mfcc, self._out_real_mfcc_len],
         feed_dict={
-          self._wav_file_ts: wav_file,
-          self._frame_num: target_frame_num
+          self._in_audio: audio_data,
+          self._in_frame_num: target_frame_num
         }
       )
 

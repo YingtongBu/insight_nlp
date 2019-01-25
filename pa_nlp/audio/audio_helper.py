@@ -100,13 +100,13 @@ class AudioHelper:
     return None
 
   @staticmethod
-  def convert_to_16bits(audio_file: str)-> str:
-    file_ext = nlp.get_file_extension(audio_file)
-    new_file = audio_file.replace(f".{file_ext}", ".16bits.wav")
+  def convert_to_16bits(wav_or_flac_file: str)-> typing.Union[str, None]:
+    file_ext = nlp.get_file_extension(wav_or_flac_file)
+    new_file = wav_or_flac_file.replace(f".{file_ext}", ".16bits.wav")
     if os.path.exists(new_file):
       return new_file
 
-    if nlp.execute_cmd(f"sox {audio_file} -b 16 {new_file}") == 0:
+    if nlp.execute_cmd(f"sox {wav_or_flac_file} -b 16 {new_file}") == 0:
       return new_file
 
     return None

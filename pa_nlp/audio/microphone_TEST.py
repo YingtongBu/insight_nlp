@@ -13,7 +13,7 @@ def main():
                     help="default microphone.wav")
   (options, args) = parser.parse_args()
 
-  Microphone.SAMPLE_RATE = 8000
+  Microphone.SAMPLE_RATE = 16000
   microphone = Microphone()
   microphone.record(options.export_wav_file, options.time)
   microphone.play(options.export_wav_file)
