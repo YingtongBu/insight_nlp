@@ -2,6 +2,7 @@
 #author: Tian Xia (summer.xia1@pactera.com)
 
 import tensorflow as tf
+import numpy
 from tensorflow.contrib.framework.python.ops import audio_ops as contrib_audio
 from tensorflow.python.ops import io_ops
 import librosa
@@ -88,7 +89,12 @@ class DataGraphMFCC:
         }
       )
 
-    mfcc_delta1 = librosa.feature.delta(mfcc)
-    mfcc_delta2 = librosa.feature.delta(mfcc_delta1)
+    delta1 = librosa.feature.delta(mfcc)
+    delta2 = librosa.feature.delta(delta1)
 
-    return [mfcc, mfcc_delta1, mfcc_delta2, real_length]
+    mfcc = mfcc.reshape([real_length, -1, 1])
+    delta1 = delta1.reshape([real_length, -1, 1])
+    delta2 = delta2.reshape([real_length, -1, 1])
+    feat = numpy.concatenate([mfcc, delta1, delta2], axis=2)
+
+    return feat, real_length
