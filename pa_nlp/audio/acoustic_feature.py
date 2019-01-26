@@ -16,6 +16,7 @@ def calc_mfcc_delta(wav_file_16bits: str, mfcc_dim: int,
   '''
   :return: [mfcc, mfcc_delta, mfcc_delta2]
   '''
+  assert wav_file_16bits.endswith(".wav")
   file_info = AudioHelper.get_basic_audio_info(wav_file_16bits)
   sample_width = file_info["sample_width"]
   assert sample_width == 2
