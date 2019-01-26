@@ -99,6 +99,24 @@ class AudioHelper:
 
     return None
 
+
+  @staticmethod
+  def norm_to_wav(wav_or_flac_file: str)-> typing.Union[str, None]:
+    '''
+    :return: sample-width=2 Bytes, sample rating=16K.
+    '''
+
+    file_ext = nlp.get_file_extension(wav_or_flac_file)
+    new_file = wav_or_flac_file.replace(f".{file_ext}", ".norm.wav")
+    if os.path.exists(new_file):
+      return new_file
+
+    if nlp.execute_cmd(f"sox {wav_or_flac_file} "
+                       f"-b 16 -r 16000 {new_file}") == 0:
+      return new_file
+
+    return None
+
   @staticmethod
   def convert_to_16bits(wav_or_flac_file: str)-> typing.Union[str, None]:
     file_ext = nlp.get_file_extension(wav_or_flac_file)
