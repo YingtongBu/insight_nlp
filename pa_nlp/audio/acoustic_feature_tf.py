@@ -66,7 +66,7 @@ class DataGraphMFCC:
     )
     assert sr == self._sample_rate
 
-    return audio, sr
+    return audio
 
   def calc_feats(self, audio_data: list, target_frame_num: int=-1):
     if target_frame_num <= 0:
