@@ -2,14 +2,14 @@
 #coding: utf8
 #author: Tian Xia (summer.xia1@pactera.com)
 
-import optparse
 from pa_nlp import common as nlp
-import time
 from pa_nlp.audio.audio_helper import AudioHelper
 import multiprocessing as mp
+import optparse
+import time
 
 def convert(audio_file: str):
-  new_audio = AudioHelper.convert_to_16bits(audio_file)
+  new_audio = AudioHelper.norm_to_wav(audio_file)
   if new_audio is None:
     print(f"WARN: error in {audio_file}")
 
