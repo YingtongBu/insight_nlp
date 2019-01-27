@@ -10,8 +10,9 @@ from pa_nlp import common as nlp
 from pa_nlp.audio.audio_helper import AudioHelper
 
 class DataGraphMFCC:
-  window_duration:  int=25        # ms
-  stride_duration:  int=10        # ms
+  window_duration       = 25        # ms
+  stride_duration       = 10        # ms
+  frame_num_per_second  = 100       # do NOT modify these three numbers.
 
   def __init__(self, sample_rate: int, dct_coef_count: int):
     '''
@@ -70,6 +71,9 @@ class DataGraphMFCC:
     return audio
 
   def calc_feats(self, audio_data: list, target_frame_num: int=-1):
+    '''
+    :return: [frame-num, feature, 3]
+    '''
     if target_frame_num <= 0:
       mfcc, real_length = self._sess.run(
         fetches=[
@@ -80,6 +84,8 @@ class DataGraphMFCC:
           self._in_audio: audio_data,
         }
       )
+      target_frame_num = real_length
+
     else:
       mfcc, real_length = self._sess.run(
         fetches=[self._out_expanded_mfcc, self._out_real_mfcc_len],
@@ -92,9 +98,9 @@ class DataGraphMFCC:
     delta1 = librosa.feature.delta(mfcc)
     delta2 = librosa.feature.delta(delta1)
 
-    mfcc = mfcc.reshape([real_length, -1, 1])
-    delta1 = delta1.reshape([real_length, -1, 1])
-    delta2 = delta2.reshape([real_length, -1, 1])
+    mfcc = mfcc.reshape([target_frame_num, -1, 1])
+    delta1 = delta1.reshape([target_frame_num, -1, 1])
+    delta2 = delta2.reshape([target_frame_num, -1, 1])
     feat = numpy.concatenate([mfcc, delta1, delta2], axis=2)
 
     return feat, real_length
