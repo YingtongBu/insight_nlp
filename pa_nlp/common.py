@@ -140,17 +140,22 @@ def write_pydict_file(data: list, file_name)-> None:
 def get_file_extension(file_name: str)-> str:
   return file_name.split(".")[-1]
 
+def replace_file_name(file_name: str, old_suffix: str, new_suffix: str):
+  assert old_suffix in file_name
+  return file_name[: len(file_name) - len(old_suffix)] + new_suffix
+
 def get_file_base(file_name: str)-> str:
   '''
-  :param "/tmp/summer.wav" 
+  :param "/tmp/summer.hello.wav"
   :return: summer 
+  different from os.path.baseline, which returns summer.hello
   '''
   return os.path.basename(file_name).split(".")[0]
 
 def get_files_in_folder(data_path, file_extensions: list=None,
                         resursive=False)-> list:
   '''file_exts: should be a set, or None, e.g, ["wav", "flac"]
-  return: an iterator, [fullFilePath]'''
+  return: a list, [fullFilePath]'''
   def legal_file(short_name):
     if short_name.startswith("."):
       return False

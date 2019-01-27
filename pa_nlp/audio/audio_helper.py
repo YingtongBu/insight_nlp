@@ -46,8 +46,9 @@ class AudioHelper:
         continue
 
       seg_name = os.path.join(
-        dest_folder, base_name.replace(f".{file_ext}",
-                                       f".{file_id:04}.{file_ext}")
+        dest_folder,
+        nlp.replace_file_name(base_name,
+                              f".{file_ext}", f".{file_id:04}.{file_ext}")
       )
       try:
         audio[t_from: t_to].export(seg_name, format=file_ext)
@@ -89,7 +90,7 @@ class AudioHelper:
   @staticmethod
   def _convert_flac_to_wav(flac_file: str)-> typing.Union[str, None]:
     assert flac_file.endswith(".flac")
-    out_file = flac_file.replace(".flac", ".wav")
+    out_file = nlp.replace_file_name(flac_file, ".flac", ".wav")
     if os.path.exists(out_file):
       return out_file
 
@@ -107,7 +108,8 @@ class AudioHelper:
     '''
 
     file_ext = nlp.get_file_extension(wav_or_flac_file)
-    new_file = wav_or_flac_file.replace(f".{file_ext}", ".norm.wav")
+    new_file = nlp.replace_file_name(wav_or_flac_file,
+                                     f".{file_ext}", ".norm.wav")
     if os.path.exists(new_file):
       return new_file
 
@@ -120,7 +122,8 @@ class AudioHelper:
   @staticmethod
   def convert_to_16bits(wav_or_flac_file: str)-> typing.Union[str, None]:
     file_ext = nlp.get_file_extension(wav_or_flac_file)
-    new_file = wav_or_flac_file.replace(f".{file_ext}", ".16bits.wav")
+    new_file = nlp.replace_file_name(wav_or_flac_file,
+                                     f".{file_ext}", ".16bits.wav")
     if os.path.exists(new_file):
       return new_file
 
@@ -183,7 +186,7 @@ class AudioHelper:
   @staticmethod
   def _convert_wav_to_flac(wav_file: str)-> typing.Union[str, None]:
     assert wav_file.endswith(".wav")
-    out_file = wav_file.replace(".wav", ".flac")
+    out_file = nlp.replace_file_name(wav_file, ".wav", ".flac")
     if os.path.exists(out_file):
       return out_file
 
@@ -196,7 +199,7 @@ class AudioHelper:
   @staticmethod
   def _convert_mp3_to_wav(map3_file: str)-> typing.Union[str, None]:
     assert map3_file.endswith(".mp3")
-    out_file = map3_file.replace(".mp3", ".wav")
+    out_file = nlp.replace_file_name(map3_file, ".mp3", ".wav")
     if os.path.exists(out_file):
       return out_file
 
@@ -209,7 +212,7 @@ class AudioHelper:
   @staticmethod
   def _convert_sph_to_wav(sph_file: str)-> typing.Union[str, None]:
     assert sph_file.endswith(".sph")
-    out_file = sph_file.replace(".sph", ".wav")
+    out_file = nlp.replace_file_name(sph_file, ".sph", ".wav")
     if os.path.exists(out_file):
       return out_file
 
