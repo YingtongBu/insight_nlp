@@ -16,6 +16,19 @@ norm_init1 = tf.truncated_normal_initializer(stddev=0.1)
 rand_init1 = tf.random_uniform_initializer(-1, 1)
 const_init = tf.constant_initializer
 
+def get_network_parameter_num():
+  num = 0
+  for var in tf.trainable_variables():
+    # shape is an array of tf.Dimension
+    shape = var.get_shape()
+    var_param_num = 1
+    for dim in shape:
+      var_param_num *= dim.value
+    num += var_param_num
+  print(f"#model parameter: {num}")
+
+  return num
+
 def construct_optimizer(
   loss: tf.Tensor,
   learning_rate: typing.Union[float, tf.Tensor]=0.001,
