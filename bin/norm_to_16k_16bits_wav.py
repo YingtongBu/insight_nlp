@@ -9,7 +9,7 @@ import optparse
 import time
 
 def convert(audio_file: str):
-  new_audio = AudioHelper.norm_to_wav(audio_file)
+  new_audio = AudioHelper.convert_to_standard_wav(audio_file)
   if new_audio is None:
     print(f"WARN: error in {audio_file}")
 

@@ -102,7 +102,7 @@ class AudioHelper:
 
 
   @staticmethod
-  def norm_to_wav(wav_or_flac_file: str)-> typing.Union[str, None]:
+  def convert_to_standard_wav(wav_or_flac_file: str)-> typing.Union[str, None]:
     '''
     :return: sample-width=2 Bytes, sample rating=16K.
     '''
