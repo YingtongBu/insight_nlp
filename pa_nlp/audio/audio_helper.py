@@ -8,8 +8,10 @@ from pa_nlp.common import print_flush, execute_cmd
 from pydub import AudioSegment
 from pydub.utils import mediainfo
 from pa_nlp import common as nlp
+from scipy.io import wavfile
 import os
 import typing
+import numpy
 
 class AudioHelper:
   AUDIO_EXTENSIONS = [
@@ -100,6 +102,26 @@ class AudioHelper:
 
     return None
 
+  @staticmethod
+  def norm_wav(standard_wav_file: str):
+    assert standard_wav_file.endswith(".norm.wav")
+    sample_rate, signal = wavfile.read(standard_wav_file)
+    assert sample_rate == 16000
+
+    pre_emphasis = 0.97
+    emphasized_signal = numpy.append(
+      signal[0], signal[1:] - pre_emphasis * signal[:-1]
+    )
+
+    amplified_signal = emphasized_signal * (32768 / emphasized_signal.max())
+
+    new_file = nlp.replace_file_name(
+      standard_wav_file, ".norm.wav", ".norm.amp.wav"
+    )
+
+    wavfile.write(new_file, sample_rate, amplified_signal.astype(numpy.int16))
+
+    return new_file
 
   @staticmethod
   def convert_to_standard_wav(wav_or_flac_file: str)-> typing.Union[str, None]:
