@@ -105,6 +105,12 @@ class AudioHelper:
   @staticmethod
   def norm_wav(standard_wav_file: str):
     assert standard_wav_file.endswith(".norm.wav")
+    new_file = nlp.replace_file_name(
+      standard_wav_file, ".norm.wav", ".norm.amp.wav"
+    )
+    if os.path.exists(new_file):
+      return new_file
+
     sample_rate, signal = wavfile.read(standard_wav_file)
     assert sample_rate == 16000
 
@@ -112,13 +118,7 @@ class AudioHelper:
     emphasized_signal = numpy.append(
       signal[0], signal[1:] - pre_emphasis * signal[:-1]
     )
-
     amplified_signal = emphasized_signal * (32768 / emphasized_signal.max())
-
-    new_file = nlp.replace_file_name(
-      standard_wav_file, ".norm.wav", ".norm.amp.wav"
-    )
-
     wavfile.write(new_file, sample_rate, amplified_signal.astype(numpy.int16))
 
     return new_file
