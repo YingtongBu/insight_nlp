@@ -64,7 +64,7 @@ def read_tfrecord_file(file_name: str,
     return dataset
 
   dataset = input_fn()
-  data_iter = dataset.prefetch(8).make_initializable_iterator()
+  data_iter = dataset.prefetch(4).make_initializable_iterator()
   sample = data_iter.get_next()
 
   return data_iter.initializer, sample
