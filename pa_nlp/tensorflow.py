@@ -49,14 +49,14 @@ def read_tfrecord_file(file_name: str,
   def input_fn():
     files = tf.data.Dataset.list_files(file_name)
     dataset = files.apply(
-      tf.contrib.data.parallel_interleave(
+      tf.data.experimental.parallel_interleave(
         tf.data.TFRecordDataset, cycle_length=4)
     )
 
     dataset = dataset.shuffle(buffer_size=10000)
     dataset = dataset.repeat(epoch_num)
     dataset = dataset.apply(
-      tf.contrib.data.map_and_batch(
+      tf.data.experimental.map_and_batch(
         map_func=parse_fn, batch_size=batch_size,
       )
     )
