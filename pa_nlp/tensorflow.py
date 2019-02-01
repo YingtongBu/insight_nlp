@@ -4,6 +4,7 @@
 import tensorflow as tf
 import typing
 from operator import itemgetter
+import numpy as np
 
 activations = tf.keras.activations
 estimator = tf.estimator
@@ -15,6 +16,55 @@ rnn_cell = tf.nn.rnn_cell
 norm_init1 = tf.truncated_normal_initializer(stddev=0.1)
 rand_init1 = tf.random_uniform_initializer(-1, 1)
 const_init = tf.constant_initializer
+
+def _bytes_feature(value: bytes):
+  """Returns a bytes_list from a string / byte."""
+  return tf.train.Feature(bytes_list=tf.train.BytesList(value=[value]))
+
+def _float_feature(value: float):
+  """Returns a float_list from a float / double."""
+  return tf.train.Feature(float_list=tf.train.FloatList(value=[value]))
+
+def _int64_feature(value: int):
+  """Returns an int64_list from a bool / enum / int / uint."""
+  return tf.train.Feature(int64_list=tf.train.Int64List(value=[value]))
+
+def write_to_tfrecord_file(samples: typing.Union[list, typing.Iterator],
+                           serialize_sample_fun, file_name: str):
+  with tf.python_io.TFRecordWriter(file_name) as writer:
+    for sample in samples:
+      example = serialize_sample_fun(sample)
+      writer.write(example)
+
+def read_tfrecord_file(file_name: str,
+                       example_fmt: dict, example2sample_func,
+                       epoch_num: int, batch_size: int):
+  def parse_fn(example):
+    parsed = tf.parse_single_example(example, example_fmt)
+    return example2sample_func(parsed)
+
+  def input_fn():
+    files = tf.data.Dataset.list_files(file_name)
+    dataset = files.apply(
+      tf.contrib.data.parallel_interleave(
+        tf.data.TFRecordDataset, cycle_length=4)
+    )
+
+    dataset = dataset.shuffle(buffer_size=10000)
+    dataset = dataset.repeat(epoch_num)
+    dataset = dataset.apply(
+      tf.contrib.data.map_and_batch(
+        map_func=parse_fn, batch_size=batch_size,
+      )
+    )
+
+    return dataset
+
+  dataset = input_fn()
+  data_iter = dataset.prefetch(8).make_initializable_iterator()
+  sample = data_iter.get_next()
+
+  return data_iter.initializer, sample
 
 def load_model(graph: tf.Graph, sess: tf.Session, model_path: str):
   try:
