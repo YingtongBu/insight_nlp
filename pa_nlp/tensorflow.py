@@ -17,15 +17,15 @@ norm_init1 = tf.truncated_normal_initializer(stddev=0.1)
 rand_init1 = tf.random_uniform_initializer(-1, 1)
 const_init = tf.constant_initializer
 
-def bytes_feature(value: bytes):
+def tf_bytes_feature(value: bytes):
   """Returns a bytes_list from a string / byte."""
   return tf.train.Feature(bytes_list=tf.train.BytesList(value=[value]))
 
-def float_feature(value: float):
+def tf_float_feature(value: float):
   """Returns a float_list from a float / double."""
   return tf.train.Feature(float_list=tf.train.FloatList(value=[value]))
 
-def int64_feature(value: int):
+def tf_int64_feature(value: int):
   """Returns an int64_list from a bool / enum / int / uint."""
   return tf.train.Feature(int64_list=tf.train.Int64List(value=[value]))
 
@@ -36,8 +36,8 @@ def write_to_tfrecord_file(samples: typing.Union[list, typing.Iterator],
       if idx > 0 and idx % 1000 == 0:
         print(f"{idx} samples have been finished.")
 
-      example = serialize_sample_fun(sample)
-      writer.write(example)
+      for example in serialize_sample_fun(sample):
+        writer.write(example)
 
 def read_tfrecord_file(file_name: str,
                        example_fmt: dict, example2sample_func,
