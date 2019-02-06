@@ -5,6 +5,7 @@ import tensorflow as tf
 import typing
 from operator import itemgetter
 import numpy as np
+from pa_nlp.common import print_flush
 
 activations = tf.keras.activations
 estimator = tf.estimator
@@ -34,7 +35,7 @@ def write_to_tfrecord_file(samples: typing.Union[list, typing.Iterator],
   with tf.python_io.TFRecordWriter(file_name) as writer:
     for idx, sample in enumerate(samples):
       if idx > 0 and idx % 1000 == 0:
-        print(f"{idx} samples have been finished.")
+        print_flush(f"{idx} samples have been finished.")
 
       for example in serialize_sample_fun(sample):
         writer.write(example)
@@ -64,7 +65,7 @@ def read_tfrecord_file(file_name: str,
     return dataset
 
   dataset = input_fn()
-  data_iter = dataset.prefetch(4).make_initializable_iterator()
+  data_iter = dataset.prefetch(8).make_initializable_iterator()
   sample = data_iter.get_next()
 
   return data_iter.initializer, sample
@@ -284,4 +285,19 @@ def batch_norm_wrapper(inputs, scope_name, is_train: bool, decay=0.99,
       return tf.nn.batch_normalization(
         inputs, pop_mean, pop_var, offset, scale, epsilon
       )
+
+def norm_data(data: tf.Tensor, axels: list)-> tf.Tensor:
+  shape = data.shape
+  trans = axels[:]
+  for p in range(len(shape)):
+    if p not in trans:
+      trans.append(p)
+
+  data1 = tf.transpose(data, trans)
+  mean_ts, var_ts = tf.nn.moments(data1, list(range(len(axels))))
+  data2 = (data1 - mean_ts) / tf.sqrt(var_ts + 1e-8)
+  data3 = tf.transpose(data2, trans)
+
+  return data3
+
 

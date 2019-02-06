@@ -291,22 +291,16 @@ def log_f_prime(fss, weight):
     pdw += math.exp(weight.dot(fs) - dn) * fs
   return pdw
 
-def group_by_key(dataIter):
-  # dataIter.next() --> (key, data)
-  # return: (key, [data1, ...])
-  sample = []
-  prevKey = None
-  for key, inst in dataIter:
-    if sample == [] or key == prevKey:
-      sample.append(inst)
-    else:
-      yield prevKey, sample
-      sample = [inst]
+def group_by_key_fun(data, key_fun):
+  '''Note, the spark.group_by_key requires the data is sorted by keys.
+  @:return a dict
+  '''
+  result = collections.defaultdict(list)
+  for d in data:
+    key = key_fun(d)
+    result[key].append(d)
 
-    prevKey = key
-
-  if sample != []:
-    yield prevKey, sample
+  return result
 
 def create_batch_iter_helper(title: str, data: list, batch_size: int,
                              epoch_num: int, shuffle=True):
