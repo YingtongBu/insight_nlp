@@ -288,15 +288,20 @@ def batch_norm_wrapper(inputs, scope_name, is_train: bool, decay=0.99,
 
 def norm_data(data: tf.Tensor, axels: list)-> tf.Tensor:
   shape = data.shape
-  trans = axels[:]
+  trans1 = axels[:]
   for p in range(len(shape)):
-    if p not in trans:
-      trans.append(p)
+    if p not in trans1:
+      trans1.append(p)
 
-  data1 = tf.transpose(data, trans)
+  data1 = tf.transpose(data, trans1)
   mean_ts, var_ts = tf.nn.moments(data1, list(range(len(axels))))
   data2 = (data1 - mean_ts) / tf.sqrt(var_ts + 1e-8)
-  data3 = tf.transpose(data2, trans)
+
+  trans2 = list(range(len(trans1)))
+  for p in trans1:
+    trans2[trans1[p]] = p
+
+  data3 = tf.transpose(data2, trans2)
 
   return data3
 
