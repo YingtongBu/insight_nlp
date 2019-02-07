@@ -1,11 +1,11 @@
 #coding: utf8
 #author: Tian Xia (summer.xia1@pactera.com)
 
+from operator import itemgetter
+from pa_nlp.common import print_flush
+import numpy as np
 import tensorflow as tf
 import typing
-from operator import itemgetter
-import numpy as np
-from pa_nlp.common import print_flush
 
 activations = tf.keras.activations
 estimator = tf.estimator
@@ -30,8 +30,8 @@ def tf_int64_feature(value: int):
   """Returns an int64_list from a bool / enum / int / uint."""
   return tf.train.Feature(int64_list=tf.train.Int64List(value=[value]))
 
-def write_to_tfrecord_file(samples: typing.Union[list, typing.Iterator],
-                           serialize_sample_fun, file_name: str):
+def write_tfrecord(samples: typing.Union[list, typing.Iterator],
+                   serialize_sample_fun, file_name: str):
   with tf.python_io.TFRecordWriter(file_name) as writer:
     for idx, sample in enumerate(samples):
       if idx > 0 and idx % 1000 == 0:
@@ -40,9 +40,9 @@ def write_to_tfrecord_file(samples: typing.Union[list, typing.Iterator],
       for example in serialize_sample_fun(sample):
         writer.write(example)
 
-def read_tfrecord_file(file_name: str,
-                       example_fmt: dict, example2sample_func,
-                       epoch_num: int, batch_size: int):
+def read_tfrecord(file_name: str,
+                  example_fmt: dict, example2sample_func,
+                  epoch_num: int, batch_size: int):
   def parse_fn(example):
     parsed = tf.parse_single_example(example, example_fmt)
     return example2sample_func(parsed)
@@ -116,8 +116,8 @@ def construct_optimizer(
 
     return opt_op
 
-def high_way_layer(input, size, num_layers=1, activation=tf.nn.relu,
-                   scope='highway'):
+def highway_layer(input, size, num_layers=1, activation=tf.nn.relu,
+                  scope='highway'):
   '''
    t = sigmoid(Wy + b)
    z = t * g(Wy + b) + (1 - t) * y
@@ -153,9 +153,10 @@ def lookup1(table, table_width, pos):
   :return [batch]
   '''
   dtype = table.dtype
-  return tf.reduce_sum(tf.multiply(table,
-                                   tf.one_hot(pos, table_width, dtype=dtype)),
-                       axis=1)
+  return tf.reduce_sum(
+    tf.multiply(table, tf.one_hot(pos, table_width, dtype=dtype)),
+    axis=1
+  )
   
 def lookup2(table, pos):
   '''
@@ -186,11 +187,12 @@ def tf_multi_hot(x, depth):
   indexes = tf.one_hot(x, depth)
   initV = tf.constant(0)
 
-  _, v = tf.while_loop(func_c, func_b,
-                        [initV, tf.convert_to_tensor([list(range(depth))],
-                                                    tf.float32)],
-                        shape_invariants=[initV.get_shape(),
-                                          tf.TensorShape([None, depth])])
+  _, v = tf.while_loop(
+    func_c,
+    func_b,
+    [initV, tf.convert_to_tensor([list(range(depth))], tf.float32)],
+    shape_invariants=[initV.get_shape(), tf.TensorShape([None, depth])]
+  )
 
   return v[1:,]
 
@@ -286,7 +288,10 @@ def batch_norm_wrapper(inputs, scope_name, is_train: bool, decay=0.99,
         inputs, pop_mean, pop_var, offset, scale, epsilon
       )
 
-def norm_data(data: tf.Tensor, axels: list)-> tf.Tensor:
+def normalize_data(data: tf.Tensor,
+                   axels: list,
+                   method: str="mean"    # mean, or guassian
+                   )-> tf.Tensor:
   shape = data.shape
   trans1 = axels[:]
   for p in range(len(shape)):
@@ -295,7 +300,14 @@ def norm_data(data: tf.Tensor, axels: list)-> tf.Tensor:
 
   data1 = tf.transpose(data, trans1)
   mean_ts, var_ts = tf.nn.moments(data1, list(range(len(axels))))
-  data2 = (data1 - mean_ts) / tf.sqrt(var_ts + 1e-8)
+
+  method = method.lower()
+  if method == "mean":
+    data2 = data1 - mean_ts
+  elif method == "guassian":
+    data2 = (data1 - mean_ts) / tf.sqrt(var_ts + 1e-8)
+  else:
+    assert False
 
   trans2 = list(range(len(trans1)))
   for p in trans1:
