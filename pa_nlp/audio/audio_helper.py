@@ -128,6 +128,8 @@ class AudioHelper:
     '''
     :return: sample-width=2 Bytes, sample rating=16K.
     '''
+    if wav_or_flac_file.endswith(".norm.wav"):
+      return wav_or_flac_file
 
     file_ext = nlp.get_file_extension(wav_or_flac_file)
     new_file = nlp.replace_file_name(wav_or_flac_file,

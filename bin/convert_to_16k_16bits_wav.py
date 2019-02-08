@@ -21,8 +21,13 @@ def main():
   (options, args) = parser.parse_args()
 
   start_time = time.time()
-  files = nlp.get_files_in_folder(options.audio_folder, ["wav"], True)
-  mp.Pool().map(convert, files)
+  for audio_file in args:
+    convert(audio_file)
+
+  if options.audio_folder is not None:
+    files = nlp.get_files_in_folder(options.audio_folder, ["wav"], True)
+    mp.Pool().map(convert, files)
+
   print(f"Time: {time.time() - start_time:.2f} sec.")
 
 if __name__ == "__main__":
