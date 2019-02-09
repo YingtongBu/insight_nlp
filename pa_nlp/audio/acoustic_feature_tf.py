@@ -13,11 +13,16 @@ class DataGraphMFCC:
   window_duration       = 25        # ms
   stride_duration       = 10        # ms
   frame_num_per_second  = 100       # do NOT modify these three numbers.
+  max_mfcc_num          = 40
 
-  def __init__(self, sample_rate: int, dct_coef_count: int):
+  def __init__(self, sample_rate: int, dct_coef_count: int=-1):
     '''
     suppose the channel number is 1.
     '''
+    assert sample_rate == 16_000
+    if dct_coef_count == -1:
+      dct_coef_count = DataGraphMFCC.max_mfcc_num
+
     self._sample_rate = sample_rate
     samples_per_second = sample_rate / 1000
     window = int(DataGraphMFCC.window_duration * samples_per_second)
@@ -51,10 +56,11 @@ class DataGraphMFCC:
       self._out_mfcc = feat_ts[0]
       self._out_real_mfcc_len = tf.shape(self._out_mfcc)[0]
 
+      diff = tf.maximum(0, self._in_frame_num - self._out_real_mfcc_len)
       self._out_expanded_mfcc = tf.pad(
         self._out_mfcc,
-        [[0, self._in_frame_num - self._out_real_mfcc_len], [0, 0]],
-      )
+        [[0, diff], [0, 0]],
+      )[: self._in_frame_num]
 
     self._sess = tf.Session(graph=self._graph)
     print(f"DataGgraphMFCC graph is created!")
