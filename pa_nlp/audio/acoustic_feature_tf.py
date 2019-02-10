@@ -10,9 +10,10 @@ from pa_nlp import common as nlp
 from pa_nlp.audio.audio_helper import AudioHelper
 
 class DataGraphMFCC:
+  # do NOT modify these numbers.
   window_duration       = 25        # ms
   stride_duration       = 10        # ms
-  frame_num_per_second  = 100       # do NOT modify these three numbers.
+  frame_num_per_second  = 100
   max_mfcc_num          = 40
 
   def __init__(self, sample_rate: int, dct_coef_count: int=-1):
