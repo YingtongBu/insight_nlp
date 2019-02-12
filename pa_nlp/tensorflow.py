@@ -3,20 +3,13 @@
 
 from operator import itemgetter
 from pa_nlp.common import print_flush
-import numpy as np
 import tensorflow as tf
 import typing
 
-activations = tf.keras.activations
-estimator = tf.estimator
-layers = tf.layers
-losses = tf.losses
-nn = tf.nn
-rnn_cell = tf.nn.rnn_cell
-
-norm_init1 = tf.truncated_normal_initializer(stddev=0.1)
-rand_init1 = tf.random_uniform_initializer(-1, 1)
-const_init = tf.constant_initializer
+xavier_init   = tf.contrib.layers.xavier_initializer
+norm_init     = tf.truncated_normal_initializer
+rand_init     = tf.random_uniform_initializer
+const_init    = tf.constant_initializer
 
 def tf_bytes_feature(value: bytes):
   """Returns a bytes_list from a string / byte."""

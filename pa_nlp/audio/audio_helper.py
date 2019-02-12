@@ -103,7 +103,7 @@ class AudioHelper:
     return None
 
   @staticmethod
-  def norm_wav(standard_wav_file: str):
+  def preemphasize_wav(standard_wav_file: str):
     assert standard_wav_file.endswith(".norm.wav")
     new_file = nlp.replace_file_name(
       standard_wav_file, ".norm.wav", ".norm.amp.wav"
