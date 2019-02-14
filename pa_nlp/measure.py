@@ -37,11 +37,15 @@ class Measure:
     return d[len(ref_words)][len(hyp_words)], len(ref_words)
 
   @staticmethod
-  def WER(ref_list: list, hyp_list: list, parallel: bool=False):
+  def WER(ref_list: list, hyp_list: list,
+          parallel: bool=False, case_sensitive: bool=False):
     '''
     In the parallel mode, the multiprocess.Pool() would leads memory leak.
     '''
     assert type(ref_list) is list and type(ref_list[0]) is str
+    if not case_sensitive:
+      ref_list = [ref.lower() for ref in ref_list]
+      hyp_list = [hyp.lower() for hyp in hyp_list]
 
     if parallel:
       pool = mp.Pool()
