@@ -174,12 +174,12 @@ def get_files_in_folder(data_path, file_extensions: list=None,
 
   return results
 
-def create_list(shape: list, value=None):
-  assert len(shape) > 0
-  if len(shape) == 1:
-    return [value for _ in range(shape[0])]
-  else:
-    return [create_list(shape[1:], value) for _ in range(shape[0])]
+# def create_list(shape: list, value=None):
+#   assert len(shape) > 0
+#   if len(shape) == 1:
+#     return [value for _ in range(shape[0])]
+#   else:
+#     return [create_list(shape[1:], value) for _ in range(shape[0])]
 
 def split_data_by_func(data, func):
   data1, data2 = [], []
@@ -279,6 +279,7 @@ def log_sum(ds):
   e = math.log(sum([math.exp(d - dv) for d in ds]))
   return dv + e
 
+#depricated. Use tensorflow
 def log_f_prime(fss, weight):
   '''input: fss: a list of feature vectors
       weight: scipy.array
