@@ -10,28 +10,25 @@ class Measure:
   @staticmethod
   def _WER_single(param):
     ref_words, hyp_words = param
-    # initialisation
     d = numpy.zeros(
-      (len(ref_words) + 1) * (len(hyp_words) + 1), dtype=numpy.uint8
+      (len(ref_words) + 1, len(hyp_words) + 1), dtype=numpy.int32
     )
-    d = d.reshape((len(ref_words) + 1, len(hyp_words) + 1))
-    for i in range(len(ref_words) + 1):
-      for j in range(len(hyp_words) + 1):
-        if i == 0:
-          d[0][j] = j
-        elif j == 0:
-          d[i][0] = i
 
-    # computation
+    for j in range(len(hyp_words) + 1):
+      d[0][j] = j
+    for i in range(len(ref_words) + 1):
+      d[i][0] = i
+
     for i in range(1, len(ref_words) + 1):
       for j in range(1, len(hyp_words) + 1):
         if ref_words[i - 1] == hyp_words[j - 1]:
-          d[i][j] = d[i - 1][j - 1]
+          substitution = d[i - 1][j - 1]
         else:
           substitution = d[i - 1][j - 1] + 1
-          insertion = d[i][j - 1] + 1
-          deletion = d[i - 1][j] + 1
-          d[i][j] = min(substitution, insertion, deletion)
+
+        insertion = d[i - 1][j] + 1
+        deletion = d[i][j - 1] + 1
+        d[i][j] = min(substitution, insertion, deletion)
 
     return d[len(ref_words)][len(hyp_words)]
 
