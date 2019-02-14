@@ -3,13 +3,17 @@
 
 from collections import defaultdict, Counter
 from pa_nlp.common import EPSILON
+import pa_nlp.common as nlp
 import numpy
 import multiprocessing as mp
 
 class Measure:
   @staticmethod
   def _WER_single(param):
-    ref_words, hyp_words = param
+    ref, hyp = param
+    ref_words = ref.split()
+    hyp_words = hyp.split()
+
     d = numpy.zeros(
       (len(ref_words) + 1, len(hyp_words) + 1), dtype=numpy.int32
     )
@@ -30,27 +34,31 @@ class Measure:
         deletion = d[i][j - 1] + 1
         d[i][j] = min(substitution, insertion, deletion)
 
-    return d[len(ref_words)][len(hyp_words)]
+    return d[len(ref_words)][len(hyp_words)], len(ref_words)
 
   @staticmethod
-  def WER(ref_words_list: list, hyp_words_list: list, parallel: bool=False):
+  def WER(ref_list: list, hyp_list: list, parallel: bool=False):
     '''
     In the parallel mode, the multiprocess.Pool() would leads memory leak.
     '''
-    assert type(ref_words_list) is list and type(ref_words_list[0]) is list
+    assert type(ref_list) is list and type(ref_list[0]) is str
 
     if parallel:
       pool = mp.Pool()
-      error = sum(
-        pool.map(Measure._WER_single, zip(ref_words_list, hyp_words_list))
+      error_list, len_list = nlp.split_to_sublist(
+        pool.map(Measure._WER_single, zip(ref_list, hyp_list))
       )
       pool.close()
 
     else:
-      error = sum([Measure._WER_single([ref, hyp])
-                   for ref, hyp in zip(ref_words_list, hyp_words_list)])
+      error_list, len_list = nlp.split_to_sublist(
+        [Measure._WER_single([ref, hyp])
+         for ref, hyp in zip(ref_list, hyp_list)]
+      )
 
-    ref_count = max(1, sum([len(hyp) for hyp in ref_words_list]))
+    error = sum(error_list)
+    ref_count = max(1, sum(len_list))
+
     return error / ref_count
 
   @staticmethod
