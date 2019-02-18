@@ -23,6 +23,8 @@ class DataGraphMFCC:
     assert sample_rate == 16_000
     if dct_coef_count == -1:
       dct_coef_count = DataGraphMFCC.max_mfcc_num
+    else:
+      assert dct_coef_count <= DataGraphMFCC.max_mfcc_num
 
     self._sample_rate = sample_rate
     samples_per_second = sample_rate / 1000

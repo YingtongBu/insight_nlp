@@ -1,39 +1,23 @@
 #coding: utf8
 #author: Tian Xia (summer.xia1@pactera.com)
 
-from collections import defaultdict, namedtuple, Counter
-from operator import methodcaller, attrgetter, itemgetter, add
-from optparse import OptionParser
-from scipy import array
-
-import abc
-import bisect
-import collections
-import copy
-import datetime
-import functools
-import heapq
-import itertools
-import logging
-import math
-import multiprocessing as mp
-import numpy as np
-import operator
-import optparse
-import os
-import pickle
-import pprint
-import queue
-import random
-import re
-import scipy
-import struct
-import sys
-import time
-import typing
+from pa_nlp import *
 
 INF         = float("inf")
 EPSILON     = 1e-6
+
+def segment_contain(seg1: list, seg2: list):
+  if seg1[0] <= seg2[0] and seg2[1] <= seg1[1]:
+    return 1
+  if seg2[0] <= seg1[0] and seg1[1] <= seg2[1]:
+    return -1
+  return 0
+
+def segment_intersec(seg1: list, seg2: list):
+  return not segment_no_touch(seg1, seg2)
+
+def segment_no_touch(seg1: list, seg2: list):
+  return seg1[1] <= seg2[0] or seg2[1] <= seg1[0]
 
 def uniq(data: list)->list:
   result = []
@@ -121,8 +105,8 @@ def read_pydict_file(file_name, max_num: int=-1)-> list:
     try:
       obj = eval(ln)
       data.append(obj)
-    except:
-      print(f"ERR in reading {file_name}:{idx + 1}: '{ln}'")
+    except Exception as err:
+      print(f"ERR in reading {file_name}:{idx + 1}: {err} '{ln}'")
 
   print(f"{file_name}: #data={len(data)}")
 
@@ -143,14 +127,6 @@ def get_file_extension(file_name: str)-> str:
 def replace_file_name(file_name: str, old_suffix: str, new_suffix: str):
   assert old_suffix in file_name
   return file_name[: len(file_name) - len(old_suffix)] + new_suffix
-
-def get_file_base(file_name: str)-> str:
-  '''
-  :param "/tmp/summer.hello.wav"
-  :return: summer 
-  different from os.path.baseline, which returns summer.hello
-  '''
-  return os.path.basename(file_name).split(".")[0]
 
 def get_files_in_folder(data_path, file_extensions: list=None,
                         resursive=False)-> list:
