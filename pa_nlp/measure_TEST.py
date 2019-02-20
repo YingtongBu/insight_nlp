@@ -14,15 +14,15 @@ if __name__ == "__main__":
   print(Measure.calc_precision_recall_fvalue([0, 1, 1, 2],
                                              [0, 0, 1, 2]))
 
-  refs = ["who is there".split(), "who is there".split()]
-  hyps = ["is there".split(), "".split()]
-  assert nlp.eq(Measure.WER(refs, hyps), 2 / 3)
+  refs = ["who is there", "who is there"]
+  hyps = ["is there", ""]
+  assert nlp.eq(Measure.calc_WER(refs, hyps), 2 / 3)
 
   time_start = time.time()
-  ref = "who is there in the playground , Summer Rain, can you see it".split()
-  hyp = "who is there in playground , Summer Rain, can you see it".split()
+  ref = "who is there in the playground , Summer Rain, can you see it"
+  hyp = "who is there in the playground , Summer Rain, can you see it"
   refs = [ref] * 100
   hyps = [hyp] * 100
-  print(Measure.WER(refs, hyps, True))
+  print(Measure.calc_WER(refs, hyps, True))
   duration = time.time() - time_start
   print(f"[time: {duration}, memory: {nlp.get_memory()}")

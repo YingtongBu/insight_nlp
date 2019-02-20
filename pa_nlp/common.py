@@ -142,20 +142,10 @@ def get_files_in_folder(data_path, file_extensions: list=None,
     assert isinstance(file_extensions, (list, dict))
     file_extensions = set(file_extensions)
 
-  results = []
   for path, folders, files in os.walk(data_path, resursive):
     for short_name in files:
       if legal_file(short_name):
-        results.append(os.path.realpath(os.path.join(path, short_name)))
-
-  return results
-
-# def create_list(shape: list, value=None):
-#   assert len(shape) > 0
-#   if len(shape) == 1:
-#     return [value for _ in range(shape[0])]
-#   else:
-#     return [create_list(shape[1:], value) for _ in range(shape[0])]
+        yield os.path.realpath(os.path.join(path, short_name))
 
 def split_data_by_func(data, func):
   data1, data2 = [], []
