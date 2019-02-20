@@ -19,13 +19,15 @@ def segment_intersec(seg1: list, seg2: list):
 def segment_no_touch(seg1: list, seg2: list):
   return seg1[1] <= seg2[0] or seg2[1] <= seg1[0]
 
-def uniq(data: list)->list:
-  result = []
+def uniq(data: list)->typing.Iterator:
+  '''
+  :param data: must be sorted.
+  '''
+  prev = None
   for d in data:
-    if result == [] or d != result[-1]:
-      result.append(d)
-
-  return result
+    if prev is None or d != prev:
+      yield d
+      prev = d
 
 def norm1(vec):
   vec = array(vec)
@@ -93,9 +95,9 @@ def norm_regex(regexExpr)-> str:
     .replace("{", "\{").replace("}", "\}")\
     .replace(".", "\.")
 
-def read_pydict_file(file_name, max_num: int=-1)-> list:
+def read_pydict_file(file_name, max_num: int=-1)-> typing.Iterator:
   assert file_name.endswith(".pydict")
-  data = []
+  data_num = 0
   for idx, ln in enumerate(open(file_name)):
     if max_num >= 0 and idx + 1 > max_num:
       break
@@ -104,13 +106,12 @@ def read_pydict_file(file_name, max_num: int=-1)-> list:
 
     try:
       obj = eval(ln)
-      data.append(obj)
+      yield obj
+      data_num += 1
     except Exception as err:
       print(f"ERR in reading {file_name}:{idx + 1}: {err} '{ln}'")
 
-  print(f"{file_name}: #data={len(data)}")
-
-  return data
+  print(f"{file_name}: #data={data_num}")
 
 def write_pydict_file(data: list, file_name)-> None:
   assert file_name.endswith(".pydict")
