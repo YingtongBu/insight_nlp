@@ -107,7 +107,9 @@ class Measure:
     return result
 
   @staticmethod
-  def calc_intervals_accurarcy(true_labels_list: list, pred_labels_list: list):
+  def calc_intervals_accurarcy(true_labels_list: list,
+                               pred_labels_list: list,
+                               over_lapping: float=0.75):
     '''
     :param true_labels_list: [[(0., 2.0), (3.4, 4.5)], [(2. 0, 4.0)]]
     :param pred_labels_list:  [[(0., 2.0), (3.4, 4.5)], [(2. 0, 4.0)]]
@@ -117,7 +119,9 @@ class Measure:
     assert type(pred_labels_list) == type(pred_labels_list[0]) == list
 
     results = [
-      Measure._intervals_accurarcy_single(true_labels, pred_labels)
+      Measure._intervals_accurarcy_single(
+        true_labels, pred_labels, over_lapping
+      )
       for true_labels, pred_labels in zip(true_labels_list, pred_labels_list)
     ]
     correct = sum([r["correct"] for r in results])
@@ -136,13 +140,26 @@ class Measure:
     }
 
   @staticmethod
-  def _intervals_accurarcy_single(true_labels: list, pred_labels: list):
+  def _intervals_accurarcy_single(true_labels: list,
+                                  pred_labels: list,
+                                  over_lapping: float):
+    def seg_len(seg):
+      return seg[1] - seg[0]
+
+    def matched(pred_label, true_label):
+      if not nlp.segment_intersec(pred_label, true_label):
+        return False
+
+      area = (max(pred_label[0], true_label[0]),
+              min(pred_label[1], true_label[1]))
+      return seg_len(area) / seg_len(true_label) >= over_lapping
+
     matched_label_num = np.zeros([len(pred_labels)], np.int)
     missing_labels = []
     correct_num = 0
     for label in true_labels:
       for idx, pred_label in enumerate(pred_labels):
-        if nlp.segment_contain(pred_label, label):
+        if matched(pred_label, label):
           matched_label_num[idx] += 1
           correct_num += 1
           break
