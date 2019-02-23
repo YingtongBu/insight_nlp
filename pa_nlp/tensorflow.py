@@ -26,11 +26,10 @@ def tf_int64_feature(value: int):
 def write_tfrecord(samples: typing.Union[list, typing.Iterator],
                    serialize_sample_fun, file_name: str):
   with tf.python_io.TFRecordWriter(file_name) as writer:
-    for idx, sample in enumerate(samples):
-      if idx > 0 and idx % 1000 == 0:
-        print_flush(f"{idx} samples have been finished.")
-
-      for example in serialize_sample_fun(sample):
+    for sample in samples:
+      for idx, example in enumerate(serialize_sample_fun(sample)):
+        if idx > 0 and idx % 1000 == 0:
+          print_flush(f"{idx} examples have been finished.")
         writer.write(example)
 
 def read_tfrecord(file_name: str,
