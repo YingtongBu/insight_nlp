@@ -25,7 +25,7 @@ def main():
     convert(audio_file)
 
   if options.audio_folder is not None:
-    files = nlp.get_files_in_folder(options.audio_folder, ["wav"], True)
+    files = nlp.get_files_in_folder(options.audio_folder, ["wav", "flac"], True)
     mp.Pool().map(convert, files)
 
   print(f"Time: {time.time() - start_time:.2f} sec.")
