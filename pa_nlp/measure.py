@@ -71,18 +71,18 @@ class Measure:
     assert len(true_labels) == len(preded_labels)
     true_label_num = defaultdict(int)
     pred_label_num = defaultdict(int)
-    correct_label = defaultdict(int)
+    correct_labels = defaultdict(int)
     
     for t_label, p_label in zip(true_labels, preded_labels):
       true_label_num[t_label] += 1
       pred_label_num[p_label] += 1
       if t_label == p_label:
-        correct_label[t_label] += 1
+        correct_labels[t_label] += 1
         
     result = dict()
     label_stat = Counter(true_labels)
     for label in label_stat.keys():
-      correct = correct_label.get(label, 0)
+      correct = correct_labels.get(label, 0)
       recall = correct / (true_label_num.get(label, 0) + nlp.EPSILON)
       prec = correct / (pred_label_num.get(label, 0) + nlp.EPSILON)
       f_value = 2 * (recall * prec) / (recall + prec + nlp.EPSILON)
@@ -101,8 +101,9 @@ class Measure:
     weighted_f_value = total_f / len(true_labels)
     result["weighted_f"] = round(weighted_f_value, 4)
     
-    result["precision"] = round(sum(correct_label.values()) / len(true_labels),
-                                4)
+    result["precision"] = round(
+      sum(correct_labels.values()) / len(true_labels), 4
+    )
     
     return result
 
