@@ -184,7 +184,7 @@ def lookup3(table, table_width, pos1, pos2):
   col = lookup0(table, pos1)
   return lookup1(col, table_width, pos2)
 
-def tf_multi_hot(x, depth):
+def multi_hot(x, depth):
   def func_c(p, v):
     return tf.less(p, tf.shape(x)[0])
 
@@ -204,7 +204,7 @@ def tf_multi_hot(x, depth):
 
   return v[1:,]
 
-def log_sum(tensor_list):
+def log_sum(tensor_list: list):
   '''
   :param tensor_list: All tensors are of [batch] or [batch, 1] shape.
   '''
@@ -261,7 +261,7 @@ def basic_attention(states: list, context: tf.Tensor)-> tf.Tensor:
 
   return tf.reduce_sum(status * probs, 1)
 
-def basic_attention1(state: tf.Tensor, name: str)-> tf.Tensor:
+def attention_global(state: tf.Tensor, name: str)-> tf.Tensor:
   '''
   global attention.
   status: [batch, max-time, hidden-unit]
@@ -270,56 +270,54 @@ def basic_attention1(state: tf.Tensor, name: str)-> tf.Tensor:
   )
   '''
   with tf.name_scope(name):
-    h = tf.get_variable(name, (state.shape[2]), tf.float32, rand_init(-1, 1))
+    h = tf.get_variable(
+      name, (state.shape[2], 1), tf.float32, rand_init(-1, 1)
+    )
 
-  scores = tf.reduce_sum(state * h, 2)
-  probs = tf.nn.softmax(scores)
-  probs = tf.expand_dims(probs, 2)
+  scores = matmul(state, h)
+  probs = tf.nn.softmax(scores, axis=1)
 
   return tf.reduce_sum(state * probs, 1)
 
-def basic_attention2(state: tf.Tensor, context: tf.Tensor,
+def attention_basic1(state: tf.Tensor, context: tf.Tensor,
                      name: str)-> tf.Tensor:
   '''
-  status: [batch, max-time, hidden-unit]
-  context: from self-attention, or output of another nn.
+  state: [batch, max-time, hidden-unit]
+  context: [batch, hidden-unit]
   <x, y> = x * H * y
   '''
   shape = state.shape
-  with tf.name_scope(name):
+  max_time, h_size = shape[1], shape[2]
+
+  state = tf.transpose(state, [1, 0, 2])  # [max-time, batch, hidden-unit]
+  with tf.variable_scope(name, reuse=tf.AUTO_REUSE):
     h = tf.get_variable(
-      name, (shape[2], shape[2]), tf.float32, rand_init(-1, 1)
+      name, (h_size, h_size), tf.float32, rand_init(-1, 1)
     )
 
-  state = matmul(state, h)
-  states = tf.unstack(state, 1)
+  scores = tf.reduce_sum(matmul(state, h) * context, 2)
+  probs = tf.nn.softmax(scores, axis=0)
+  probs = tf.expand_dims(probs, -1)
+  vec = tf.reduce_sum(state * probs, 0)
 
-  return basic_attention(states, context)
+  return vec
 
-# def self_attention(state: tf.Tensor, name: str)-> tf.Tensor:
-#   '''
-#   :param state: [batch, max-time, hidden-unit]
-#   '''
-#
-#   shape = state.shape
-#   with tf.variable_scope(name):
-#     h = tf.get_variable(
-#       "h", [shape[2], shape[2]], tf.float32, rand_init(-1, 1)
-#     )
-#
-#   results = []
-#   for time_step in range(shape[1]):
-#     context = state[:, time_step, :]
-#     scores = tf.reduce_sum(state * h * context, 2)
-#     probs = tf.nn.softmax(scores)
-#     probs = tf.expand_dims(probs, 2)
-#     vec = tf.reduce_sum(state * probs, 1)
-#     results.append(vec)
-#
-#   result = tf.stack(results)
-#   result = tf.transpose(result, [1, 0, 2])
-#
-#   return result
+def attention_self1(state: tf.Tensor, name: str)-> tf.Tensor:
+  '''
+  :param state: [batch, max-time, hidden-unit]
+  '''
+  max_time, h_size = state.shape[1:]
+  results = []
+  with tf.variable_scope(name, reuse=tf.AUTO_REUSE):
+    for time_step in range(max_time):
+      context = state[:, time_step, :]
+      vec = attention_basic1(state, context, f"element")
+      results.append(vec)
+
+  result = tf.stack(results)
+  result = tf.transpose(result, [1, 0, 2])
+
+  return result
 
 def batch_norm_wrapper(inputs, scope_name, is_train: bool, decay=0.99,
                        float_type=tf.float32):
