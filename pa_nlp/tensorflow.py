@@ -50,7 +50,8 @@ def write_tfrecord(samples: typing.Union[list, typing.Iterator],
 
 def read_tfrecord(file_name: str,
                   example_fmt: dict, example2sample_func,
-                  epoch_num: int, batch_size: int):
+                  epoch_num: int, batch_size: int,
+                  drop_remainder: bool=False):
   def parse_fn(example):
     parsed = tf.parse_single_example(example, example_fmt)
     return example2sample_func(parsed)
@@ -67,6 +68,7 @@ def read_tfrecord(file_name: str,
     dataset = dataset.apply(
       tf.data.experimental.map_and_batch(
         map_func=parse_fn, batch_size=batch_size,
+        drop_remainder=drop_remainder,
       )
     )
 
@@ -356,7 +358,7 @@ def batch_norm_wrapper(inputs, scope_name, is_train: bool, decay=0.99,
 
 def normalize_data(data: tf.Tensor,
                    axels: list,
-                   method: str="mean"    # mean, or guassian
+                   method: str="mean"  # mean, or guassian
                    )-> tf.Tensor:
   shape = data.shape
   trans1 = axels[:]
@@ -364,14 +366,22 @@ def normalize_data(data: tf.Tensor,
     if p not in trans1:
       trans1.append(p)
 
+  axels = list(range(len(axels)))
   data1 = tf.transpose(data, trans1)
-  mean_ts, var_ts = tf.nn.moments(data1, list(range(len(axels))))
+  mean_ts, var_ts = tf.nn.moments(data1, axels)
 
   method = method.lower()
   if method == "mean":
     data2 = data1 - mean_ts
+
   elif method == "guassian":
     data2 = (data1 - mean_ts) / tf.sqrt(var_ts + 1e-8)
+
+  elif method == "l2":
+    assert len(axels) == 1
+    norm_ts = tf.norm(data1, ord="euclidean", axis=axels[0])
+    data2 = data1 / (norm_ts + 1e-8)
+
   else:
     assert False
 
