@@ -11,16 +11,23 @@ rand_init     = tf.random_uniform_initializer
 const_init    = tf.constant_initializer
 
 def matmul(m1: tf.Tensor, m2: tf.Tensor)-> tf.Tensor:
-  shape1 = m1.shape.as_list()
-  shape2 = m2.shape.as_list()
-  if shape1[: -2] == shape2[: -2] and shape1[-1] == shape2[-2]:
+  '''
+  :param m1: [None, d1, d2, ..., m, n], the first dimension is batch.
+  :param m2: [None, d1, d2, ..., n, k], or [n, k]
+  '''
+  s_shape1 = m1.shape.as_list()
+  s_shape2 = m2.shape.as_list()
+  if s_shape1[: -2] == s_shape2[: -2] and s_shape1[-1] == s_shape2[-2]:
     return m1 @ m2
 
-  if shape1[-1] == shape2[0] and len(shape2) == 2:
-    m1 = tf.reshape(m1, [-1, shape1[-1]])
+  if s_shape1[-1] == s_shape2[0] and len(s_shape2) == 2:
+    out_shape = s_shape1[: -1] + [s_shape2[1]]
+    out_shape = [d if d is not None else -1 for d in out_shape]
+
+    m1 = tf.reshape(m1, [-1, s_shape1[-1]])
     m = m1 @ m2
-    shape = shape1[: -1] + [shape2[1]]
-    m = tf.reshape(m, shape)
+    m = tf.reshape(m, out_shape)
+
     return m
   
   assert False
