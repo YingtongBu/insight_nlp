@@ -12,8 +12,8 @@ const_init    = tf.constant_initializer
 
 def matmul(m1: tf.Tensor, m2: tf.Tensor)-> tf.Tensor:
   '''
-  :param m1: [None, d1, d2, ..., m, n], the first dimension is batch.
-  :param m2: [None, d1, d2, ..., n, k], or [n, k]
+  :param m1: [d1, d2, ..., m, n], no matter where the batch dimension is.
+  :param m2: [d1, d2, ..., n, k], or [n, k]
   '''
   s_shape1 = m1.shape.as_list()
   s_shape2 = m2.shape.as_list()
@@ -21,11 +21,11 @@ def matmul(m1: tf.Tensor, m2: tf.Tensor)-> tf.Tensor:
     return m1 @ m2
 
   if s_shape1[-1] == s_shape2[0] and len(s_shape2) == 2:
-    out_shape = s_shape1[: -1] + [s_shape2[1]]
-    out_shape = [d if d is not None else -1 for d in out_shape]
-
     m1 = tf.reshape(m1, [-1, s_shape1[-1]])
     m = m1 @ m2
+
+    out_shape = s_shape1[: -1] + [s_shape2[1]]
+    out_shape = [d if d is not None else -1 for d in out_shape]
     m = tf.reshape(m, out_shape)
 
     return m
@@ -57,8 +57,7 @@ def write_tfrecord(samples: typing.Union[list, typing.Iterator],
 
 def read_tfrecord(file_name: str,
                   example_fmt: dict, example2sample_func,
-                  epoch_num: int, batch_size: int,
-                  drop_remainder: bool=False):
+                  epoch_num: int, batch_size: int):
   def parse_fn(example):
     parsed = tf.parse_single_example(example, example_fmt)
     return example2sample_func(parsed)
@@ -75,7 +74,7 @@ def read_tfrecord(file_name: str,
     dataset = dataset.apply(
       tf.data.experimental.map_and_batch(
         map_func=parse_fn, batch_size=batch_size,
-        drop_remainder=drop_remainder,
+        drop_remainder=False,
       )
     )
 
