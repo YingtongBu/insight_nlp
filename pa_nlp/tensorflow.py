@@ -1,15 +1,29 @@
 #coding: utf8
 #author: Tian Xia (summer.xia1@pactera.com)
 
-from operator import itemgetter
+from pa_nlp import *
 from pa_nlp.common import print_flush
 import tensorflow as tf
-import typing
 
 xavier_init   = tf.contrib.layers.xavier_initializer
 norm_init     = tf.truncated_normal_initializer
 rand_init     = tf.random_uniform_initializer
 const_init    = tf.constant_initializer
+
+def matmul(m1: tf.Tensor, m2: tf.Tensor)-> tf.Tensor:
+  shape1 = m1.shape.as_list()
+  shape2 = m2.shape.as_list()
+  if shape1[: -2] == shape2[: -2] and shape1[-1] == shape2[-2]:
+    return m1 @ m2
+
+  if shape1[-1] == shape2[0] and len(shape2) == 2:
+    m1 = tf.reshape(m1, [-1, shape1[-1]])
+    m = m1 @ m2
+    shape = shape1[: -1] + [shape2[1]]
+    m = tf.reshape(m, shape)
+    return m
+  
+  assert False
 
 def tf_bytes_feature(value: bytes):
   """Returns a bytes_list from a string / byte."""
@@ -231,14 +245,14 @@ def create_bi_LSTM(
 
   return outputs
 
-def basic_attention(statuses: list, context: tf.Tensor)-> tf.Tensor:
+def basic_attention(states: list, context: tf.Tensor)-> tf.Tensor:
   '''
   status: list of [batch, hidden-unit]
   context = tf.Variable(
     tf.random_uniform([hidden_unit], -1., 1), dtype=tf.float32
   )
   '''
-  status = tf.stack(statuses)
+  status = tf.stack(states)
   status = tf.transpose(status, [1, 0, 2])
 
   scores = tf.reduce_sum(status * context, 2)
@@ -246,6 +260,49 @@ def basic_attention(statuses: list, context: tf.Tensor)-> tf.Tensor:
   probs = tf.expand_dims(probs, 2)
 
   return tf.reduce_sum(status * probs, 1)
+
+# def basic_attention1(states: list, context: tf.Tensor, name: str)-> tf.Tensor:
+#   '''
+#   status: list of [batch, hidden-unit]
+#   '''
+#   shape = states[0].shape
+#   with tf.name_scope(name):
+#     h = tf.get_variable(
+#       name, (shape[1], shape[1]), tf.float32, rand_init(-1, 1)
+#     )
+#
+#   scores = []
+#   for state in scores:
+#     scores.append(tf.matmul(state, h))
+#
+#   scores = tf.reduce_sum(status * context, 2)
+#   probs = tf.nn.softmax(scores)
+#   probs = tf.expand_dims(probs, 2)
+#
+#   return tf.reduce_sum(status * probs, 1)
+
+
+
+# def self_attention(states: tf.Tensor, name: str)-> tf.Tensor:
+#   with tf.variable_scope(name):
+#     shape = states.shape
+#     h = tf.get_variable(
+#       "h", [shape[2], shape[2]], tf.float32, rand_init(-1, 1)
+#     )
+#
+#     results = []
+#     for time_step in range(shape[1]):
+#       context = states[:, time_step, :]
+#       scores = tf.reduce_sum(states * h * context, 2)
+#       probs = tf.nn.softmax(scores)
+#       probs = tf.expand_dims(probs, 2)
+#       vec = tf.reduce_sum(states * probs, 1)
+#       results.append(vec)
+#
+#     result = tf.stack(results)
+#     result = tf.transpose(result, [1, 0, 2])
+#
+#     return result
 
 def batch_norm_wrapper(inputs, scope_name, is_train: bool, decay=0.99,
                        float_type=tf.float32):
