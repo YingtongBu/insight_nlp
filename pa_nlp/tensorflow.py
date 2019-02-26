@@ -57,7 +57,7 @@ def write_tfrecord(samples: typing.Union[list, typing.Iterator],
 
 def read_tfrecord(file_name: str,
                   example_fmt: dict, example2sample_func,
-                  epoch_num: int, batch_size: int):
+                  epoch_num: int, batch_size: int, shuffle: bool=True):
   def parse_fn(example):
     parsed = tf.parse_single_example(example, example_fmt)
     return example2sample_func(parsed)
@@ -69,7 +69,8 @@ def read_tfrecord(file_name: str,
         tf.data.TFRecordDataset, cycle_length=4)
     )
 
-    dataset = dataset.shuffle(buffer_size=10000)
+    if shuffle:
+      dataset = dataset.shuffle(buffer_size=10000)
     dataset = dataset.repeat(epoch_num)
     dataset = dataset.apply(
       tf.data.experimental.map_and_batch(
