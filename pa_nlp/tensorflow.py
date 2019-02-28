@@ -222,12 +222,17 @@ def log_sum(tensor_list: list):
   tensor = tf.concat(tensor_list, 1)
   return tf.reduce_logsumexp(tensor, 1)
 
-def create_bi_LSTM(
-  word_vec: tf.Tensor,  # [batch, max_len, embedding_size]
-  rnn_layer_num: int,
-  hidden_unit_num: int,
-  rnn_type: str= "lstm"
-)-> list:
+#deprecated.
+def create_bi_LSTM(input: tf.Tensor,
+                   layer_num: int,
+                   hidden_unit: int,
+                   rnn_type: str="lstm")-> list:
+  '''
+  :param input: [batch, max_len, dim]
+  :param hidden_unit: might be different from embedding_size
+  :param rnn_type: lstm, gru
+  '''
+
   def encode(input, score_name):
     with tf.variable_scope(score_name, reuse=False):
       if rnn_type.lower() == "lstm":
@@ -238,7 +243,7 @@ def create_bi_LSTM(
         assert False
         
       cell = rnn_cell.MultiRNNCell(
-        [cell(hidden_unit_num) for _ in range(rnn_layer_num)]
+        [cell(hidden_unit) for _ in range(layer_num)]
       )
       word_list = tf.unstack(input, axis=1)
       outputs, encoding = tf.nn.static_rnn(cell, word_list, dtype=tf.float32)
@@ -246,11 +251,96 @@ def create_bi_LSTM(
       return outputs
 
   rnn_cell = tf.nn.rnn_cell
-  outputs1 = encode(word_vec, "directed")
-  outputs2 = encode(tf.reverse(word_vec, [1]), "reversed")
+  outputs1 = encode(input, "directed")
+  outputs2 = encode(tf.reverse(input, [1]), "reversed")
   outputs2 = list(reversed(outputs2))
   
   outputs = [tf.concat(o, axis=1) for o in zip(outputs1, outputs2)]
+
+  return outputs
+
+def bi_LSTM_layer_seperate(input: tf.Tensor,
+                           layer_num: int,
+                           hidden_unit: int,
+                           rnn_type: str="lstm",
+                           )-> tf.Tensor:
+  '''
+  This is different from bi_LSTM_layer_google.
+  The two direction LSTM are built layer by layer independently.
+
+  input: [batch, max_len, dim]
+  hidden_unit: might be different from embedding_size
+  rnn_type: lstm, gru
+  '''
+  def encode(input: list, score_name):
+    with tf.variable_scope(score_name, reuse=False):
+      if rnn_type.lower() == "lstm":
+        cell = rnn_cell.LSTMCell
+      elif rnn_type.lower() == "gru":
+        cell = rnn_cell.GRUCell
+      else:
+        assert False
+
+    prev_layer = tf.unstack(input, axis=1)
+    for layer in range(layer_num):
+      outputs, _ = tf.nn.static_rnn(
+        cell(hidden_unit), prev_layer, dtype=tf.float32
+      )
+
+      if layer_num == 1:
+        prev_layer = outputs
+      else:
+        prev_layer = tf.concat([outputs, prev_layer], axis=2)
+
+    return prev_layer
+
+  assert layer_num >= 1
+  rnn_cell = tf.nn.rnn_cell
+
+  input = tf.unstack(input, axis=1)
+  outputs1 = encode(input, "directed")
+  outputs2 = encode(list(reversed(input)), "reversed")
+  outputs2 = list(reversed(outputs2))
+
+  if layer_num == 1:
+    outputs = [tf.concat(o, axis=1) for o in zip(outputs1, outputs2, input)]
+  else:
+    outputs = [tf.concat(o, axis=1) for o in zip(outputs1, outputs2)]
+  outputs = tf.stack(outputs)
+  outputs = tf.transpose(outputs, [1, 0, 2])
+
+  return outputs
+
+def bi_LSTM_layer_google(input: tf.Tensor,
+                         layer_num: int,
+                         hidden_unit: int,
+                         rnn_type: str="lstm",
+                         )-> tf.Tensor:
+  '''
+  input: [batch, max_len, dim]
+  hidden_unit: might be different from embedding_size
+  rnn_type: lstm, gru
+  '''
+  assert layer_num >= 1
+  rnn_cell = tf.nn.rnn_cell
+  bi_layer = bi_LSTM_layer_seperate(input, 1, hidden_unit, rnn_type)
+
+  if rnn_type.lower() == "lstm":
+    cell = rnn_cell.LSTMCell
+  elif rnn_type.lower() == "gru":
+    cell = rnn_cell.GRUCell
+  else:
+    assert False
+
+  prev_layer = bi_layer
+  for layer in range(1, layer_num):
+    outputs, _ = tf.nn.static_rnn(
+      cell(hidden_unit), prev_layer, dtype=tf.float32
+    )
+    prev_layer = tf.concat([outputs, prev_layer], axis=2)
+
+  outputs = tf.stack(prev_layer)
+  outputs = tf.transpose(outputs, [1, 0, 2])
 
   return outputs
 

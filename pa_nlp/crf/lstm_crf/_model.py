@@ -34,9 +34,9 @@ class _Model(object):
     word_vec = TF.lookup0(embeddings, self.input_x)
 
     bi_LSTM_states = TF.create_bi_LSTM(
-      word_vec=word_vec,
-      rnn_layer_num=LSTM_layer_num,
-      hidden_unit_num=embedding_size,
+      input=word_vec,
+      layer_num=LSTM_layer_num,
+      hidden_unit=embedding_size,
       rnn_type=RNN_type
     )
     bi_LSTM_states = tf.unstack(tf.nn.dropout(bi_LSTM_states,
