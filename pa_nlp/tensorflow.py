@@ -281,18 +281,18 @@ def bi_LSTM_layer_seperate(input: tf.Tensor,
       else:
         assert False
 
-    prev_layer = tf.unstack(input, axis=1)
-    for layer in range(layer_num):
-      outputs, _ = tf.nn.static_rnn(
-        cell(hidden_unit), prev_layer, dtype=tf.float32
-      )
+      prev_layer = input
+      for layer in range(layer_num):
+        outputs, _ = tf.nn.static_rnn(
+          cell(hidden_unit), prev_layer, dtype=tf.float32
+        )
 
-      if layer_num == 1:
-        prev_layer = outputs
-      else:
-        prev_layer = tf.concat([outputs, prev_layer], axis=2)
+        if layer_num == 1:
+          prev_layer = outputs
+        else:
+          prev_layer = tf.concat([prev_layer, outputs], axis=2)
 
-    return prev_layer
+      return prev_layer
 
   assert layer_num >= 1
   rnn_cell = tf.nn.rnn_cell
@@ -332,7 +332,7 @@ def bi_LSTM_layer_google(input: tf.Tensor,
   else:
     assert False
 
-  prev_layer = bi_layer
+  prev_layer = tf.unstack(bi_layer, axis=1)
   for layer in range(1, layer_num):
     outputs, _ = tf.nn.static_rnn(
       cell(hidden_unit), prev_layer, dtype=tf.float32
