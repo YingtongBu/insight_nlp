@@ -273,7 +273,6 @@ def bi_LSTM_layer_seperate(input: tf.Tensor,
   rnn_type: lstm, gru
   '''
   def encode(input: list, score_name):
-    with tf.variable_scope(score_name, reuse=False):
       if rnn_type.lower() == "lstm":
         cell = rnn_cell.LSTMCell
       elif rnn_type.lower() == "gru":
@@ -283,14 +282,16 @@ def bi_LSTM_layer_seperate(input: tf.Tensor,
 
       prev_layer = input
       for layer in range(layer_num):
-        outputs, _ = tf.nn.static_rnn(
-          cell(hidden_unit), prev_layer, dtype=tf.float32
-        )
+        with tf.variable_scope(f"{score_name}/layer_{layer}", reuse=False):
+          outputs, _ = tf.nn.static_rnn(
+            cell(hidden_unit), prev_layer, dtype=tf.float32
+          )
 
-        if layer_num == 1:
-          prev_layer = outputs
-        else:
-          prev_layer = tf.concat([prev_layer, outputs], axis=2)
+          if layer_num == 1:
+            prev_layer = outputs
+          else:
+            prev_layer = [tf.concat([v1, v2], axis=1)
+                          for v1, v2 in zip(prev_layer, outputs)]
 
       return prev_layer
 
@@ -315,6 +316,7 @@ def bi_LSTM_layer_google(input: tf.Tensor,
                          layer_num: int,
                          hidden_unit: int,
                          rnn_type: str="lstm",
+                         scope: str="bi-lstm",
                          )-> tf.Tensor:
   '''
   input: [batch, max_len, dim]
@@ -323,7 +325,6 @@ def bi_LSTM_layer_google(input: tf.Tensor,
   '''
   assert layer_num >= 1
   rnn_cell = tf.nn.rnn_cell
-  bi_layer = bi_LSTM_layer_seperate(input, 1, hidden_unit, rnn_type)
 
   if rnn_type.lower() == "lstm":
     cell = rnn_cell.LSTMCell
@@ -332,17 +333,22 @@ def bi_LSTM_layer_google(input: tf.Tensor,
   else:
     assert False
 
-  prev_layer = tf.unstack(bi_layer, axis=1)
-  for layer in range(1, layer_num):
-    outputs, _ = tf.nn.static_rnn(
-      cell(hidden_unit), prev_layer, dtype=tf.float32
-    )
-    prev_layer = tf.concat([outputs, prev_layer], axis=2)
+  with tf.variable_scope(scope, reuse=False):
+    bi_layer = bi_LSTM_layer_seperate(input, 1, hidden_unit, rnn_type)
 
-  outputs = tf.stack(prev_layer)
-  outputs = tf.transpose(outputs, [1, 0, 2])
+    prev_layer = tf.unstack(bi_layer, axis=1)
+    for layer in range(1, layer_num):
+      with tf.variable_scope(f"layer_{layer}", reuse=False):
+        outputs, _ = tf.nn.static_rnn(
+          cell(hidden_unit), prev_layer, dtype=tf.float32
+        )
+        prev_layer = [tf.concat([v1, v2], axis=1)
+                      for v1, v2 in zip(prev_layer, outputs)]
 
-  return outputs
+    outputs = tf.stack(prev_layer)
+    outputs = tf.transpose(outputs, [1, 0, 2])
+
+    return outputs
 
 def basic_attention(states: list, context: tf.Tensor)-> tf.Tensor:
   '''
@@ -360,7 +366,7 @@ def basic_attention(states: list, context: tf.Tensor)-> tf.Tensor:
 
   return tf.reduce_sum(status * probs, 1)
 
-def attention_global(state: tf.Tensor, name: str)-> tf.Tensor:
+def attention_global(state: tf.Tensor, scope: str)-> tf.Tensor:
   '''
   global attention.
   status: [batch, max-time, hidden-unit]
@@ -368,9 +374,9 @@ def attention_global(state: tf.Tensor, name: str)-> tf.Tensor:
     tf.random_uniform([hidden_unit], -1., 1), dtype=tf.float32
   )
   '''
-  with tf.name_scope(name):
+  with tf.name_scope(scope):
     h = tf.get_variable(
-      name, (state.shape[2], 1), tf.float32, rand_init(-1, 1)
+      scope, (state.shape[2], 1), tf.float32, rand_init(-1, 1)
     )
 
   scores = matmul(state, h)
@@ -379,7 +385,7 @@ def attention_global(state: tf.Tensor, name: str)-> tf.Tensor:
   return tf.reduce_sum(state * probs, 1)
 
 def attention_basic1(state: tf.Tensor, context: tf.Tensor,
-                     name: str)-> tf.Tensor:
+                     scope: str)-> tf.Tensor:
   '''
   state: [batch, max-time, hidden-unit]
   context: [batch, hidden-unit]
@@ -389,9 +395,9 @@ def attention_basic1(state: tf.Tensor, context: tf.Tensor,
   max_time, h_size = shape[1], shape[2]
 
   state = tf.transpose(state, [1, 0, 2])  # [max-time, batch, hidden-unit]
-  with tf.variable_scope(name, reuse=tf.AUTO_REUSE):
+  with tf.variable_scope(scope, reuse=tf.AUTO_REUSE):
     h = tf.get_variable(
-      name, (h_size, h_size), tf.float32, rand_init(-1, 1)
+      scope, (h_size, h_size), tf.float32, rand_init(-1, 1)
     )
 
   scores = tf.reduce_sum(matmul(state, h) * context, 2)
@@ -401,13 +407,13 @@ def attention_basic1(state: tf.Tensor, context: tf.Tensor,
 
   return vec
 
-def attention_self1(state: tf.Tensor, name: str)-> tf.Tensor:
+def attention_self1(state: tf.Tensor, scope: str)-> tf.Tensor:
   '''
   :param state: [batch, max-time, hidden-unit]
   '''
   max_time, h_size = state.shape[1:]
   results = []
-  with tf.variable_scope(name, reuse=tf.AUTO_REUSE):
+  with tf.variable_scope(scope, reuse=tf.AUTO_REUSE):
     for time_step in range(max_time):
       context = state[:, time_step, :]
       vec = attention_basic1(state, context, f"element")
