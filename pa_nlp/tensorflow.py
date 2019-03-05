@@ -55,6 +55,7 @@ def write_tfrecord(samples: typing.Union[list, typing.Iterator],
           print_flush(f"{num} examples have been finished.")
         writer.write(example)
 
+#todo: support multi-files, and file-shuffle: bool, buffer_size
 def read_tfrecord(file_name: str,
                   example_fmt: dict, example2sample_func,
                   epoch_num: int, batch_size: int, shuffle: bool=True):
