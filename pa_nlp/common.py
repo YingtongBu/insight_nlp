@@ -6,6 +6,9 @@ from pa_nlp import *
 INF         = float("inf")
 EPSILON     = 1e-6
 
+def replace_list(data: list, func):
+  return [func(d) for d in data]
+
 def segment_contain(seg1: list, seg2: list):
   if seg1[0] <= seg2[0] and seg2[1] <= seg1[1]:
     return 1
