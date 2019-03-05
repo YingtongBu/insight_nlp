@@ -49,8 +49,9 @@ class AudioHelper:
 
       seg_name = os.path.join(
         dest_folder,
-        nlp.replace_file_name(base_name,
-                              f".{file_ext}", f".{file_id:04}.{file_ext}")
+        nlp.replace_file_name(
+          base_name, f".{file_ext}", f".{file_id:04}.{file_ext}"
+        )
       )
       try:
         audio[t_from: t_to].export(seg_name, format=file_ext)
