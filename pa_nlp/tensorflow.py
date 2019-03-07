@@ -108,7 +108,7 @@ def get_network_parameter_num():
     for dim in shape:
       var_param_num *= dim.value
     num += var_param_num
-  print(f"#model parameter: {num}")
+  print(f"#model parameter: {num:,}")
 
   return num
 

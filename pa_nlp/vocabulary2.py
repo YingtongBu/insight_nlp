@@ -7,18 +7,14 @@ import pa_nlp.common as nlp
 '''This class has added two special tokens, <empty> and <oov> by default.
 '''
 class Vocabulary:
-  special_tokens = {
-  }
-
-  def __init__(self,
-               special_tokens: list, empty_word: str, oov_word: str,
-               vob: dict, min_freq: int=0):
+  def create_from_data(self, special_tokens: list, empty_word: str,
+                       oov_word: str, word2freq: dict, min_freq: int=0):
     self._word2id = {}
     self._words = []
 
     for w in set(special_tokens + [empty_word, oov_word]):
       self._add_word(w)
-    for w, freq in vob.items():
+    for w, freq in word2freq.items():
       if freq >= min_freq:
         self._add_word(w)
 
@@ -27,13 +23,17 @@ class Vocabulary:
     print(f"[{empty_word}]: {self._empty_id}")
     print(f"[{oov_word}]: {self._oov_id}")
 
-  def save_model(self, vob_file: str):
-    nlp.write_pydict_file([self._word2id, self._words], vob_file)
-    print(f"wrote {self.size()} words to {vob_file}.")
-
-  def load_model(self, vob_file):
-    self._word2id, self._words = nlp.read_pydict_file(vob_file)
+  def create_from_model(self, vob_file):
+    self._word2id, self._words, self._empty_id, self._oov_id = \
+      nlp.read_pydict_file(vob_file)
     print(f"loaded {self.size()} words from {vob_file}.")
+
+  def save_model(self, vob_file: str):
+    nlp.write_pydict_file(
+      [self._word2id, self._words, self._empty_id, self._oov_id],
+      vob_file
+    )
+    print(f"wrote {self.size()} words to {vob_file}.")
 
   def _add_word(self, word: str)-> int:
     ''' add word if it does not exist, and then return its id.

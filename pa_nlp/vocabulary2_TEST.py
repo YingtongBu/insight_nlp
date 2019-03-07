@@ -18,12 +18,17 @@ if __name__ == "__main__":
 
   oov_word = "oov"
   empty_word = "empty"
-  vob = Vocabulary([oov_word, empty_word], empty_word, oov_word, word2freqs, 1)
+  vob = Vocabulary()
+  vob.create_from_data(
+    [oov_word, empty_word], empty_word, oov_word, word2freqs, 1
+  )
   oov_id = vob.get_word_id(oov_word)
   empty_id = vob.get_word_id(empty_word)
 
   vob.save_model("vob.pydict")
-  vob.load_model("vob.pydict")
+
+  vob = Vocabulary()
+  vob.create_from_model("vob.pydict")
  
   for tokens in data:
     print(f"{tokens}:", vob.get_word_ids(tokens, 10, False))
