@@ -6,6 +6,19 @@ from pa_nlp import *
 INF         = float("inf")
 EPSILON     = 1e-6
 
+def get_next_line(file_name: str=None, file_names: list=None,
+                  max_count: int=-1):
+  assert not (file_name is not None and file_names is not None)
+
+  if file_name is not None:
+    for num, ln in enumerate(open(file_name)):
+      if (max_count > 0 and num < max_count) or max_count <= 0:
+        yield ln.rstrip()
+
+  elif file_names is not None:
+    for f in file_names:
+      yield from get_next_line(file_name=f, max_count=max_count)
+
 def replace_list(data: list, func):
   return [func(d) for d in data]
 
