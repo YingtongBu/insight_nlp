@@ -6,6 +6,9 @@ from pa_nlp import *
 INF         = float("inf")
 EPSILON     = 1e-6
 
+def get_new_temporay_file():
+  return tempfile.NamedTemporaryFile(delete=False).name
+
 def get_next_line(file_name: str=None, file_names: list=None,
                   max_count: int=-1):
   assert not (file_name is not None and file_names is not None)
@@ -275,13 +278,13 @@ def log_f_prime(fss, weight):
     pdw += math.exp(weight.dot(fs) - dn) * fs
   return pdw
 
-def group_by_key_fun(data, key_fun):
+def group_by_key_fun(data, key_fun=None):
   '''Note, the spark.group_by_key requires the data is sorted by keys.
   @:return a dict
   '''
   result = collections.defaultdict(list)
   for d in data:
-    key = key_fun(d)
+    key = d[0] if key_fun is None else key_fun(d)
     result[key].append(d)
 
   return result

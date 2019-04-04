@@ -11,18 +11,6 @@ if __name__ == "__main__":
 
   print(uniq(["summer", "rain", "rain", 2, 2, 3, 1, "rain", "rain"]))
 
-  data = create_list([10])
-  data[0] = 1
-  print(data)
-
-  data = create_list([3, 4], None)
-  data[0][0] = 1
-  print(data)
-
-  data = create_list([3, 4, 5], None)
-  data[0][0][0] = 1
-  print(data)
-  
   print(get_module_path("NLP.translation.Translate"))
 
   print(eq(0, 0, EPSILON))
@@ -35,8 +23,12 @@ if __name__ == "__main__":
     assert is_existed
 
   data = [("a", 1), ("a", 2), ("b", 3), ("c", 4)]
-  print(list(group_by_key(iter(data))))
+  print(group_by_key_fun(data).items())
 
   dists = [1, 2, 3, 4]
   print(collections.Counter([discrete_sample(dists) for freq in range(100000)]))
+
+  print(get_new_temporay_file())
+  print(get_new_temporay_file())
+  print(get_new_temporay_file())
 
