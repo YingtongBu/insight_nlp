@@ -6,21 +6,40 @@ from pa_nlp import *
 INF         = float("inf")
 EPSILON     = 1e-6
 
+def next_k(data: typing.Iterator, k: int):
+  _ = range(k)
+  data_iter = iter(data)
+  while True:
+    buff = list(zip(_, data_iter))
+    if buff == []:
+      break
+    batch_data = list(map(itemgetter(1), buff))
+    yield batch_data
+
+def ensure_random_seed_for_one_time(buff={}):
+  key = "randomized"
+  status = buff.get(key, False)
+  if not status:
+    random.seed()
+    buff[key] = True
+
+def get_file_line_count(file_name: str):
+  return int(os.popen(f"wc -l {file_name}").read().split()[0])
+
+def get_files_line_count(file_names: list):
+  return sum([get_file_line_count(f) for f in file_names])
+
 def get_new_temporay_file():
   return tempfile.NamedTemporaryFile(delete=False).name
 
-def get_next_line(file_name: str=None, file_names: list=None,
-                  max_count: int=-1):
-  assert not (file_name is not None and file_names is not None)
+def next_line_from_file(file_name: str, max_count: int=-1):
+  for idx, ln in enumerate(open(file_name)):
+    if (max_count > 0 and idx < max_count) or max_count <= 0:
+      yield idx, ln.rstrip()
 
-  if file_name is not None:
-    for num, ln in enumerate(open(file_name)):
-      if (max_count > 0 and num < max_count) or max_count <= 0:
-        yield ln.rstrip()
-
-  elif file_names is not None:
-    for f in file_names:
-      yield from get_next_line(file_name=f, max_count=max_count)
+def next_line_from_files(file_names: list, max_count: int=-1):
+  for f in file_names:
+    yield from next_line_from_file(f, max_count)
 
 def replace_list(data: list, func):
   return [func(d) for d in data]
