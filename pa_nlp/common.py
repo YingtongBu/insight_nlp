@@ -136,22 +136,24 @@ def norm_regex(regexExpr)-> str:
 def read_pydict_file(file_name, max_num: int=-1)-> typing.Iterator:
   assert file_name.endswith(".pydict")
   data_num = 0
-  for idx, ln in enumerate(open(file_name)):
-    if max_num >= 0 and idx + 1 > max_num:
-      break
-    if idx > 0 and idx % 5000 == 0:
-      print_flush(f"{file_name}: {idx} lines have been loaded.")
+  with open(file_name) as fin:
+    for idx, ln in enumerate(fin):
+      if max_num >= 0 and idx + 1 > max_num:
+        break
+      if idx > 0 and idx % 10_000 == 0:
+        print_flush(f"{file_name}: {idx} lines have been loaded.")
 
-    try:
-      obj = eval(ln)
-      yield obj
-      data_num += 1
-    except Exception as err:
-      print(f"ERR in reading {file_name}:{idx + 1}: {err} '{ln}'")
+      try:
+        obj = eval(ln)
+        yield obj
+        data_num += 1
+
+      except Exception as err:
+        print(f"ERR in reading {file_name}:{idx + 1}: {err} '{ln}'")
 
   print(f"{file_name}: #data={data_num}")
 
-def write_pydict_file(data: list, file_name)-> None:
+def write_pydict_file(data: typing.Iterator, file_name)-> None:
   assert file_name.endswith(".pydict")
   with open(file_name, "w") as fou:
     for obj in data:
