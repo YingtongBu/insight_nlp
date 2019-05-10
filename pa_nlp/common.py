@@ -35,7 +35,7 @@ def get_new_temporay_file():
 def next_line_from_file(file_name: str, max_count: int=-1):
   for idx, ln in enumerate(open(file_name)):
     if (max_count > 0 and idx < max_count) or max_count <= 0:
-      yield idx, ln.rstrip()
+      yield ln.rstrip()
 
 def next_line_from_files(file_names: list, max_count: int=-1):
   for f in file_names:
