@@ -88,6 +88,17 @@ def read_tfrecord(file_name: str,
 
   return data_iter.initializer, sample
 
+def save_model(saver: tf.train.Saver, sess: tf.Session, model_path: str,
+               model_prefix: str, batch_id: int):
+  try:
+    saver.save(sess, f"{model_path}/{model_prefix}", global_step=batch_id)
+    print(f"Successful saving model[{batch_id}] ...")
+    return True
+
+  except Exception as error:
+    print(f"Failed saving model[{batch_id}] : {error}")
+    return False
+
 def load_model(graph: tf.Graph, sess: tf.Session, model_path: str):
   try:
     with graph.as_default():
