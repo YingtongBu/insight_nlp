@@ -455,6 +455,7 @@ def attention_basic2(states: tf.Tensor, context: tf.Tensor,
 
   return vec
 
+#deprecated.
 def attention_self1(state: tf.Tensor, scope: str)-> tf.Tensor:
   '''
   :param state: [batch, max-time, hidden-unit]
@@ -471,6 +472,21 @@ def attention_self1(state: tf.Tensor, scope: str)-> tf.Tensor:
   result = tf.transpose(result, [1, 0, 2])
 
   return result
+
+def attention_self2(state: tf.Tensor, scope: str)-> tf.Tensor:
+  '''
+  :param state: [batch, max-time, hidden-unit]
+  '''
+  with tf.variable_scope(scope, reuse=tf.AUTO_REUSE):
+    h_size = state.shape[2]
+    h = tf.get_variable(
+      scope, (h_size, h_size), tf.float32, rand_init(-1, 1)
+    )
+    scores = matmul(state, h) @ tf.transpose(state, [0, 2, 1])
+    probs = tf.nn.softmax(scores, axis=2)
+    result = probs @ state
+
+    return result
 
 def batch_norm_wrapper(inputs, scope_name, is_train: bool, decay=0.99,
                        float_type=tf.float32):
