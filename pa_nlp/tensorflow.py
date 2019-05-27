@@ -482,7 +482,8 @@ def attention_self2(state: tf.Tensor, scope: str)-> tf.Tensor:
     h = tf.get_variable(
       scope, (h_size, h_size), tf.float32, rand_init(-1, 1)
     )
-    scores = matmul(state, h) @ tf.transpose(state, [0, 2, 1])
+    # scores = matmul(state, h) @ tf.transpose(state, [0, 2, 1])
+    scores = state @ tf.transpose(state, [0, 2, 1])
     probs = tf.nn.softmax(scores, axis=2)
     result = probs @ state
 
