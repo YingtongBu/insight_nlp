@@ -5,9 +5,18 @@ from pa_nlp import *
 from pa_nlp.common import print_flush
 import tensorflow as tf
 
+init_xavier   = tf.contrib.layers.xavier_initializer
+init_norm     = tf.truncated_normal_initializer
+init_rand     = tf.random_uniform_initializer
+init_const    = tf.constant_initializer
+
+#deprecated.
 xavier_init   = tf.contrib.layers.xavier_initializer
+#deprecated.
 norm_init     = tf.truncated_normal_initializer
+#deprecated.
 rand_init     = tf.random_uniform_initializer
+#deprecated.
 const_init    = tf.constant_initializer
 
 def matmul(m1: tf.Tensor, m2: tf.Tensor)-> tf.Tensor:
@@ -39,18 +48,34 @@ def matmul(m1: tf.Tensor, m2: tf.Tensor)-> tf.Tensor:
   
   assert False
 
+#deprecated.
 def tf_bytes_feature(value: bytes):
   """Returns a bytes_list from a string / byte."""
   return tf.train.Feature(bytes_list=tf.train.BytesList(value=[value]))
 
+#deprecated.
 def tf_float_feature(value: float):
   """Returns a float_list from a float / double."""
   return tf.train.Feature(float_list=tf.train.FloatList(value=[value]))
 
+#deprecated.
 def tf_int64_feature(value: int):
   """Returns an int64_list from a bool / enum / int / uint."""
   return tf.train.Feature(int64_list=tf.train.Int64List(value=[value]))
 
+def tf_feature_bytes(value: bytes):
+  """Returns a bytes_list from a string / byte."""
+  return tf.train.Feature(bytes_list=tf.train.BytesList(value=[value]))
+
+def tf_feature_float(value: float):
+  """Returns a float_list from a float / double."""
+  return tf.train.Feature(float_list=tf.train.FloatList(value=[value]))
+
+def tf_feature_int64(value: int):
+  """Returns an int64_list from a bool / enum / int / uint."""
+  return tf.train.Feature(int64_list=tf.train.Int64List(value=[value]))
+
+#deprecated.
 def write_tfrecord(samples: typing.Union[list, typing.Iterator],
                    serialize_sample_fun, file_name: str):
   with tf.python_io.TFRecordWriter(file_name) as writer:
@@ -62,6 +87,7 @@ def write_tfrecord(samples: typing.Union[list, typing.Iterator],
           print_flush(f"{num} examples have been finished.")
         writer.write(example)
 
+#deprecated.
 #todo: support multi-files, and file-shuffle: bool, buffer_size
 def read_tfrecord(file_name: str,
                   example_fmt: dict, example2sample_func,
@@ -95,6 +121,51 @@ def read_tfrecord(file_name: str,
 
   return data_iter.initializer, sample
 
+def tfrecord_write(samples: typing.Union[list, typing.Iterator],
+                   serialize_sample_fun, file_name: str):
+  with tf.python_io.TFRecordWriter(file_name) as writer:
+    num = 0
+    for sample in samples:
+      for example in serialize_sample_fun(sample):
+        num += 1
+        if num % 1000 == 0:
+          print_flush(f"{num} examples have been finished.")
+        writer.write(example)
+
+#todo: support multi-files, and file-shuffle: bool, buffer_size
+def tfrecord_read(file_name: str,
+                  example_fmt: dict, example2sample_func,
+                  epoch_num: int, batch_size: int, shuffle: bool=True):
+  def parse_fn(example):
+    parsed = tf.parse_single_example(example, example_fmt)
+    return example2sample_func(parsed)
+
+  def input_fn():
+    files = tf.data.Dataset.list_files(file_name)
+    dataset = files.apply(
+      tf.data.experimental.parallel_interleave(
+        tf.data.TFRecordDataset, cycle_length=4)
+    )
+
+    if shuffle:
+      dataset = dataset.shuffle(buffer_size=10000)
+    dataset = dataset.repeat(epoch_num)
+    dataset = dataset.apply(
+      tf.data.experimental.map_and_batch(
+        map_func=parse_fn, batch_size=batch_size,
+        drop_remainder=False,
+      )
+    )
+
+    return dataset
+
+  dataset = input_fn()
+  data_iter = dataset.prefetch(8).make_initializable_iterator()
+  sample = data_iter.get_next()
+
+  return data_iter.initializer, sample
+
+#deprecated.
 def save_model(saver: tf.train.Saver, sess: tf.Session, model_path: str,
                model_prefix: str, batch_id: int):
   try:
@@ -106,7 +177,30 @@ def save_model(saver: tf.train.Saver, sess: tf.Session, model_path: str,
     print(f"Failed saving model[{batch_id}] : {error}")
     return False
 
+def model_save(saver: tf.train.Saver, sess: tf.Session, model_path: str,
+               model_prefix: str, batch_id: int):
+  try:
+    saver.save(sess, f"{model_path}/{model_prefix}", global_step=batch_id)
+    print(f"Successful saving model[{batch_id}] ...")
+    return True
+
+  except Exception as error:
+    print(f"Failed saving model[{batch_id}] : {error}")
+    return False
+
+#deprecated.
 def load_model(graph: tf.Graph, sess: tf.Session, model_path: str):
+  try:
+    with graph.as_default():
+      tf.train.Saver().restore(sess, tf.train.latest_checkpoint(model_path))
+    print(f"Successful loading existing model from '{model_path}'")
+    return True
+
+  except Exception as error:
+    print(f"Failed loading existing model from '{model_path}: {error}")
+    return False
+
+def model_load(graph: tf.Graph, sess: tf.Session, model_path: str):
   try:
     with graph.as_default():
       tf.train.Saver().restore(sess, tf.train.latest_checkpoint(model_path))
@@ -369,6 +463,7 @@ def bi_LSTM_layer_google(input: tf.Tensor,
 
     return outputs
 
+#deprecated.
 def basic_attention(states: list, context: tf.Tensor)-> tf.Tensor:
   '''
   status: list of [batch, hidden-unit]
@@ -395,7 +490,7 @@ def attention_global(state: tf.Tensor, scope: str)-> tf.Tensor:
   '''
   with tf.name_scope(scope):
     h = tf.get_variable(
-      scope, (state.shape[2], 1), tf.float32, rand_init(-1, 1)
+      scope, (state.shape[2], 1), tf.float32, init_rand(-1, 1)
     )
 
   scores = matmul(state, h)
@@ -417,7 +512,7 @@ def attention_basic1(state: tf.Tensor, context: tf.Tensor,
   state = tf.transpose(state, [1, 0, 2])  # [max-time, batch, hidden-unit]
   with tf.variable_scope(scope, reuse=tf.AUTO_REUSE):
     h = tf.get_variable(
-      scope, (h_size, h_size), tf.float32, rand_init(-1, 1)
+      scope, (h_size, h_size), tf.float32, init_rand(-1, 1)
     )
 
   scores = tf.reduce_sum(matmul(state, h) * context, 2)
@@ -442,7 +537,7 @@ def attention_basic2(states: tf.Tensor, context: tf.Tensor,
   states = tf.transpose(states, [1, 0, 2])  # [max-time, batch, hidden-unit]
   with tf.variable_scope(scope, reuse=tf.AUTO_REUSE):
     h = tf.get_variable(
-      scope, (h_size, h_size), tf.float32, rand_init(-1, 1)
+      scope, (h_size, h_size), tf.float32, init_rand(-1, 1)
     )
 
   scores = tf.reduce_sum(matmul(states, h) * context, 2)
@@ -487,7 +582,7 @@ def attention_self2(state: tf.Tensor, scope: str)-> tf.Tensor:
   with tf.variable_scope(scope, reuse=tf.AUTO_REUSE):
     h_size = state.shape[2]
     h = tf.get_variable(
-      scope, (h_size, h_size), tf.float32, rand_init(-1, 1)
+      scope, (h_size, h_size), tf.float32, init_rand(-1, 1)
     )
     scores = matmul(state, h) @ tf.transpose(state, [0, 2, 1])
     # scores = state @ tf.transpose(state, [0, 2, 1])
@@ -503,13 +598,13 @@ def batch_norm_wrapper(inputs, scope_name, is_train: bool, decay=0.99,
 
   with tf.variable_scope(f"bn_{scope_name}"):
     offset = tf.get_variable("offset", shape[-1], dtype=float_type,
-                             initializer=const_init(0))
+                             initializer=init_const(0))
     scale = tf.get_variable("scale", shape[-1], dtype=float_type,
-                            initializer=const_init(1))
+                            initializer=init_const(1))
     pop_mean = tf.get_variable("mean", shape[-1], dtype=float_type,
-                               initializer=const_init(0))
+                               initializer=init_const(0))
     pop_var = tf.get_variable("variance", shape[-1], dtype=float_type,
-                              initializer=const_init(1))
+                              initializer=init_const(1))
     if is_train:
       batch_mean, batch_var = tf.nn.moments(
         inputs, axes=list(range(len(shape)-1))
