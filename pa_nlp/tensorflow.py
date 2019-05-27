@@ -21,11 +21,18 @@ def matmul(m1: tf.Tensor, m2: tf.Tensor)-> tf.Tensor:
     return m1 @ m2
 
   if s_shape1[-1] == s_shape2[0] and len(s_shape2) == 2:
-    m1 = tf.reshape(m1, [-1, s_shape1[-1]])
-    m = m1 @ m2
+    m = tf.reshape(m1, [-1, s_shape1[-1]]) @ m2
 
-    out_shape = s_shape1[: -1] + [s_shape2[1]]
-    out_shape = [d if d is not None else -1 for d in out_shape]
+    d_shape1 = tf.shape(m1)
+    d_shape2 = tf.shape(m2)
+    out_shape = [
+      d_shape1[p] if d is None else d for p, d in enumerate(s_shape1[: -1])
+    ]
+    if s_shape2[1] is None:
+      out_shape.append(d_shape2[1])
+    else:
+      out_shape.append(s_shape2[1])
+
     m = tf.reshape(m, out_shape)
 
     return m
@@ -482,8 +489,8 @@ def attention_self2(state: tf.Tensor, scope: str)-> tf.Tensor:
     h = tf.get_variable(
       scope, (h_size, h_size), tf.float32, rand_init(-1, 1)
     )
-    # scores = matmul(state, h) @ tf.transpose(state, [0, 2, 1])
-    scores = state @ tf.transpose(state, [0, 2, 1])
+    scores = matmul(state, h) @ tf.transpose(state, [0, 2, 1])
+    # scores = state @ tf.transpose(state, [0, 2, 1])
     probs = tf.nn.softmax(scores, axis=2)
     result = probs @ state
 
