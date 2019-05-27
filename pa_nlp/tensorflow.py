@@ -396,6 +396,7 @@ def attention_global(state: tf.Tensor, scope: str)-> tf.Tensor:
 
   return tf.reduce_sum(state * probs, 1)
 
+#deprecated.
 def attention_basic1(state: tf.Tensor, context: tf.Tensor,
                      scope: str)-> tf.Tensor:
   '''
@@ -416,6 +417,41 @@ def attention_basic1(state: tf.Tensor, context: tf.Tensor,
   probs = tf.nn.softmax(scores, axis=0)
   probs = tf.expand_dims(probs, -1)
   vec = tf.reduce_sum(state * probs, 0)
+
+  return vec
+
+def attention_basic2(states: tf.Tensor, context: tf.Tensor,
+                     length_masks: typing.Union[tf.Tensor, None],
+                     scope: str)-> tf.Tensor:
+  '''
+  states: [batch, max-time, hidden-unit]
+  context: [batch, hidden-unit]
+  length_masks: [batch, max-time], actually length, tf.float32
+  <x, y> = x * H * y
+  '''
+  shape = states.shape
+  max_time, h_size = shape[1], shape[2]
+
+  states = tf.transpose(states, [1, 0, 2])  # [max-time, batch, hidden-unit]
+  with tf.variable_scope(scope, reuse=tf.AUTO_REUSE):
+    h = tf.get_variable(
+      scope, (h_size, h_size), tf.float32, rand_init(-1, 1)
+    )
+
+  scores = tf.reduce_sum(matmul(states, h) * context, 2)
+  # scores = tf.reduce_sum(states * context, 2)
+  probs = tf.nn.softmax(scores, axis=0)
+
+  if length_masks is not None:
+    length_masks = tf.transpose(length_masks)
+    valid_probs = length_masks * probs
+    actual_probs = probs / tf.reduce_sum(valid_probs, 0)
+    actual_probs *= length_masks
+    actual_probs = tf.expand_dims(actual_probs, -1)
+  else:
+    actual_probs = tf.expand_dims(probs, -1)
+
+  vec = tf.reduce_sum(states * actual_probs, 0)
 
   return vec
 
