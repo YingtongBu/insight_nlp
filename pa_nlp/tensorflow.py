@@ -425,6 +425,7 @@ def bi_LSTM_layer_seperate(input: tf.Tensor,
 
   return outputs
 
+#deprecated.
 def bi_LSTM_layer_google(input: tf.Tensor,
                          layer_num: int,
                          hidden_unit: int,
@@ -457,6 +458,45 @@ def bi_LSTM_layer_google(input: tf.Tensor,
         )
         prev_layer = [tf.concat([v1, v2], axis=1)
                       for v1, v2 in zip(prev_layer, outputs)]
+
+    outputs = tf.stack(prev_layer)
+    outputs = tf.transpose(outputs, [1, 0, 2])
+
+    return outputs
+
+def bi_LSTM_layer_google2(input: tf.Tensor,
+                          layer_num: int,
+                          hidden_unit: int,
+                          rnn_type: str="lstm",
+                          scope: str="bi-lstm",
+                          )-> tf.Tensor:
+  '''
+  Fix the output dimenstion to 'hidden_unit', regardelss of 'layer_num'.
+  input: [batch, max_len, dim]
+  hidden_unit: might be different from embedding_size
+  rnn_type: lstm, gru
+  '''
+  assert layer_num >= 1
+  rnn_cell = tf.nn.rnn_cell
+
+  if rnn_type.lower() == "lstm":
+    cell = rnn_cell.LSTMCell
+  elif rnn_type.lower() == "gru":
+    cell = rnn_cell.GRUCell
+  else:
+    assert False
+
+  with tf.variable_scope(scope, reuse=False):
+    bi_layer = bi_LSTM_layer_seperate(input, 1, hidden_unit, rnn_type)
+    bi_layer = tf.layers.dense(bi_layer, hidden_unit, tf.nn.leaky_relu)
+
+    prev_layer = tf.unstack(bi_layer, axis=1)
+    for layer in range(1, layer_num):
+      with tf.variable_scope(f"layer_{layer}", reuse=False):
+        outputs, _ = tf.nn.static_rnn(
+          cell(hidden_unit), prev_layer, dtype=tf.float32
+        )
+      prev_layer = [v1 + v2 for v1, v2 in zip(prev_layer, outputs)]
 
     outputs = tf.stack(prev_layer)
     outputs = tf.transpose(outputs, [1, 0, 2])
