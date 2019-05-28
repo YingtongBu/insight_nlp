@@ -527,7 +527,7 @@ def attention_basic2(states: tf.Tensor, context: tf.Tensor,
                      scope: str)-> tf.Tensor:
   '''
   states: [batch, max-time, hidden-unit]
-  context: [batch, hidden-unit]
+  context: [batch, hidden-unit] or [hidden-unit]
   length_masks: [batch, max-time], actually length, tf.float32
   <x, y> = x * H * y
   '''
@@ -537,7 +537,7 @@ def attention_basic2(states: tf.Tensor, context: tf.Tensor,
   states = tf.transpose(states, [1, 0, 2])  # [max-time, batch, hidden-unit]
   with tf.variable_scope(scope, reuse=tf.AUTO_REUSE):
     h = tf.get_variable(
-      scope, (h_size, h_size), tf.float32, init_rand(-1, 1)
+      f"{scope}_h", (h_size, h_size), tf.float32, init_rand(-1, 1)
     )
 
   scores = tf.reduce_sum(matmul(states, h) * context, 2)
