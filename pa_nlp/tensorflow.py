@@ -666,10 +666,11 @@ def batch_norm_wrapper(inputs, scope_name, is_train: bool, decay=0.99,
         inputs, pop_mean, pop_var, offset, scale, epsilon
       )
 
-def normalize_data(data: tf.Tensor,
-                   axels: list,
-                   method: str="mean"  # mean, or guassian
-                   )-> tf.Tensor:
+def normalize_data(data: tf.Tensor, axels: list, method: str="mean"):
+  '''
+  :param method: [mean, guassian, l2, min_max, min_max_mean]
+  :return: normalized tensor.
+  '''
   shape = data.shape
   trans1 = axels[:]
   for p in range(len(shape)):
