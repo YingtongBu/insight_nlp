@@ -417,7 +417,7 @@ def bi_LSTM_layer_seperate(input: tf.Tensor,
   outputs2 = list(reversed(outputs2))
 
   if layer_num == 1:
-    outputs = [tf.concat(o, axis=1) for o in zip(outputs1, outputs2, input)]
+    outputs = [tf.concat(o, axis=1) for o in zip(outputs1, outputs2)]
   else:
     outputs = [tf.concat(o, axis=1) for o in zip(outputs1, outputs2)]
   outputs = tf.stack(outputs)
