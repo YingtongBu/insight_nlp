@@ -416,10 +416,7 @@ def bi_LSTM_layer_seperate(input: tf.Tensor,
   outputs2 = encode(list(reversed(input)), "reversed")
   outputs2 = list(reversed(outputs2))
 
-  if layer_num == 1:
-    outputs = [tf.concat(o, axis=1) for o in zip(outputs1, outputs2)]
-  else:
-    outputs = [tf.concat(o, axis=1) for o in zip(outputs1, outputs2)]
+  outputs = [o[0] + o[1] for o in zip(outputs1, outputs2)]
   outputs = tf.stack(outputs)
   outputs = tf.transpose(outputs, [1, 0, 2])
 
@@ -488,7 +485,6 @@ def bi_LSTM_layer_google2(input: tf.Tensor,
 
   with tf.variable_scope(scope, reuse=False):
     bi_layer = bi_LSTM_layer_seperate(input, 1, hidden_unit, rnn_type)
-    bi_layer = tf.layers.dense(bi_layer, hidden_unit, tf.nn.leaky_relu)
 
     prev_layer = tf.unstack(bi_layer, axis=1)
     for layer in range(1, layer_num):
