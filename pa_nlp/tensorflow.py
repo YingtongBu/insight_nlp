@@ -246,6 +246,48 @@ def construct_optimizer(
 
     return opt_op
 
+def construct_optimizer2(
+  loss: tf.Tensor,
+  virtual_batch_size_ratio: int,
+  gradient_norm: float,
+  learning_rate: typing.Union[float, tf.Tensor]=0.001,
+):
+  batch_id = tf.train.create_global_step()
+  opt = tf.train.AdamOptimizer(learning_rate=learning_rate)
+  tvars = tf.trainable_variables()
+  accum_g = [tf.Variable(tf.zeros_like(tv), trainable=False) for tv in tvars]
+  single_grads = opt.compute_gradients(loss)
+  accum_g_op = [
+    accum_g[i].assign_add(g) for i, (g, var) in enumerate(single_grads)
+    if g is not None
+  ]
+
+  def f_apply():
+    update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
+    with tf.control_dependencies(update_ops):
+      cropped_g, _ = tf.clip_by_global_norm(accum_g, gradient_norm)
+      train_opt = opt.apply_gradients(
+        [(cropped_g[i], var) for i, (g, var) in enumerate(single_grads)],
+        global_step=batch_id
+      )
+
+      with tf.control_dependencies([train_opt]):
+        zero_op = [tv.assign(tf.zeros_like(tv)) for tv in accum_g]
+        return tf.group(zero_op)
+
+  def f_accumulate():
+    step_update_opt = batch_id.assign(batch_id + 1)
+    return tf.group(step_update_opt)
+
+  with tf.control_dependencies(accum_g_op):
+    train_op = tf.cond(
+      tf.equal(tf.mod(batch_id, virtual_batch_size_ratio), 0),
+      f_apply,
+      f_accumulate,
+    )
+
+  return train_op
+
 def highway_layer(input, size, num_layers=1, activation=tf.nn.relu,
                   scope='highway'):
   '''
