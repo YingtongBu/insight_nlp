@@ -266,18 +266,18 @@ def construct_optimizer2(
     update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
     with tf.control_dependencies(update_ops):
       cropped_g, _ = tf.clip_by_global_norm(accum_g, gradient_norm)
-      train_opt = opt.apply_gradients(
+      train_op = opt.apply_gradients(
         [(cropped_g[i], var) for i, (g, var) in enumerate(single_grads)],
         global_step=batch_id
       )
 
-      with tf.control_dependencies([train_opt]):
+      with tf.control_dependencies([train_op]):
         zero_op = [tv.assign(tf.zeros_like(tv)) for tv in accum_g]
         return tf.group(zero_op)
 
   def f_accumulate():
-    step_update_opt = batch_id.assign(batch_id + 1)
-    return tf.group(step_update_opt)
+    step_update_op = batch_id.assign(batch_id + 1)
+    return tf.group(step_update_op)
 
   with tf.control_dependencies(accum_g_op):
     train_op = tf.cond(
