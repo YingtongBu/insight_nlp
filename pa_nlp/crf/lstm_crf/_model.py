@@ -177,6 +177,8 @@ class _Model(object):
     print(f"name(opt_seq):{self.opt_seq.name}")
     print(f"name(opt_seq_prob):{self.opt_seq_prob.name}")
 
-    self.accuracy = TF.accuracy(self.opt_seq, self.input_y, "accuracy")
+    self.accuracy = tf.identity(
+      TF.accuracy(self.opt_seq, self.input_y), "accuracy"
+    )
     print(f"name(accuracy):{self.accuracy.name}")
 

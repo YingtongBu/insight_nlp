@@ -2,13 +2,13 @@
 #author: Tian Xia (summer.xia1@pactera.com)
 
 from pa_nlp.tensorflow import *
-from pa_nlp.classifiers.textcnn.config import Model
+from pa_nlp.classifiers.textcnn._model import Model
 from pa_nlp.classifiers.textcnn.data import *
 from pa_nlp.measure import Measure
 
 class Predictor(object):
   def __init__(self):
-    self._param = read_pydict_file("model/param.pydict")[0]
+    self._param = list(read_pydict_file("model/param.pydict"))[0]
 
     self._vob = Vocabulary(self._param["remove_OOV"],
                            self._param["max_seq_length"])

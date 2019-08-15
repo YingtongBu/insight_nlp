@@ -2,7 +2,7 @@
 #author: Tian Xia (summer.xia1@pactera.com)
 
 from pa_nlp.tensorflow import *
-from pa_nlp.classifiers.textcnn.config import Model
+from pa_nlp.classifiers.textcnn._model import Model
 from pa_nlp.classifiers.textcnn.data import *
 from pa_nlp.classifiers.textcnn.predictor import Predictor
 
