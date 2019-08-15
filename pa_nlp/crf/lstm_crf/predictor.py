@@ -13,7 +13,7 @@ class Predictor(object):
       return int(re.findall(r"iter-(.*?).index", model_file)[0])
 
     param_file = os.path.join(model_path, "param.pydict")
-    self.param = read_pydict_file(param_file)[0]
+    self.param = list(read_pydict_file(param_file))[0]
     
     self._vob = Vocabulary(self.param["remove_OOV"],
                            self.param["max_seq_length"])
