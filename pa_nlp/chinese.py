@@ -55,7 +55,7 @@ def split_and_norm_string(text: str):
   '''
   text = convert_full_to_half(text)
   
-  text = re.sub(r"[^A-Za-z0-9\u4e00-\u9fa5()（）！？，,!?\'\`]", " ", text)
+  text = re.sub(r"[^A-Za-z0-9\u4e00-\u9fa5()（）！？，,!?\'\`:]", " ", text)
   text = re.sub(r"\'s", " \'s", text)
   text = re.sub(r"\'ve", " \'ve", text)
   text = re.sub(r"n\'t", " n\'t", text)
