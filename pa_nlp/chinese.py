@@ -64,9 +64,9 @@ def split_and_norm_string(text: str):
   text = re.sub(r"\'ll", " \'ll", text)
   text = re.sub(r",", " , ", text)
   text = re.sub(r"!", " ! ", text)
-  text = re.sub(r"\(", " \( ", text)
-  text = re.sub(r"\)", " \) ", text)
-  text = re.sub(r"\?", " \? ", text)
+  text = re.sub(r"\(", " ( ", text)
+  text = re.sub(r"\)", " ) ", text)
+  text = re.sub(r"\?", " ? ", text)
   text = re.sub(r"\s{2,}", " ", text)
   # clean for chinese character
   new_string = ""
