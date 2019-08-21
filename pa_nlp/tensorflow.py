@@ -270,8 +270,11 @@ def construct_optimizer2(
         [(cropped_g[i], var) for i, (g, var) in enumerate(single_grads)],
         global_step=batch_id
       )
+      print_op = tf.print(
+        f"optimize every [{virtual_batch_size_ratio}] batches"
+      )
 
-      with tf.control_dependencies([train_op]):
+      with tf.control_dependencies([train_op, print_op]):
         zero_op = [tv.assign(tf.zeros_like(tv)) for tv in accum_g]
         return tf.group(zero_op)
 
