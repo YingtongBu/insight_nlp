@@ -251,6 +251,7 @@ def construct_optimizer2(
   loss: tf.Tensor,
   virtual_batch_size_ratio: int=1,
   gradient_norm: float=10,
+  min_global_norm: float=1e-6,
   learning_rate: typing.Union[float, tf.Tensor]=0.001,
 ):
   batch_id = tf.train.create_global_step()
@@ -268,7 +269,7 @@ def construct_optimizer2(
     with tf.control_dependencies(update_ops):
       cropped_g, global_norm = tf.clip_by_global_norm(accum_g, gradient_norm)
       update_g = tf.cond(
-        tf.less(global_norm, 1e-6),
+        tf.less(global_norm, min_global_norm),
         lambda: accum_g,
         lambda: cropped_g,
       )
