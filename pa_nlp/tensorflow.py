@@ -224,6 +224,7 @@ def get_network_parameter_num():
 
   return num
 
+#depreciated.
 def construct_optimizer(
   loss: tf.Tensor,
   learning_rate: typing.Union[float, tf.Tensor]=0.001,
@@ -248,8 +249,8 @@ def construct_optimizer(
 
 def construct_optimizer2(
   loss: tf.Tensor,
-  virtual_batch_size_ratio: int,
-  gradient_norm: float,
+  virtual_batch_size_ratio: int=1,
+  gradient_norm: float=10,
   learning_rate: typing.Union[float, tf.Tensor]=0.001,
 ):
   batch_id = tf.train.create_global_step()
@@ -265,9 +266,15 @@ def construct_optimizer2(
   def f_apply():
     update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
     with tf.control_dependencies(update_ops):
-      cropped_g, _ = tf.clip_by_global_norm(accum_g, gradient_norm)
+      cropped_g, global_norm = tf.clip_by_global_norm(accum_g, gradient_norm)
+      update_g = tf.cond(
+        tf.less(global_norm, 1e-6),
+        lambda: accum_g,
+        lambda: cropped_g,
+      )
+
       train_op = opt.apply_gradients(
-        [(cropped_g[i], var) for i, (g, var) in enumerate(single_grads)],
+        [(update_g[i], var) for i, (g, var) in enumerate(single_grads)],
         global_step=batch_id
       )
       with tf.control_dependencies([train_op]):
