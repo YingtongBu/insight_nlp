@@ -4,7 +4,6 @@
 from collections import defaultdict, namedtuple, Counter
 from operator import methodcaller, attrgetter, itemgetter
 from optparse import OptionParser
-from scipy import array
 
 import abc
 import bisect
@@ -26,10 +25,15 @@ import pprint
 import queue
 import random
 import re
-import scipy
 import struct
 import sys
 import time
 import typing
 import tempfile
+
+try:
+  import scipy
+  from scipy import array
+except ImportError:
+  print(f"Err: can not import 'scipy'")
 
