@@ -1,9 +1,9 @@
 #author: Tian Xia (summer.xia1@pactera.com)
 #!/usr/bin/env python3
 
-from pa_nlp.tf.estimator import *
+from pa_nlp.tf import *
 from pa_nlp.tf.estimator.dataset import DataReader
-from pa_nlp.tf.estimator import Param
+from pa_nlp.tf.estimator.param import Param
 
 def write_file(tf_file: str):
   class Serializer:

@@ -1,7 +1,7 @@
 #author: Tian Xia (summer.xia1@pactera.com)
 
-from pa_nlp.tf.estimator import *
-from pa_nlp.tf.estimator import Param
+from pa_nlp.tf import *
+from pa_nlp.tf.estimator.param import Param
 
 # Buffer size for reading records from a TFRecord file. Each training file is
 # 7.2 MB, so 8 MB allows an entire file to be kept in memory.
