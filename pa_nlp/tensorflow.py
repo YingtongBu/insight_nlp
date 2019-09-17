@@ -510,6 +510,7 @@ def bi_LSTM_layer_google(input: tf.Tensor,
 
     return outputs
 
+#todo: add sequence_length option.
 def bi_LSTM_layer_google2(input: tf.Tensor,
                           layer_num: int,
                           hidden_unit: int,
