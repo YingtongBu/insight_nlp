@@ -2,10 +2,9 @@ import abc
 import pa_nlp.common as nlp
 
 class Param(abc.ABC):
-  def __init__(self):
-    self.model_name = ""
-
+  def __init__(self, model_name: str):
     self.debug = False
+    self.model_name = model_name
 
     self.path_work = f"_tmp.run.{self.model_name}"
     self.path_model = f"{self.path_work}/model"
@@ -19,8 +18,15 @@ class Param(abc.ABC):
     self.evaluate_freq = None # in batch number
 
     self.train_file = ""
-    self.test_files = []
+    self.eval_files = []
 
   def verify(self):
-    pass
+    assert not nlp.is_none_or_empty(self.model_name)
+    assert not nlp.is_none_or_empty(self.train_file)
+
+    print("-" * 64)
+    for key in self.__dict__:
+      print(f"{key:20}: {self.__dict__[key]}")
+    print("-" * 64)
+
 

@@ -7,14 +7,11 @@ from pa_nlp.tf.estimator.param import Param
 # 7.2 MB, so 8 MB allows an entire file to be kept in memory.
 _READ_RECORD_BUFFER = 64 * 1000 * 1000
 
-class DataReader(abc.ABC):
-  def __init__(self,
-               tfrecord_file: str, param: Param,
-               training: bool, debug: bool=False):
+class DataReaderBase(abc.ABC):
+  def __init__(self, tfrecord_file: str, param: Param, training: bool):
     self._tf_file = tfrecord_file
     self._param = param
     self._shuffle = training
-    self._debug = debug
 
   @abc.abstractmethod
   def parse_example(self, serialized_example):
@@ -69,7 +66,7 @@ class DataReader(abc.ABC):
           start_time = time.time()
           batch_data = sess.run(sample)
           duration = time.time() - start_time
-          if self._debug:
+          if self._param.debug:
             print(f"batch fetching time: {duration:.4f} seconds.")
 
           yield epoch_id, batch_data

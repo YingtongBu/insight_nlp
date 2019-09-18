@@ -2,7 +2,7 @@
 #!/usr/bin/env python3
 
 from pa_nlp.tf import *
-from pa_nlp.tf.estimator.dataset import DataReader
+from pa_nlp.tf.estimator.dataset import DataReaderBase
 from pa_nlp.tf.estimator.param import Param
 
 def write_file(tf_file: str):
@@ -36,7 +36,7 @@ def write_file(tf_file: str):
   nlp_tf.write_tfrecord(get_file_record(), Serializer(), tf_file)
 
 def read_file(tf_file: str):
-  class MyDataReader(DataReader):
+  class MyDataReader(DataReaderBase):
     def parse_example(self, serialized_example):
       data_fields = {
         "name": tf.FixedLenFeature((), tf.string, ""),
@@ -51,11 +51,11 @@ def read_file(tf_file: str):
 
       return name, age, height
 
-  param = Param()
+  param = Param("debug_model")
   param.batch_size = 3
   param.epoch_num = 2
 
-  data_reader = MyDataReader(tf_file, param, True, True)
+  data_reader = MyDataReader(tf_file, param, True)
   for epoch_id, batch_data in data_reader.get_batch_data():
     print(epoch_id, batch_data)
 
