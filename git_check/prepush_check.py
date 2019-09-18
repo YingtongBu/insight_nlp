@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #coding: utf8
-#author: Tian Xia (summer.xia1@pactera.com)
+#author: Tian Xia (SummerRainET2008@gmail.com)
 
 from pa_nlp.common import *
 from git_check.format_checker import *

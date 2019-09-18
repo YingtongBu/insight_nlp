@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #coding: utf8
-#author: Tian Xia (summer.xia1@pactera.com)
+#author: Tian Xia (SummerRainET2008@gmail.com)
 
 # from mutagen.mp3 import MP3
 # import audioread

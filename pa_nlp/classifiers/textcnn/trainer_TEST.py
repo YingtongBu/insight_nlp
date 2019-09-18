@@ -1,5 +1,5 @@
 #coding: utf8
-#author: Tian Xia (summer.xia1@pactera.com)
+#author: Tian Xia (SummerRainET2008@gmail.com)
 
 from pa_nlp.classifiers.textcnn.trainer import *
 from pa_nlp.chinese import split_and_norm_string

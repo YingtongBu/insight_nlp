@@ -1,5 +1,5 @@
 #coding: utf8
-#author: Tian Xia (summer.xia1@pactera.com)
+#author: Tian Xia (SummerRainET2008@gmail.com)
 
 from optparse import OptionParser
 import pa_nlp.common as nlp
@@ -20,7 +20,7 @@ class FormatChecker:
       if "#author:" in ln and "@" in ln:
         return
     print("Error! 文件头上应该有脚本作者以及⼯工作邮箱: "
-          "e.g. #author: Tian Xia (summer.xia1@pactera.com)")
+          "e.g. #author: Tian Xia (SummerRainET2008@gmail.com)")
     self.error += 1
     
   def _rule_analyze_file_length(self):

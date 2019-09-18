@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
-#author: Tian Xia (summer.xia1@pactera.com)
+#author: Tian Xia (SummerRainET2008@gmail.com)
 
 from pa_nlp.tf import *
-from pa_nlp.tf.estimator.predict import PredictorBase
 from pa_nlp.tf.estimator.param import Param
 
 class TrainerBase(abc.ABC):

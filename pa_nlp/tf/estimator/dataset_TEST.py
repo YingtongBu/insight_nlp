@@ -1,4 +1,4 @@
-#author: Tian Xia (summer.xia1@pactera.com)
+#author: Tian Xia (SummerRainET2008@gmail.com)
 #!/usr/bin/env python3
 
 from pa_nlp.tf import *

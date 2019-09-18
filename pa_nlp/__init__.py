@@ -1,5 +1,5 @@
 #coding: utf8
-#author: Tian Xia (summer.xia1@pactera.com)
+#author: Tian Xia (SummerRainET2008@gmail.com)
 
 from collections import defaultdict, namedtuple, Counter
 from operator import methodcaller, attrgetter, itemgetter
