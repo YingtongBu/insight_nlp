@@ -15,6 +15,7 @@ class Param(abc.ABC):
     self.lr_min = 0.0005
     self.epoch_num = 1
     self.batch_size = 32
+    self.virtual_batch_ratio = 1  
     self.evaluate_freq = None # in batch number
 
     self.train_file = ""
