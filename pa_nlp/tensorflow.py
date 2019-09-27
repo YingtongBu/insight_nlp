@@ -549,6 +549,55 @@ def bi_LSTM_layer_google2(input: tf.Tensor,
 
     return outputs
 
+def bi_LSTM_layer_google3(input: tf.Tensor,
+                          seq_len: tf.Tensor,
+                          layer_num: int,
+                          hidden_unit: int,
+                          rnn_type: str="lstm",
+                          scope: str="bi-lstm",
+                          )-> tf.Tensor:
+  '''
+  Fix the output dimenstion to 'hidden_unit', regardelss of 'layer_num'.
+  input: [batch, max_len, dim]
+  hidden_unit: might be different from embedding_size
+  rnn_type: lstm, gru
+  '''
+  assert layer_num >= 1
+  rnn_cell = tf.nn.rnn_cell
+
+  if rnn_type.lower() == "lstm":
+    cell = rnn_cell.LSTMCell
+  elif rnn_type.lower() == "gru":
+    cell = rnn_cell.GRUCell
+  else:
+    assert False
+
+  with tf.variable_scope(scope, reuse=False):
+    input = tf.unstack(input, axis=1)
+    bi_layer, _, _ = tf.nn.static_bidirectional_rnn(
+      cell(hidden_unit),
+      cell(hidden_unit),
+      input,
+      dtype=tf.float32,
+      sequence_length=seq_len,
+      scope=f"{scope}_first"
+    )
+
+    bi_layer = [v[:, 0: hidden_unit] + v[:, hidden_unit:] for v in bi_layer]
+    # prev_layer = tf.unstack(bi_layer, axis=1)
+    prev_layer = bi_layer
+    for layer in range(1, layer_num):
+      with tf.variable_scope(f"layer_{layer}", reuse=False):
+        outputs, _ = tf.nn.static_rnn(
+          cell(hidden_unit), prev_layer, dtype=tf.float32
+        )
+      prev_layer = [v1 + v2 for v1, v2 in zip(prev_layer, outputs)]
+
+    outputs = tf.stack(prev_layer)
+    outputs = tf.transpose(outputs, [1, 0, 2])
+
+    return outputs
+
 #deprecated.
 def basic_attention(states: list, context: tf.Tensor)-> tf.Tensor:
   '''
