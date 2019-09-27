@@ -33,7 +33,7 @@ def write_file(tf_file: str):
     for sample in data:
       yield [sample]
 
-  nlp_tf.write_tfrecord(get_file_record(), Serializer(), tf_file)
+  nlp_tf.tfrecord_write(get_file_record(), Serializer(), tf_file)
 
 def read_file(tf_file: str):
   class MyDataReader(DataReaderBase):

@@ -16,8 +16,8 @@ class TrainerBase(abc.ABC):
 
     self._model = model_cls(param, True)
     self._lr = tf.placeholder(dtype=tf.float32, shape=[])
-    self._train_op = nlp_tf.construct_optimizer(
-      self._model.loss, self._lr
+    self._train_op = nlp_tf.construct_optimizer2(
+      self._model.loss, learning_rate=self._lr
     )
 
   def _get_batch_id(self):

@@ -1,5 +1,5 @@
 import abc
-import pa_nlp.common as nlp
+from pa_nlp import nlp
 
 class Param(abc.ABC):
   def __init__(self, model_name: str):
