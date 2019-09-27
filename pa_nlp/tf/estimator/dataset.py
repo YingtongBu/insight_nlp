@@ -1,14 +1,14 @@
 #author: Tian Xia (SummerRainET2008@gmail.com)
 
 from pa_nlp.tf import *
-from pa_nlp.tf.estimator.param import Param
+from pa_nlp.tf.estimator.param import ParamBase
 
 # Buffer size for reading records from a TFRecord file. Each training file is
 # 7.2 MB, so 8 MB allows an entire file to be kept in memory.
 _READ_RECORD_BUFFER = 64 * 1000 * 1000
 
 class DataReaderBase(abc.ABC):
-  def __init__(self, tfrecord_file: str, param: Param, training: bool):
+  def __init__(self, tfrecord_file: str, param: ParamBase, training: bool):
     self._tf_file = tfrecord_file
     self._param = param
     self._shuffle = training

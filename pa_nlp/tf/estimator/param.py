@@ -1,7 +1,7 @@
 import abc
 from pa_nlp import nlp
 
-class Param(abc.ABC):
+class ParamBase(abc.ABC):
   def __init__(self, model_name: str):
     self.debug = False
     self.model_name = model_name

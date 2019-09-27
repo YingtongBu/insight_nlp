@@ -5,7 +5,7 @@ from pa_nlp.tf import *
 from pa_nlp.tf.estimator.dataset import DataReaderBase
 from pa_nlp.tf.estimator.model import ModelBase
 from pa_nlp.tf.estimator.predict import PredictorBase
-from pa_nlp.tf.estimator.param import Param
+from pa_nlp.tf.estimator.param import ParamBase
 from pa_nlp.tf.estimator.train import TrainerBase
 
 class Model(ModelBase):
@@ -109,7 +109,7 @@ def main():
   train_file = "_debug.tfrecord"
   # gen_train_data(train_file)
 
-  param = Param("debug_model")
+  param = ParamBase("debug_model")
   param.train_file = train_file
   param.eval_files = [train_file]
   param.epoch_num = 20

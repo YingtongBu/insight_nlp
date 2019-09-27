@@ -3,7 +3,7 @@
 
 from pa_nlp.tf import *
 from pa_nlp.tf.estimator.dataset import DataReaderBase
-from pa_nlp.tf.estimator.param import Param
+from pa_nlp.tf.estimator.param import ParamBase
 
 def write_file(tf_file: str):
   class Serializer:
@@ -51,7 +51,7 @@ def read_file(tf_file: str):
 
       return name, age, height
 
-  param = Param("debug_model")
+  param = ParamBase("debug_model")
   param.batch_size = 3
   param.epoch_num = 2
 

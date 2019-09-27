@@ -2,10 +2,10 @@
 #author: Tian Xia (SummerRainET2008@gmail.com)
 
 from pa_nlp.tf import *
-from pa_nlp.tf.estimator.param import Param
+from pa_nlp.tf.estimator.param import ParamBase
 
 class PredictorBase(abc.ABC):
-  def __init__(self, param: Param, model_cls, data_reader_cls):
+  def __init__(self, param: ParamBase, model_cls, data_reader_cls):
     self._param = param
     self._data_reader_cls = data_reader_cls
     self._graph = tf.Graph()
