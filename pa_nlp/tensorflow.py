@@ -1,6 +1,6 @@
 #coding: utf8
 #author: Tian Xia (SummerRainET2008@gmail.com)
-#depreciated. Use nlp_tensorflow.py
+#depreciated. Use nlp_tf.py
 
 from pa_nlp import *
 from pa_nlp.common import print_flush
