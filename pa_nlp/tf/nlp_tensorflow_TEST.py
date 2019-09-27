@@ -1,8 +1,7 @@
 #coding: utf8
 #author: Tian Xia (SummerRainET2008@gmail.com)
 
-from pa_nlp.nlp import *
-from pa_nlp.nlp_tensorflow import *
+from pa_nlp.tf.nlp_tensorflow import *
 
 if __name__ == "__main__":
   parser = OptionParser(usage="cmd dev1@dir1 dir2")
