@@ -133,7 +133,7 @@ def norm_regex(regexExpr)-> str:
     .replace("{", "\{").replace("}", "\}")\
     .replace(".", "\.")
 
-def read_pydict_file(file_name, max_num: int=-1)-> typing.Iterator:
+def pydict_file_read(file_name, max_num: int=-1)-> typing.Iterator:
   assert file_name.endswith(".pydict")
   data_num = 0
   with open(file_name) as fin:
@@ -153,7 +153,7 @@ def read_pydict_file(file_name, max_num: int=-1)-> typing.Iterator:
 
   print(f"{file_name}: #data={data_num}")
 
-def write_pydict_file(data: typing.Iterator, file_name)-> None:
+def pydict_file_write(data: typing.Iterator, file_name)-> None:
   assert file_name.endswith(".pydict")
   with open(file_name, "w") as fou:
     for obj in data:

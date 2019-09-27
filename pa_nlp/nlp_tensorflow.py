@@ -10,15 +10,6 @@ init_norm     = tf.truncated_normal_initializer
 init_rand     = tf.random_uniform_initializer
 init_const    = tf.constant_initializer
 
-#deprecated.
-xavier_init   = tf.contrib.layers.xavier_initializer
-#deprecated.
-norm_init     = tf.truncated_normal_initializer
-#deprecated.
-rand_init     = tf.random_uniform_initializer
-#deprecated.
-const_init    = tf.constant_initializer
-
 def matmul(m1: tf.Tensor, m2: tf.Tensor)-> tf.Tensor:
   '''
   :param m1: [d1, d2, ..., m, n], no matter where the batch dimension is.
@@ -48,21 +39,6 @@ def matmul(m1: tf.Tensor, m2: tf.Tensor)-> tf.Tensor:
   
   assert False
 
-#deprecated.
-def tf_bytes_feature(value: bytes):
-  """Returns a bytes_list from a string / byte."""
-  return tf.train.Feature(bytes_list=tf.train.BytesList(value=[value]))
-
-#deprecated.
-def tf_float_feature(value: float):
-  """Returns a float_list from a float / double."""
-  return tf.train.Feature(float_list=tf.train.FloatList(value=[value]))
-
-#deprecated.
-def tf_int64_feature(value: int):
-  """Returns an int64_list from a bool / enum / int / uint."""
-  return tf.train.Feature(int64_list=tf.train.Int64List(value=[value]))
-
 def tf_feature_bytes(value: bytes):
   """Returns a bytes_list from a string / byte."""
   return tf.train.Feature(bytes_list=tf.train.BytesList(value=[value]))
@@ -74,52 +50,6 @@ def tf_feature_float(value: float):
 def tf_feature_int64(value: int):
   """Returns an int64_list from a bool / enum / int / uint."""
   return tf.train.Feature(int64_list=tf.train.Int64List(value=[value]))
-
-#deprecated.
-def write_tfrecord(samples: typing.Union[list, typing.Iterator],
-                   serialize_sample_fun, file_name: str):
-  with tf.python_io.TFRecordWriter(file_name) as writer:
-    num = 0
-    for sample in samples:
-      for example in serialize_sample_fun(sample):
-        num += 1
-        if num % 1000 == 0:
-          print_flush(f"{num} examples have been finished.")
-        writer.write(example)
-
-#deprecated.
-#todo: support multi-files, and file-shuffle: bool, buffer_size
-def read_tfrecord(file_name: str,
-                  example_fmt: dict, example2sample_func,
-                  epoch_num: int, batch_size: int, shuffle: bool=True):
-  def parse_fn(example):
-    parsed = tf.parse_single_example(example, example_fmt)
-    return example2sample_func(parsed)
-
-  def input_fn():
-    files = tf.data.Dataset.list_files(file_name)
-    dataset = files.apply(
-      tf.data.experimental.parallel_interleave(
-        tf.data.TFRecordDataset, cycle_length=4)
-    )
-
-    if shuffle:
-      dataset = dataset.shuffle(buffer_size=10000)
-    dataset = dataset.repeat(epoch_num)
-    dataset = dataset.apply(
-      tf.data.experimental.map_and_batch(
-        map_func=parse_fn, batch_size=batch_size,
-        drop_remainder=False,
-      )
-    )
-
-    return dataset
-
-  dataset = input_fn()
-  data_iter = dataset.prefetch(8).make_initializable_iterator()
-  sample = data_iter.get_next()
-
-  return data_iter.initializer, sample
 
 def tfrecord_write(samples: typing.Union[list, typing.Iterator],
                    serialize_sample_fun, file_name: str):
@@ -165,18 +95,6 @@ def tfrecord_read(file_name: str,
 
   return data_iter.initializer, sample
 
-#deprecated.
-def save_model(saver: tf.train.Saver, sess: tf.Session, model_path: str,
-               model_prefix: str, batch_id: int):
-  try:
-    saver.save(sess, f"{model_path}/{model_prefix}", global_step=batch_id)
-    print(f"Successful saving model[{batch_id}] ...")
-    return True
-
-  except Exception as error:
-    print(f"Failed saving model[{batch_id}] : {error}")
-    return False
-
 def model_save(saver: tf.train.Saver, sess: tf.Session, model_path: str,
                model_prefix: str, batch_id: int):
   try:
@@ -186,18 +104,6 @@ def model_save(saver: tf.train.Saver, sess: tf.Session, model_path: str,
 
   except Exception as error:
     print(f"Failed saving model[{batch_id}] : {error}")
-    return False
-
-#deprecated.
-def load_model(graph: tf.Graph, sess: tf.Session, model_path: str):
-  try:
-    with graph.as_default():
-      tf.train.Saver().restore(sess, tf.train.latest_checkpoint(model_path))
-    print(f"Successful loading existing model from '{model_path}'")
-    return True
-
-  except Exception as error:
-    print(f"Failed loading existing model from '{model_path}: {error}")
     return False
 
 def model_load(graph: tf.Graph, sess: tf.Session, model_path: str):
@@ -223,29 +129,6 @@ def get_network_parameter_num():
   print(f"#model parameter: {num:,}")
 
   return num
-
-#depreciated.
-def construct_optimizer(
-  loss: tf.Tensor,
-  learning_rate: typing.Union[float, tf.Tensor]=0.001,
-  gradient_norm: typing.Union[float, None]=None
-):
-  batch_id = tf.train.create_global_step()
-  opt = tf.train.AdamOptimizer(learning_rate=learning_rate)
-  update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
-  with tf.control_dependencies(update_ops):
-    gradient = opt.compute_gradients(loss=loss)
-    if gradient_norm is None:
-      opt_op = opt.apply_gradients(gradient, global_step=batch_id)
-
-    else:
-      grads = list(map(itemgetter(0), gradient))
-      parms = list(map(itemgetter(1), gradient))
-      grads, _ = tf.clip_by_global_norm(grads, gradient_norm)
-      opt_op = opt.apply_gradients(list(zip(grads, parms)),
-                                   global_step=batch_id)
-
-    return opt_op
 
 def construct_optimizer2(
   loss: tf.Tensor,
@@ -384,43 +267,6 @@ def log_sum(tensor_list: list):
   tensor = tf.concat(tensor_list, 1)
   return tf.reduce_logsumexp(tensor, 1)
 
-#deprecated.
-def create_bi_LSTM(input: tf.Tensor,
-                   layer_num: int,
-                   hidden_unit: int,
-                   rnn_type: str="lstm")-> list:
-  '''
-  :param input: [batch, max_len, dim]
-  :param hidden_unit: might be different from embedding_size
-  :param rnn_type: lstm, gru
-  '''
-
-  def encode(input, score_name):
-    with tf.variable_scope(score_name, reuse=False):
-      if rnn_type.lower() == "lstm":
-        cell = rnn_cell.LSTMCell
-      elif rnn_type.lower() == "gru":
-        cell = rnn_cell.GRUCell
-      else:
-        assert False
-        
-      cell = rnn_cell.MultiRNNCell(
-        [cell(hidden_unit) for _ in range(layer_num)]
-      )
-      word_list = tf.unstack(input, axis=1)
-      outputs, encoding = tf.nn.static_rnn(cell, word_list, dtype=tf.float32)
-
-      return outputs
-
-  rnn_cell = tf.nn.rnn_cell
-  outputs1 = encode(input, "directed")
-  outputs2 = encode(tf.reverse(input, [1]), "reversed")
-  outputs2 = list(reversed(outputs2))
-  
-  outputs = [tf.concat(o, axis=1) for o in zip(outputs1, outputs2)]
-
-  return outputs
-
 def bi_LSTM_layer_seperate(input: tf.Tensor,
                            layer_num: int,
                            hidden_unit: int,
@@ -470,45 +316,6 @@ def bi_LSTM_layer_seperate(input: tf.Tensor,
   outputs = tf.transpose(outputs, [1, 0, 2])
 
   return outputs
-
-#deprecated.
-def bi_LSTM_layer_google(input: tf.Tensor,
-                         layer_num: int,
-                         hidden_unit: int,
-                         rnn_type: str="lstm",
-                         scope: str="bi-lstm",
-                         )-> tf.Tensor:
-  '''
-  input: [batch, max_len, dim]
-  hidden_unit: might be different from embedding_size
-  rnn_type: lstm, gru
-  '''
-  assert layer_num >= 1
-  rnn_cell = tf.nn.rnn_cell
-
-  if rnn_type.lower() == "lstm":
-    cell = rnn_cell.LSTMCell
-  elif rnn_type.lower() == "gru":
-    cell = rnn_cell.GRUCell
-  else:
-    assert False
-
-  with tf.variable_scope(scope, reuse=False):
-    bi_layer = bi_LSTM_layer_seperate(input, 1, hidden_unit, rnn_type)
-
-    prev_layer = tf.unstack(bi_layer, axis=1)
-    for layer in range(1, layer_num):
-      with tf.variable_scope(f"layer_{layer}", reuse=False):
-        outputs, _ = tf.nn.static_rnn(
-          cell(hidden_unit), prev_layer, dtype=tf.float32
-        )
-        prev_layer = [tf.concat([v1, v2], axis=1)
-                      for v1, v2 in zip(prev_layer, outputs)]
-
-    outputs = tf.stack(prev_layer)
-    outputs = tf.transpose(outputs, [1, 0, 2])
-
-    return outputs
 
 #todo: add sequence_length option.
 def bi_LSTM_layer_google2(input: tf.Tensor,
@@ -598,23 +405,6 @@ def bi_LSTM_layer_google3(input: tf.Tensor,
 
     return outputs
 
-#deprecated.
-def basic_attention(states: list, context: tf.Tensor)-> tf.Tensor:
-  '''
-  status: list of [batch, hidden-unit]
-  context = tf.Variable(
-    tf.random_uniform([hidden_unit], -1., 1), dtype=tf.float32
-  )
-  '''
-  status = tf.stack(states)
-  status = tf.transpose(status, [1, 0, 2])
-
-  scores = tf.reduce_sum(status * context, 2)
-  probs = tf.nn.softmax(scores)
-  probs = tf.expand_dims(probs, 2)
-
-  return tf.reduce_sum(status * probs, 1)
-
 def attention_global(state: tf.Tensor, scope: str)-> tf.Tensor:
   '''
   global attention.
@@ -632,30 +422,6 @@ def attention_global(state: tf.Tensor, scope: str)-> tf.Tensor:
   probs = tf.nn.softmax(scores, axis=1)
 
   return tf.reduce_sum(state * probs, 1)
-
-#deprecated.
-def attention_basic1(state: tf.Tensor, context: tf.Tensor,
-                     scope: str)-> tf.Tensor:
-  '''
-  state: [batch, max-time, hidden-unit]
-  context: [batch, hidden-unit]
-  <x, y> = x * H * y
-  '''
-  shape = state.shape
-  max_time, h_size = shape[1], shape[2]
-
-  state = tf.transpose(state, [1, 0, 2])  # [max-time, batch, hidden-unit]
-  with tf.variable_scope(scope, reuse=tf.AUTO_REUSE):
-    h = tf.get_variable(
-      scope, (h_size, h_size), tf.float32, init_rand(-1, 1)
-    )
-
-  scores = tf.reduce_sum(matmul(state, h) * context, 2)
-  probs = tf.nn.softmax(scores, axis=0)
-  probs = tf.expand_dims(probs, -1)
-  vec = tf.reduce_sum(state * probs, 0)
-
-  return vec
 
 def attention_basic2(states: tf.Tensor, context: tf.Tensor,
                      length_masks: typing.Union[tf.Tensor, None],
@@ -691,24 +457,6 @@ def attention_basic2(states: tf.Tensor, context: tf.Tensor,
   vec = tf.reduce_sum(states * actual_probs, 0)
 
   return vec
-
-#deprecated.
-def attention_self1(state: tf.Tensor, scope: str)-> tf.Tensor:
-  '''
-  :param state: [batch, max-time, hidden-unit]
-  '''
-  max_time, h_size = state.shape[1:]
-  results = []
-  with tf.variable_scope(scope, reuse=tf.AUTO_REUSE):
-    for time_step in range(max_time):
-      context = state[:, time_step, :]
-      vec = attention_basic1(state, context, f"element")
-      results.append(vec)
-
-  result = tf.stack(results)
-  result = tf.transpose(result, [1, 0, 2])
-
-  return result
 
 def attention_self2(state: tf.Tensor, scope: str)-> tf.Tensor:
   '''

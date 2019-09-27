@@ -1,5 +1,6 @@
 #coding: utf8
 #author: Tian Xia (SummerRainET2008@gmail.com)
+#depreciated. Use nlp.py
 
 from pa_nlp import *
 
