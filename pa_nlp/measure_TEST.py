@@ -26,3 +26,20 @@ if __name__ == "__main__":
   print(Measure.calc_WER(refs, hyps, True))
   duration = time.time() - time_start
   print(f"[time: {duration}, memory: {nlp.get_memory()}")
+
+  data = [
+    {
+      "qid": 1,
+      "ranks": [4, 3, 2, 1],
+    }
+  ]
+  print("ndcg:", Measure.calc_ndcg(data))
+
+  data =  [
+    {
+      "qid": 2,
+      "ranks": [1, 2, 3, 4],
+    },
+  ]
+  print("ndcg:", Measure.calc_ndcg(data))
+

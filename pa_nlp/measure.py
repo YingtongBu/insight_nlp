@@ -181,3 +181,44 @@ class Measure:
       "missing": missing_labels,
       "wrong": wrong_labels,
     }
+
+  @staticmethod
+  def calc_ndcg(data: list, buff={}):
+    '''
+    :param data: [{"qid": 1234, "ranks": [0, 4, 2, 1]}...]
+    :return: [NDCG@1, NDCG@2, ..., NDCG@10]
+    '''
+
+    def calc_ndcg(pdata: dict):
+      qid = pdata["qid"]
+      if qid in buff:
+        ideal_dcg = buff[qid]
+
+      else:
+        sorted_ranks = sorted(pdata["ranks"], reverse=True)
+        ideal_dcg = calc_dcg(sorted_ranks)
+        buff[qid] = ideal_dcg
+
+      dcg = calc_dcg(pdata["ranks"])
+      ndcg = dcg / ideal_dcg
+
+      return ndcg
+
+    def calc_dcg(ranks: dict):
+      norm = lambda pos: math.log(pos + 2)
+      dcg = [(2 ** u - 1) / norm(i) for i, u in enumerate(ranks[: 10])]
+      dcg = [0.0] + dcg + [0.0] * (10 - len(dcg))
+      for p in range(1, 11):
+        dcg[p] += dcg[p - 1]
+
+      return array(dcg) + nlp.EPSILON
+
+    avg_ndcg = array([0.0] * 11)
+    for pdata in data:
+      ndcg = calc_ndcg(pdata)
+      avg_ndcg += ndcg
+
+    avg_ndcg /= len(data)
+
+    return avg_ndcg
+
