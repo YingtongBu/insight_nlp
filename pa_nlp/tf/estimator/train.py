@@ -4,6 +4,42 @@
 from pa_nlp.tf import *
 from pa_nlp.tf.estimator.param import ParamBase
 
+class _ModelBuff:
+  def __init__(self, model_path: str, capacity: int):
+    '''bug: multiple files'''
+    self._all_records = defaultdict(list)
+    self._capacity = capacity
+    self._model_path = model_path 
+    
+  def update(self, batch_id: int, data_losses: list):
+    '''
+    :param data_losses: [(data_file, loss), ...]
+    :return: 
+    '''
+    all_records = self._all_records
+    kept_batch_ids = set()
+    removed_batch_ids = set()
+    for data_file, loss in data_losses:
+      records  = all_records[data_file]
+      records.append((loss, batch_id, data_file))
+      if len(records) > self._capacity:
+        records.sort()
+        
+        for p, (_, his_batch_id, _) in enumerate(records):
+          if p < self._capacity:
+            kept_batch_ids.add(his_batch_id)
+          else:
+            removed_batch_ids.add(his_batch_id)
+            
+        records.pop(self._capacity)      
+          
+    for his_batch_id in removed_batch_ids - kept_batch_ids:
+      self._remove_model(his_batch_id)
+
+  def _remove_model(self, batch_id: int):
+    file = os.path.join(self._model_path, f"model-{batch_id}.*")
+    nlp.execute_cmd(f"rm {file}")
+
 class TrainerBase(abc.ABC):
   def __init__(self, param: ParamBase, model_cls, predictor_cls, data_reader_cls):
     self._param = param
@@ -24,6 +60,11 @@ class TrainerBase(abc.ABC):
     return self._sess.run(tf.train.get_global_step())
 
   def _save_model(self):
+    max_to_keep = 3 if nlp.is_none_or_empty(self._param.eval_files) else 1000
+    self.__dict__.setdefault(
+      "_saver",
+      tf.train.Saver(tf.global_variables(), max_to_keep=max_to_keep)
+    )
     nlp_tf.model_save(
       self._saver, self._sess, self._param.path_model, "model", self._batch_id,
     )
@@ -31,14 +72,27 @@ class TrainerBase(abc.ABC):
   def _evaluate(self):
     self._save_model()
 
+    pred_param = copy.deepcopy(self._param)
+    pred_param.epoch_num = 1
     predictor = self.__dict__.setdefault(
       "_predictor",
-      self._predictor_cls(self._param, self._model_cls, self._data_reader_cls)
+      self._predictor_cls(pred_param, self._model_cls, self._data_reader_cls)
+    )
+    model_buff = self.__dict__.setdefault(
+      f"_model_buff", _ModelBuff(self._param.path_model, 2)
     )
 
     predictor.load_model(self._param.path_model)
+    data_losses = []
     for data_file in self._param.eval_files:
-      predictor.predict_dataset(data_file)
+      key_measure = predictor.predict_dataset(data_file)
+      data_losses.append((data_file, key_measure))
+      
+    model_buff.update(self._get_batch_id(), data_losses)
+    for records in model_buff ._all_records.values():
+      loss, batch_id, data_file = records[0]
+      print(f"[optimal]: '{data_file}', batch_id: {batch_id}, measure={loss}")
+    print()
 
   @abc.abstractmethod
   def _run_one_batch(self, epoch_id, batch_data):
@@ -47,7 +101,6 @@ class TrainerBase(abc.ABC):
   def train(self):
     self._sess = tf.Session()
     self._sess.run(tf.global_variables_initializer())
-    self._saver = tf.train.Saver(tf.global_variables(), max_to_keep=1000)
     param = self._param
 
     reader = self._data_reader_cls(param.train_file, param, True)

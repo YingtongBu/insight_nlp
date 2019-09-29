@@ -61,6 +61,9 @@ class Predictor(PredictorBase):
       }
     )
 
+  def extract_label(self, batch_data):
+    return batch_data[1]
+
   def calc_measure(self, pred_labels: list, correct_labels: list):
     loss = sum([(y1 - y2) * (y1 - y2)
                 for y1, y2 in zip(pred_labels, correct_labels)])
@@ -69,7 +72,7 @@ class Predictor(PredictorBase):
       "MSE": loss
     }
 
-    return measure
+    return loss, measure
 
 def gen_train_data(tf_file: str):
   class Serializer:
@@ -112,9 +115,9 @@ def main():
   param = ParamBase("debug_model")
   param.train_file = train_file
   param.eval_files = [train_file]
-  param.epoch_num = 20
+  param.epoch_num = 50
   param.batch_size = 3
-  param.evaluate_freq = 10
+  param.evaluate_freq = 3
   param.lr = 0.1
   param.verify()
 

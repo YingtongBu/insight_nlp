@@ -22,9 +22,21 @@ class PredictorBase(abc.ABC):
 
   @abc.abstractmethod
   def calc_measure(self, pred_labels: list, correct_labels: list):
+    '''
+    :return: key_measure: float, smaller, better; measure: dict
+    '''
+    pass
+  
+  @abc.abstractmethod
+  def extract_label(self, batch_data):
     pass
 
   def predict_dataset(self, data_file: str):
+    '''
+    must return a key measure, smaller, better, by which models are 
+    kept or deleted.
+    '''
+    
     print("-" * 80)
     time_start = time.time()
 
@@ -33,10 +45,12 @@ class PredictorBase(abc.ABC):
     correct_labels = []
     for _, batch_data in reader.get_batch_data():
       pred_labels.extend(self.predict_sample(batch_data))
-      correct_labels.extend(batch_data[1])
+      correct_labels.extend(self.extract_label(batch_data))
 
-    measure = self.calc_measure(pred_labels, correct_labels)
+    key_measure, measure = self.calc_measure(pred_labels, correct_labels)
     duration = time.time() - time_start
     print(f"[evaluate]: '{data_file}', {measure.items()}, {duration:.2f} sec.")
     print("-" * 80)
+    
+    return key_measure
 
