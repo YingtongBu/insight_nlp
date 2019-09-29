@@ -220,5 +220,5 @@ class Measure:
 
     avg_ndcg /= len(data)
 
-    return avg_ndcg
+    return list(avg_ndcg)[1:]
 

@@ -56,15 +56,22 @@ class TrainerBase(abc.ABC):
       self._model.loss, learning_rate=self._lr
     )
 
+    max_to_keep = 3 if nlp.is_none_or_empty(self._param.eval_files) else 1000
+    self._saver = tf.train.Saver(tf.global_variables(), max_to_keep=max_to_keep)
+    self._model_buff = _ModelBuff(self._param.path_model, 2)
+
+    self._predictor = None
+    if not nlp.is_none_or_empty(self._param.eval_files):
+      pred_param = copy.deepcopy(self._param)
+      pred_param.epoch_num = 1
+      self._predictor = self._predictor_cls(
+        pred_param, self._model_cls, self._data_reader_cls
+      )
+
   def _get_batch_id(self):
     return self._sess.run(tf.train.get_global_step())
 
   def _save_model(self):
-    max_to_keep = 3 if nlp.is_none_or_empty(self._param.eval_files) else 1000
-    self.__dict__.setdefault(
-      "_saver",
-      tf.train.Saver(tf.global_variables(), max_to_keep=max_to_keep)
-    )
     nlp_tf.model_save(
       self._saver, self._sess, self._param.path_model, "model", self._batch_id,
     )
@@ -72,24 +79,14 @@ class TrainerBase(abc.ABC):
   def _evaluate(self):
     self._save_model()
 
-    pred_param = copy.deepcopy(self._param)
-    pred_param.epoch_num = 1
-    predictor = self.__dict__.setdefault(
-      "_predictor",
-      self._predictor_cls(pred_param, self._model_cls, self._data_reader_cls)
-    )
-    model_buff = self.__dict__.setdefault(
-      f"_model_buff", _ModelBuff(self._param.path_model, 2)
-    )
-
-    predictor.load_model(self._param.path_model)
+    self._predictor.load_model(self._param.path_model)
     data_losses = []
     for data_file in self._param.eval_files:
-      key_measure = predictor.predict_dataset(data_file)
+      key_measure = self._predictor.predict_dataset(data_file)
       data_losses.append((data_file, key_measure))
       
-    model_buff.update(self._get_batch_id(), data_losses)
-    for records in model_buff ._all_records.values():
+    self._model_buff.update(self._get_batch_id(), data_losses)
+    for records in self._model_buff ._all_records.values():
       loss, batch_id, data_file = records[0]
       print(f"[optimal]: '{data_file}', batch_id: {batch_id}, measure={loss}")
     print()
