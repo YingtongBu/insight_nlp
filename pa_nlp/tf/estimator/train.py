@@ -96,7 +96,7 @@ class TrainerBase(abc.ABC):
     pass
 
   def train(self):
-    self._sess = tf.Session()
+    self._sess = nlp_tf.get_new_session()
     self._sess.run(tf.global_variables_initializer())
     param = self._param
 

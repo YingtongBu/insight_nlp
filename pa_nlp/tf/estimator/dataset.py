@@ -56,7 +56,7 @@ class DataReaderBase(abc.ABC):
     graph = tf.Graph()
     with graph.as_default():
       initializer, sample = self._read_and_batch_from_files()
-    sess = tf.Session(graph=graph)
+    sess = nlp_tf.get_new_session(graph)
 
     for epoch_id in range(self._param.epoch_num):
       sess.run(initializer)

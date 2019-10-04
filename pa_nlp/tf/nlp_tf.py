@@ -117,6 +117,16 @@ def model_load(graph: tf.Graph, sess: tf.Session, model_path: str):
     print(f"Failed loading existing model from '{model_path}: {error}")
     return False
 
+def get_new_session(graph=None):
+  config = tf.ConfigProto(
+    log_device_placement=True, allow_soft_placement=True
+  )
+  config.gpu_options.allow_growth = True
+  # config.gpu_options.per_process_gpu_memory_fraction = 0.4
+  sess = tf.Session(config=config, graph=graph)
+
+  return sess
+
 def get_network_parameter_num():
   num = 0
   for var in tf.trainable_variables():
