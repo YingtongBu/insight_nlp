@@ -68,6 +68,8 @@ class TrainerBase(abc.ABC):
         pred_param, self._model_cls, self._data_reader_cls
       )
 
+    nlp_tf.get_network_parameter_num()
+
   def _get_batch_id(self):
     return self._sess.run(tf.train.get_global_step())
 
