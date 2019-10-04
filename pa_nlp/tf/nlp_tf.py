@@ -117,9 +117,9 @@ def model_load(graph: tf.Graph, sess: tf.Session, model_path: str):
     print(f"Failed loading existing model from '{model_path}: {error}")
     return False
 
-def get_new_session(graph=None):
+def get_new_session(graph=None, log_device=False):
   config = tf.ConfigProto(
-    log_device_placement=True, allow_soft_placement=True
+    log_device_placement=log_device, allow_soft_placement=True
   )
   config.gpu_options.allow_growth = True
   # config.gpu_options.per_process_gpu_memory_fraction = 0.4
