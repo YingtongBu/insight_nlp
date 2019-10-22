@@ -358,5 +358,5 @@ def display_server_info():
   import socket
   host_name = socket.gethostname()
   ip = socket.gethostbyname(host_name)
-  print(f"server information: {host_name}: {ip}")
+  print(f"server information: {host_name}: {ip}, process: {os.getpid()}")
 
