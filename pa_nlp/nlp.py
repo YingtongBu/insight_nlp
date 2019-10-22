@@ -354,3 +354,9 @@ def create_batch_iter_helper1(title: str, data: list, batch_size: int,
 
     print(f"The '{title}' {epoch_id + 1}/{epoch_num} epoch has finished!")
 
+def display_server_info():
+  import socket
+  host_name = socket.gethostname()
+  ip = socket.gethostbyname(host_name)
+  print(f"server information: {host_name}: {ip}")
+
