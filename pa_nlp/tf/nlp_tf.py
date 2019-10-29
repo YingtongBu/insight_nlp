@@ -389,9 +389,8 @@ def bi_LSTM_layer_google3(input: tf.Tensor,
   else:
     assert False
 
-  with tf.variable_scope(scope, reuse=False):
-    input = tf.unstack(input, axis=1)
-    bi_layer, _, _ = tf.nn.static_bidirectional_rnn(
+  with tf.variable_scope(scope, reuse=tf.AUTO_REUSE):
+    outputs, output_states = tf.nn.bidirectional_dynamic_rnn(
       cell(hidden_unit),
       cell(hidden_unit),
       input,
@@ -399,21 +398,20 @@ def bi_LSTM_layer_google3(input: tf.Tensor,
       sequence_length=seq_len,
       scope=f"{scope}_first"
     )
+    bi_layer = outputs[0] + outputs[1]
 
-    bi_layer = [v[:, 0: hidden_unit] + v[:, hidden_unit:] for v in bi_layer]
-    # prev_layer = tf.unstack(bi_layer, axis=1)
     prev_layer = bi_layer
     for layer in range(1, layer_num):
-      with tf.variable_scope(f"layer_{layer}", reuse=False):
-        outputs, _ = tf.nn.static_rnn(
-          cell(hidden_unit), prev_layer, dtype=tf.float32
+      with tf.variable_scope(f"layer_{layer}", reuse=tf.AUTO_REUSE):
+        outputs, _ = tf.nn.dynamic_rnn(
+          cell(hidden_unit),
+          prev_layer,
+          sequence_length=seq_len,
+          dtype=tf.float32
         )
-      prev_layer = [v1 + v2 for v1, v2 in zip(prev_layer, outputs)]
+      prev_layer = outputs + prev_layer
 
-    outputs = tf.stack(prev_layer)
-    outputs = tf.transpose(outputs, [1, 0, 2])
-
-    return outputs
+    return prev_layer
 
 def attention_global(state: tf.Tensor, scope: str)-> tf.Tensor:
   '''
