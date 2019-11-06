@@ -6,6 +6,40 @@ from pa_nlp import *
 INF         = float("inf")
 EPSILON     = 1e-6
 
+class Logger:
+  '''
+  debug=0, info=1, warning=2, error=3
+  '''
+  level = 1
+
+  @staticmethod
+  def set_level(level):
+    Logger.level = level
+
+  @staticmethod
+  def debug(*args):
+    if Logger.level <= 0:
+      print(get_log_time(), "DEBUG:", *args)
+      sys.stdout.flush()
+
+  @staticmethod
+  def info(*args):
+    if Logger.level <= 1:
+      print(get_log_time(), "INFO:", *args)
+      sys.stdout.flush()
+
+  @staticmethod
+  def warn(*args):
+    if Logger.level <= 2:
+      print(get_log_time(), "WARN:", *args)
+      sys.stdout.flush()
+
+  @staticmethod
+  def error(*args):
+    if Logger.level <= 3:
+      print(get_log_time(), "ERR:", *args)
+      sys.stdout.flush()
+
 def next_k(data: typing.Iterator, k: int):
   _ = range(k)
   data_iter = iter(data)
@@ -89,6 +123,12 @@ def ensure_folder_exists(folder: str, delete_first: bool=False)-> None:
 
   if not os.path.exists(folder):
     execute_cmd(f"mkdir {folder}")
+
+def ensure_file_exist(file: str):
+  if not os.path.isfile(file):
+    print(f"file does not exist: '{file}'")
+    return False
+  return True
 
 def split_to_sublist(data)-> list:
   '''

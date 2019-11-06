@@ -101,7 +101,7 @@ class Measure:
     weighted_f_value = total_f / len(true_labels)
     result["weighted_f"] = round(weighted_f_value, 4)
     
-    result["precision"] = round(
+    result["accuracy"] = round(
       sum(correct_labels.values()) / len(true_labels), 4
     )
     
